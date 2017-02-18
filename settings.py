@@ -1,5 +1,7 @@
 import random as r  # to ensure the tie-breaking property
 
+r.seed()
+
 # the size of the validator set is assumed to be known in advance
 NUM_VALIDATORS = 5
 
