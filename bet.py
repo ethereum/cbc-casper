@@ -55,19 +55,19 @@ class Bet:
         return True
 
     # this serializes bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
-    def __str__(self):
-        string = "("
-        string += str(self.estimate) + ", {"
-        i = 0
-        # if this following line of code sometimes produces different orders (justification is a set), then
-        # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
-        for b in self.justification:
-            string += str(b)
-            i += 1
-            if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
-                string += ", "
-        string += "}, " + str(self.sender) + ")"
-        return string
+    # def __str__(self):
+    #     string = "("
+    #     string += str(self.estimate) + ", {"
+    #     i = 0
+    #     # if this following line of code sometimes produces different orders (justification is a set), then
+    #     # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
+    #     for b in self.justification:
+    #         string += str(b)
+    #         i += 1
+    #         if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
+    #             string += ", "
+    #     string += "}, " + str(self.sender) + ")"
+    #     return string
 
     # it turns out that to make a set of something in Python, it needs to be hashable!...
     # ...btw it would be cool to show that for two bets A, B with A == B implies str(A) == str(B),..
