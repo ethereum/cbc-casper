@@ -54,20 +54,22 @@ class Bet:
             return False
         return True
 
-    # this serializes bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
-    # def __str__(self):
-    #     string = "("
-    #     string += str(self.estimate) + ", {"
-    #     i = 0
-    #     # if this following line of code sometimes produces different orders (justification is a set), then
-    #     # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
-    #     for b in self.justification:
-    #         string += str(b)
-    #         i += 1
-    #         if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
-    #             string += ", "
-    #     string += "}, " + str(self.sender) + ")"
-    #     return string
+    # this is not an efficient serialization, because bets are included redundantly
+    # but this does serialize bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
+    @profile
+    def __str__(self):
+        string = "("
+        string += str(self.estimate) + ", {"
+        i = 0
+        # if this following line of code sometimes produces different orders (justification is a set), then
+        # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
+        for b in self.justification:
+            string += str(b)
+            i += 1
+            if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
+                string += ", "
+        string += "}, " + str(self.sender) + ")"
+        return string
 
     # it turns out that to make a set of something in Python, it needs to be hashable!...
     # ...btw it would be cool to show that for two bets A, B with A == B implies str(A) == str(B),..
@@ -75,7 +77,7 @@ class Bet:
     # ...so that we don't need to think about counterintuive Python set() behaviour...
     # ...for example if we have set([A]).add(B) = set([A,B]) with hash(A) != hash(B) even though A == B!
     def __hash__(self):
-        return hash(str(self))
+        return hash(self.id_number)
 
     #####################################################################################
     # a bet A is a dependency of a bet B if either...
@@ -84,22 +86,33 @@ class Bet:
     #####################################################################################
 
     # this function checks if this bet (self) is a dependency of some bet B...
-    def is_dependency(self, B):
 
-        # be safe, type check!
+    @profile
+    def is_dependency(self,B):
+
         assert isinstance(B, Bet), "...expected a bet!"
 
-        # self is definitely a dependency of B if it is in the justification...
-        if self in B.justification:
-            return True
+        is_checked = dict()
 
-        # ...or if it is in the dependency of anything in the justification!
-        for b in B.justification:
-            if self.is_dependency(b):
+        def recursive_is_dependency(B):
+
+            # be safe, type check!        
+            # self is definitely a dependency of B if it is in the justification...
+            if self in B.justification:
                 return True
 
-        # if neither of these, then "self" is not a dependency of B!
-        return False
+            is_checked[B] = True
+
+            # ...or if it is in the dependency of anything in the justification!
+            for b in B.justification:
+                if b not in is_checked:
+                    if recursive_is_dependency(b):
+                        return True
+
+            # if neither of these, then "self" is not a dependency of B!
+            return False
+
+        return recursive_is_dependency(B)
 
     # this one gets all the bets in the dependency of this bet (self)...
     # ...it puts them into a set, and returns that!

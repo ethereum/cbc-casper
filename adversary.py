@@ -102,6 +102,7 @@ class Adversary:
     # this method implements an ideal network attack...
     # ...it returns the pair (True, self.operation_log) if the attack is successful
     # ...and (False, self.operatrion_log) otherwise
+    @profile
     def ideal_network_attack(self):
 
         # We'll continue the attack until we no longer make progress
@@ -220,7 +221,7 @@ class Adversary:
 
                 # ...add a log of our operations
                 self.operations_log.append(["added valid bet for a validator voting against the attacker",
-                                            str(new_bet)])
+                                            hash(new_bet)])
 
                 if self.is_attack_complete():
                     return True, self.operations_log

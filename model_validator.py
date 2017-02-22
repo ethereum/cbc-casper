@@ -128,6 +128,7 @@ class Model_Validator:
 
     # this method goes through the viewables and removes any bets that are a dependency latest bets from the same sender
     # this function should be run every time a model validator is shown a new latest_bet
+    @profile
     def update_viewable(self):
 
         # ...looping over the validators
@@ -151,6 +152,7 @@ class Model_Validator:
                 self.viewable[v] = self.viewable[v].difference(to_remove_from_viewable)
 
     # This function attempts to make a new latest bet for this validator (self) with a given estimate
+    @profile
     def make_new_latest_bet_with_estimate(self, target_estimate):
 
         # be safe, type check!
