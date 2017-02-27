@@ -96,7 +96,7 @@ class Bet:
 
         def recursive_is_dependency(B):
 
-            # be safe, type check!        
+            # be safe, type check!
             # self is definitely a dependency of B if it is in the justification...
             if self in B.justification:
                 return True
@@ -116,8 +116,6 @@ class Bet:
 
     # this one gets all the bets in the dependency of this bet (self)...
     # ...it puts them into a set, and returns that!
-
-    # THIS NEEDS TO BE OPTIMIZED WITH MEMOIZATION TO NOT RE-TRAVERSE DAT DAG
     def dependency(self):
         dependencies = set()
 
