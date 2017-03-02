@@ -5,12 +5,10 @@ import pylab
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
-
 # Views are sets of bets...
 # ...with corresponding class functions!
 class View:
     def __init__(self, bets):
-
         # be safe, type check!
         for b in bets:
             assert isinstance(b, Bet), "...expected only bets in view"
@@ -19,6 +17,9 @@ class View:
         self.bets = set()
         for b in bets:
             self.bets.add(b)
+
+        # to avoid recomputing the view's extension, when this is false we return a cached value
+        self.recompute_extension = True
 
     # this "serialization" has a new line for every serialization of bets...
     # ...so that it literally looks just like this...!
@@ -31,7 +32,9 @@ class View:
             s += str(b) + "\n"
         return s
 
+    @profile
     def add_bet(self, bet):
+        self.recompute_extension = True
 
         # be safe, type check!...
         assert isinstance(bet, Bet), "...expected to add a bet to the view"
@@ -46,7 +49,6 @@ class View:
     # CLASS FOR EVERY BET IN THE VIEW,...
     # ...REWRITING IT SO THAT THE DAG IS NOT REDUNDANTLY TRAVERSED
     def dependency(self):
-
         dependencies = set()
         for bet in self.bets:
             dependencies = dependencies.union(bet.dependency())
@@ -55,7 +57,12 @@ class View:
 
     # the "extension" of a view is the union of the bets in a view and the bets in its dependency!
     def Extension(self):
-        return (self.dependency()).union(self.bets)
+        if not self.recompute_extension:
+            return self.extension
+        # store the extension in the cache
+        self.extension = (self.dependency()).union(self.bets)
+        self.recompute_extension = False
+        return self.extension
 
     #####################################################################################
     # if A is a dependency of B, B is causally dependent on A...
