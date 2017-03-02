@@ -67,7 +67,7 @@ class Validator:
         assert (len(self.view.bets) == 0 and
                 self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
         self.my_latest_bet = Bet(estimate, set(), self.name)
-        self.view.bets.add(self.my_latest_bet)
+        self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
         return self.my_latest_bet
 
@@ -76,7 +76,7 @@ class Validator:
         if len(self.view.bets) == 0 and self.my_latest_bet is None:
             self.latest_estimate = r.choice(tuple(ESTIMATE_SPACE))
             self.my_latest_bet = self.make_bet_with_null_justification(self.latest_estimate)
-            self.view.bets.add(self.my_latest_bet)
+            self.view.add_bet(self.my_latest_bet)
             self.latest_observed_bets[self.name] = self.my_latest_bet
 
             self.decide_if_safe()
@@ -91,7 +91,7 @@ class Validator:
 
         self.my_latest_bet = Bet(estimate, justification, sender)
         self.latest_estimate = estimate
-        self.view.bets.add(self.my_latest_bet)
+        self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
 
         self.decide_if_safe()
@@ -114,7 +114,7 @@ class Validator:
                     b.is_dependency(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
             to_remove_from_view.append(b)
 
-        self.view.bets.difference_update(to_remove_from_view)
+        self.view.remove_bets(to_remove_from_view)
 
     def show_single_bet(self, bet):
         if not self.decided:
