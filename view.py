@@ -20,6 +20,7 @@ class View:
 
         # to avoid recomputing the view's extension, when this is false we return a cached value
         self.recompute_extension = True
+        self.recompute_latest_bets = True
 
     # this "serialization" has a new line for every serialization of bets...
     # ...so that it literally looks just like this...!
@@ -35,12 +36,17 @@ class View:
     @profile
     def add_bet(self, bet):
         self.recompute_extension = True
+        self.recompute_latest_bets = True
 
         # be safe, type check!...
         assert isinstance(bet, Bet), "...expected to add a bet to the view"
 
         # ...and finally, add the bet!
         self.bets.add(bet)
+
+    def remove_bets(self, bets_to_remove_from_view):
+        self.recompute_extension = True
+        self.bets.difference_update(bets_to_remove_from_view)
 
     # the dependency of a view inherits its definition from the dependency of a bet...
     # ...it is union of the dependencies of the bets in the view!
@@ -75,6 +81,8 @@ class View:
     # ...it returns a Python dictionary of the most recent bets, indexed by validator...
     # ...and it stores empty set to handle key exceptions!
     def LatestBets(self):
+        if not self.recompute_latest_bets:
+            return self.latest_bets
 
         # here's the dictionary that we'll populate and return
         latest_bets = dict()
@@ -114,6 +122,8 @@ class View:
 
         # after we filter through all of the bets in the extended view...
         # ...we have our epic dictionary of latest bets!
+        self.recompute_extension = True
+        self.latest_bets = True
         return latest_bets
 
     # this computes the maximum weight estimate from the latest bets in the view
