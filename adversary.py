@@ -21,6 +21,7 @@ from model_validator import Model_Validator
 
 
 class Adversary:
+    @profile
     def __init__(self, view, victim_estimate):
 
         # be safe! start with type checking.

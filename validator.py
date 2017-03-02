@@ -14,6 +14,7 @@ r.seed()
 
 
 class Validator:
+    @profile
     def __init__(self, name):
         self.name = name
         self.view = View(set())
@@ -23,6 +24,7 @@ class Validator:
         self.decided = False
         self.my_latest_bet = None
 
+    @profile
     def decide_if_safe(self):
 
         print "entering decide if safe!"
@@ -41,6 +43,7 @@ class Validator:
         self.decided = not unsafe
         return not unsafe
 
+    @profile
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:

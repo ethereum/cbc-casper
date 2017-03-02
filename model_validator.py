@@ -19,6 +19,7 @@ class Model_Validator:
     my_latest_bet_value_error = """...expected dictionary latest_observed_bets to only contain values
      of a bet or the empty set"""
 
+    @profile
     def __init__(self, model_of_validator, view):
 
         # lets keep a record of the validator that the model is of...
@@ -76,6 +77,7 @@ class Model_Validator:
                         self.viewable[b.sender].add(b)
 
     # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
+    @profile
     def my_estimate(self):
 
         # otherwise we compute the max score byzantine free estimate
