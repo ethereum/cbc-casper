@@ -56,7 +56,6 @@ class Bet:
 
     # this is not an efficient serialization, because bets are included redundantly
     # but this does serialize bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
-    @profile
     def __str__(self):
         string = "("
         string += str(self.estimate) + ", {"
@@ -87,7 +86,6 @@ class Bet:
 
     # this function checks if this bet (self) is a dependency of some bet B...
 
-    @profile
     def is_dependency(self,B):
 
         assert isinstance(B, Bet), "...expected a bet!"

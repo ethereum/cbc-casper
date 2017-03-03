@@ -14,7 +14,6 @@ r.seed()
 
 
 class Validator:
-    @profile
     def __init__(self, name):
         self.name = name
         self.view = View(set())
@@ -24,26 +23,26 @@ class Validator:
         self.decided = False
         self.my_latest_bet = None
 
-    @profile
     def decide_if_safe(self):
-
-        print "entering decide if safe!"
-        print "self.latest_estimate", self.latest_estimate
+        if __debug__:
+            print "entering decide if safe!"
+            print "self.latest_estimate", self.latest_estimate
         if self.latest_estimate is None:
             return False
 
         # print str(self.view)
         adversary = Adversary(self.view, self.latest_estimate)
 
-        print "about to conduct ideal attack"
+        if __debug__:
+            print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
 
-        print "are we safe?, ", not unsafe
+        if __debug__:
+            print "are we safe?, ", not unsafe
 
         self.decided = not unsafe
         return not unsafe
 
-    @profile
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
@@ -124,7 +123,8 @@ class Validator:
             self.view.add_bet(bet)
             self.update_view_and_latest_bets()
         else:
-            print "unable to show bet to decided node"
+            if __debug__:
+                print "unable to show bet to decided node"
 
     def show_set_of_bets(self, bets):
         if not self.decided:
@@ -132,4 +132,5 @@ class Validator:
                 self.view.add_bet(bet)
             self.update_view_and_latest_bets()
         else:
-            print "unable to show bet to decided node"
+            if __debug__:
+                print "unable to show bet to decided node"

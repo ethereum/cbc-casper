@@ -1,6 +1,7 @@
 import networkx as nx
-import matplotlib.pyplot as plt
-import pylab
+from networkx.readwrite import json_graph
+import sys
+import json
 
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
@@ -33,7 +34,6 @@ class View:
             s += str(b) + "\n"
         return s
 
-    @profile
     def add_bet(self, bet):
         self.recompute_extension = True
         self.recompute_latest_bets = True
@@ -155,21 +155,26 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
+    def get_bet_definition(self, bet):
+        return str(bet.estimate) + str(bet.justification) + str(bet.sender)
+
     def plot_view(self, decided):
+        # TODO: REFACTOR THIS. I am leaving a ton of unused code lying around here
 
         G = nx.DiGraph()
 
         nodes = self.Extension()
 
         for b in nodes:
-            G.add_edges_from([(b, b)])
+            bet_definition = self.get_bet_definition(b)
+            G.add_edges_from([(bet_definition, bet_definition)])
             for b2 in b.justification:
-                G.add_edges_from([(b2, b)])
+                G.add_edges_from([(self.get_bet_definition(b2), bet_definition)])
 
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
         # G.add_edges_from([('C','F')])
-
-        print "decided", decided
+        if __debug__:
+            print "decided", decided
 
         def display_height(bet, i=0):
 
@@ -188,20 +193,29 @@ class View:
             positions[b] = (float)(b.sender+1)/(float)(NUM_VALIDATORS+1), (display_height(b)+1)/4.
 
         node_color_map = {}
+        is_all_decided = True
         for b in nodes:
             if decided[b.sender] is True:
                 node_color_map[b] = 'green'
             else:
+                is_all_decided = False
                 node_color_map[b] = 'white'
 
-        color_values = [node_color_map.get(node) for node in G.nodes()]
+        # color_values = [node_color_map.get(node) for node in G.nodes()]
 
         labels = {}
         for b in nodes:
             labels[b] = b.estimate
         # labels['B']=r'$b$'
 
-        nx.draw_networkx_labels(G, positions, labels, font_size=20)
+        # nx.draw_networkx_labels(G, positions, labels, font_size=20)
 
-        nx.draw(G, positions, node_color=color_values, node_size=1500, edge_color='black', edge_cmap=plt.cm.Reds)
-        pylab.show()
+        # nx.draw(G, positions, node_color=color_values, node_size=1500, edge_color='black', edge_cmap=plt.cm.Reds)
+        # pylab.show()
+        if not is_all_decided:
+            return
+
+        # We already decided on all nodes, so let's return the data and call it a day!
+        data = json_graph.node_link_data(G)
+        print(json.dumps(data))
+        sys.exit(0)

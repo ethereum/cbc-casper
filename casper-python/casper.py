@@ -17,7 +17,8 @@ from network import Network
 network = Network()
 network.random_initialization()
 
-print "WEIGHTS", WEIGHTS
+if __debug__:
+    print "WEIGHTS", WEIGHTS
 
 decided = dict.fromkeys(VALIDATOR_NAMES, 0)
 
@@ -96,21 +97,22 @@ for i in xrange(0):
         adversary = Adversary(view, 1)
         success, attack_log = adversary.ideal_network_attack()
 
-    print "-------------------------------Victim View--------------------------------------------"
-    print str(view)
+    if __debug__:
+        print "-------------------------------Victim View--------------------------------------------"
+        print str(view)
 
-    if success:
-        print "Ideal network was attack successful..."
-    else:
-        print "Ideal network was attack unsuccessful..."
+        if success:
+            print "Ideal network was attack successful..."
+        else:
+            print "Ideal network was attack unsuccessful..."
 
-    if success:
-        print "...with the following operations_log:"
-        for l in attack_log:
-            print l
+        if success:
+            print "...with the following operations_log:"
+            for l in attack_log:
+                print l
 
-        print "-------------------------------Post-attack View-----------------------------------"
-        print str(adversary.attack_view)
+            print "-------------------------------Post-attack View-----------------------------------"
+            print str(adversary.attack_view)
 
     view.plot_view()
     adversary.attack_view.plot_view()

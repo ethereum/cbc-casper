@@ -21,7 +21,6 @@ from model_validator import Model_Validator
 
 
 class Adversary:
-    @profile
     def __init__(self, view, victim_estimate):
 
         # be safe! start with type checking.
@@ -103,7 +102,6 @@ class Adversary:
     # this method implements an ideal network attack...
     # ...it returns the pair (True, self.operation_log) if the attack is successful
     # ...and (False, self.operatrion_log) otherwise
-    @profile
     def ideal_network_attack(self):
 
         # We'll continue the attack until we no longer make progress

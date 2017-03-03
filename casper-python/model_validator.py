@@ -19,7 +19,6 @@ class Model_Validator:
     my_latest_bet_value_error = """...expected dictionary latest_observed_bets to only contain values
      of a bet or the empty set"""
 
-    @profile
     def __init__(self, model_of_validator, view):
 
         # lets keep a record of the validator that the model is of...
@@ -77,7 +76,6 @@ class Model_Validator:
                         self.viewable[b.sender].add(b)
 
     # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
-    @profile
     def my_estimate(self):
 
         # otherwise we compute the max score byzantine free estimate
@@ -130,7 +128,6 @@ class Model_Validator:
 
     # this method goes through the viewables and removes any bets that are a dependency latest bets from the same sender
     # this function should be run every time a model validator is shown a new latest_bet
-    @profile
     def update_viewable(self):
 
         # ...looping over the validators
@@ -154,7 +151,6 @@ class Model_Validator:
                 self.viewable[v] = self.viewable[v].difference(to_remove_from_viewable)
 
     # This function attempts to make a new latest bet for this validator (self) with a given estimate
-    @profile
     def make_new_latest_bet_with_estimate(self, target_estimate):
 
         # be safe, type check!
