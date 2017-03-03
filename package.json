@@ -1,0 +1,35 @@
+{
+  "name": "cbc-casper",
+  "version": "1.0.0",
+  "description": "A correct-by-construction Casper protocol",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "echo \"*** WARNING *** PLease run setup.py in a Python virtual enviornment before starting\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karlfloersch/cbc-casper.git"
+  },
+  "keywords": [
+    "PoS",
+    "Casper"
+  ],
+  "author": "Vlad Zamfir",
+  "contributors": [
+    {
+      "name": "Karl Floersch",
+      "email": "karl@karlfloersch.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/karlfloersch/cbc-casper/issues"
+  },
+  "homepage": "https://github.com/karlfloersch/cbc-casper#readme",
+  "dependencies": {
+    "express": "^4.15.0",
+    "python": "0.0.4"
+  }
+}

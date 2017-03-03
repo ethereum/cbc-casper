@@ -1,3 +1,7 @@
 venv
 *.pyc
 *.swp
+*.lprof
+node_modules
+npm-debug.log
+.ipynb_checkpoints
