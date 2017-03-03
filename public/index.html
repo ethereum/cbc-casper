@@ -1,23 +1,34 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>HTML5 : Hello World Example</title>
 
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
+        <style>
 
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
+        .links line {
+          stroke: #999;
+          stroke-opacity: 0.6;
+        }
 
-</style>
-<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-<svg width="960" height="600"></svg>
-<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
-<script>
+        .nodes circle {
+          stroke: #fff;
+          stroke-width: 1.5px;
+        }
 
+        </style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    </head>
+    <body>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Run Simulation
+        </button>
+        <svg width="960" height="600"></svg>
+        <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+
+        <script>
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
@@ -29,7 +40,16 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-d3.json("miserables.json", function(error, graph) {
+d3.request('/results')
+  .get(function(err, data) {
+    if (err) {
+      console.log(err);
+    }
+    var response = JSON.parse(data.response);
+    console.log(response);
+});
+
+d3.json("/miserables.json", function(error, graph) {
   if (error) throw error;
 
   var link = svg.append("g")
@@ -74,6 +94,7 @@ d3.json("miserables.json", function(error, graph) {
   }
 });
 
+
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
@@ -90,5 +111,6 @@ function dragended(d) {
   d.fx = null;
   d.fy = null;
 }
-
-</script>
+        </script>
+    </body>
+</html>

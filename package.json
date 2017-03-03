@@ -30,6 +30,6 @@
   "homepage": "https://github.com/karlfloersch/cbc-casper#readme",
   "dependencies": {
     "express": "^4.15.0",
-    "python": "0.0.4"
+    "python-shell": "^0.4.0"
   }
 }

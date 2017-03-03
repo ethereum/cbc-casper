@@ -1,5 +1,6 @@
 venv
 *.pyc
+*.pyo
 *.swp
 *.lprof
 node_modules
