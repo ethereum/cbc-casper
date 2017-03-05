@@ -44,7 +44,6 @@ var color = d3.scaleOrdinal(d3.schemeCategory20);
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
 
 d3.json("/results", function(error, graph) {
   console.log(graph);
@@ -93,27 +92,36 @@ d3.json("/results", function(error, graph) {
       test = false;
       console.log(node);
     }
-    link
-        .attr("x1", function(d) { return d.source.xPos*width; })
-        .attr("y1", function(d) { return height-d.source.yPos*height*0.9; })
-        .attr("x2", function(d) { return d.target.xPos*width; })
-        .attr("y2", function(d) { return height-d.target.yPos*height*0.9; });
 
     node
-        .attr("cx", function(d) { return d.xPos*width; })
-        .attr("cy", function(d) { return height-d.yPos*height*0.9; })
-//        .attr("cx", function(d) { return d.x; })
-//        .attr("cy", function(d) { return d.y; })
+        .each(gravity(.2 * 2))
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; })
+
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
 
     text
-        .attr("x", function(d) { return d.xPos*width; })
-        .attr("y", function(d) { return height-d.yPos*height*0.9; })
+        .attr("x", function(d) { return d.x; })
+        .attr("y", function(d) { return d.y; })
   }
+
+// Move nodes toward their natural position
+function gravity(alpha) {
+  return function(d) {
+    d.y += ((height-d.yPos*height*0.9) - d.y) * alpha;
+    d.x += ((d.xPos*width) - d.x) * alpha;
+  };
+}
+
 });
 
 
 function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  if (!d3.event.active) simulation.alphaTarget(0.01).restart();
   d.fx = d.x;
   d.fy = d.y;
 }
