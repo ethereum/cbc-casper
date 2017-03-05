@@ -168,13 +168,15 @@ class View:
             else:
                 return 0
 
+        max_display_height = max([display_height(b)+1 for b in nodes])
+
         def generate_bet_object(bet):
             return {'id': b.id_number,
                     'group': b.sender,
                     'estimate': b.estimate,
                     'decided': decided[b.sender],
                     'xPos': (float)(b.sender+1)/(float)(NUM_VALIDATORS+1),
-                    'yPos': (display_height(b)+1)}
+                    'yPos': (float)(display_height(b)+1)/(float)(max_display_height)}
 
         # Generate the JSON we will use to render the build
         for b in nodes:
@@ -185,7 +187,7 @@ class View:
                 new_bet2 = generate_bet_object(b2)
                 if new_bet2 not in graph['nodes']:
                     graph['nodes'].append(new_bet2)
-                edge_definition = {'source': b2.id_number, 'target': b.id_number, 'value': 5}
+                edge_definition = {'source': b2.id_number, 'target': b.id_number, 'value': 1}
                 if edge_definition not in graph['links']:
                     graph['links'].append(edge_definition)
 

@@ -16,15 +16,21 @@
           stroke-width: 1.5px;
         }
 
+        text {
+          font: 5px sans-serif;
+          text-anchor: middle;
+          pointer-events: none;
+        }
+
         </style>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
         <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     </head>
     <body>
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-          Run Simulation
-        </button>
+        <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"> -->
+        <!--   Run Simulation -->
+        <!-- </button> -->
         <svg width="960" height="600"></svg>
         <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
 
@@ -51,11 +57,14 @@ d3.json("/results", function(error, graph) {
     .enter().append("line")
       .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-  var node = svg.append("g")
+  /* Define the data for the circles */
+  var elem = svg.selectAll("g circle")
+      .data(graph.nodes)
+  var elemEnter = elem.enter()
+	    .append("g")
       .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter().append("circle")
+
+  var node = elemEnter.append("circle")
       .attr("r", 5)
       .attr("fill", function(d) { return color(d.group); })
       .call(d3.drag()
@@ -63,9 +72,14 @@ d3.json("/results", function(error, graph) {
           .on("drag", dragged)
           .on("end", dragended));
 
+  /* Create the text for each block */
+  var text = elemEnter.append("text")
+	  .text(function(d){return d.estimate})
+
   node.append("title")
       .text(function(d) { return d.id; });
 
+  //Add SVG Text Element Attributes
   simulation
       .nodes(graph.nodes)
       .on("tick", ticked);
@@ -73,16 +87,27 @@ d3.json("/results", function(error, graph) {
   simulation.force("link")
       .links(graph.links);
 
+  var test = true;
   function ticked() {
+    if (test) {
+      test = false;
+      console.log(node);
+    }
     link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+        .attr("x1", function(d) { return d.source.xPos*width; })
+        .attr("y1", function(d) { return height-d.source.yPos*height*0.9; })
+        .attr("x2", function(d) { return d.target.xPos*width; })
+        .attr("y2", function(d) { return height-d.target.yPos*height*0.9; });
 
     node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
+        .attr("cx", function(d) { return d.xPos*width; })
+        .attr("cy", function(d) { return height-d.yPos*height*0.9; })
+//        .attr("cx", function(d) { return d.x; })
+//        .attr("cy", function(d) { return d.y; })
+
+    text
+        .attr("x", function(d) { return d.xPos*width; })
+        .attr("y", function(d) { return height-d.yPos*height*0.9; })
   }
 });
 
