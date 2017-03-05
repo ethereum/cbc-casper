@@ -13,27 +13,35 @@ app.get('/', function (req, res) {
 var casperSimulationResult = null;
 var isSimulationRunning = false;
 
+function printRunning() {
+  if (isSimulationRunning) {
+    process.stdout.write('.');
+    setTimeout(printRunning, 1000);
+  }
+}
+
 function onSimulationEnd(err, data) {
   if (err) {
     console.error(err);
   } else {
-    console.error(data);
     isSimulationRunning = false;
     casperSimulationResult = JSON.parse(data);
+    console.log('Simulation complete!')
   }
 }
 
 app.get('/results', function (req, res) {
   // We have the result value to serve up
   if (casperSimulationResult) {
-    res.send(JSON.stringify(casperSimulationResult));
+    res.send(casperSimulationResult);
     return;
   }
   // We don't have the result, so we need to calculate
   if (!isSimulationRunning) {
     isSimulationRunning = true;
-    console.log('in here');
+    console.log('Running simulation');
     PythonShell.run('casper-python/casper.py', {pythonOptions: ['-O']}, onSimulationEnd);
+    printRunning();
   }
   // Reply to the request, informing the user that a simulation is running
   res.json(JSON.stringify({

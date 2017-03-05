@@ -40,16 +40,8 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-d3.request('/results')
-  .get(function(err, data) {
-    if (err) {
-      console.log(err);
-    }
-    var response = JSON.parse(data.response);
-    console.log(response);
-});
-
-d3.json("/miserables.json", function(error, graph) {
+d3.json("/results", function(error, graph) {
+  console.log(graph);
   if (error) throw error;
 
   var link = svg.append("g")

@@ -155,67 +155,54 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
-    def get_bet_definition(self, bet):
-        return str(bet.estimate) + str(bet.justification) + str(bet.sender)
-
     def plot_view(self, decided):
-        # TODO: REFACTOR THIS. I am leaving a ton of unused code lying around here
-
-        G = nx.DiGraph()
-
         nodes = self.Extension()
-
-        for b in nodes:
-            bet_definition = self.get_bet_definition(b)
-            G.add_edges_from([(bet_definition, bet_definition)])
-            for b2 in b.justification:
-                G.add_edges_from([(self.get_bet_definition(b2), bet_definition)])
-
-        # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
-        # G.add_edges_from([('C','F')])
-        if __debug__:
-            print "decided", decided
+        graph = {"nodes": [], "links": []}
 
         def display_height(bet, i=0):
-
             l = []
             for b in bet.justification:
                 l.append(display_height(b, i+1))
-
             if len(l) > 0:
                 return max(l) + 1
             else:
                 return 0
 
-        positions = dict()
+        def generate_bet_object(bet):
+            return {'id': b.id_number,
+                    'group': b.sender,
+                    'estimate': b.estimate,
+                    'decided': decided[b.sender],
+                    'xPos': (float)(b.sender+1)/(float)(NUM_VALIDATORS+1),
+                    'yPos': (display_height(b)+1)}
 
+        # Generate the JSON we will use to render the build
         for b in nodes:
-            positions[b] = (float)(b.sender+1)/(float)(NUM_VALIDATORS+1), (display_height(b)+1)/4.
+            new_bet = generate_bet_object(b)
+            if new_bet not in graph['nodes']:
+                graph['nodes'].append(new_bet)
+            for b2 in b.justification:
+                new_bet2 = generate_bet_object(b2)
+                if new_bet2 not in graph['nodes']:
+                    graph['nodes'].append(new_bet2)
+                edge_definition = {'source': b2.id_number, 'target': b.id_number, 'value': 5}
+                if edge_definition not in graph['links']:
+                    graph['links'].append(edge_definition)
+        graph['nodes'] = list(graph['nodes'])
 
-        node_color_map = {}
+        if __debug__:
+            print "decided", decided
+
+        # Check if any of our nodes is undecided. We won't return if that is the case
         is_all_decided = True
         for b in nodes:
-            if decided[b.sender] is True:
-                node_color_map[b] = 'green'
-            else:
+            if decided[b.sender] is False:
                 is_all_decided = False
-                node_color_map[b] = 'white'
 
-        # color_values = [node_color_map.get(node) for node in G.nodes()]
-
-        labels = {}
-        for b in nodes:
-            labels[b] = b.estimate
-        # labels['B']=r'$b$'
-
-        # nx.draw_networkx_labels(G, positions, labels, font_size=20)
-
-        # nx.draw(G, positions, node_color=color_values, node_size=1500, edge_color='black', edge_cmap=plt.cm.Reds)
-        # pylab.show()
+        # Let's only return when all the nodes are decided
         if not is_all_decided:
             return
 
         # We already decided on all nodes, so let's return the data and call it a day!
-        data = json_graph.node_link_data(G)
-        print(json.dumps(data))
+        print(json.dumps(graph))
         sys.exit(0)
