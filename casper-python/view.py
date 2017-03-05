@@ -188,7 +188,6 @@ class View:
                 edge_definition = {'source': b2.id_number, 'target': b.id_number, 'value': 5}
                 if edge_definition not in graph['links']:
                     graph['links'].append(edge_definition)
-        graph['nodes'] = list(graph['nodes'])
 
         if __debug__:
             print "decided", decided
@@ -196,7 +195,7 @@ class View:
         # Check if any of our nodes is undecided. We won't return if that is the case
         is_all_decided = True
         for b in nodes:
-            if decided[b.sender] is False:
+            if not decided[b.sender]:
                 is_all_decided = False
 
         # Let's only return when all the nodes are decided
