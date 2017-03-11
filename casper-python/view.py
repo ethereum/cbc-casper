@@ -1,8 +1,3 @@
-import networkx as nx
-from networkx.readwrite import json_graph
-import sys
-import json
-
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
@@ -172,7 +167,7 @@ class View:
 
         def generate_bet_object(bet):
             return {'id': b.id_number,
-                    'group': b.sender,
+                    'sender': b.sender,
                     'estimate': b.estimate,
                     'decided': decided[b.sender],
                     'xPos': (float)(b.sender+1)/(float)(NUM_VALIDATORS+1),
@@ -194,16 +189,4 @@ class View:
         if __debug__:
             print "decided", decided
 
-        # Check if any of our nodes is undecided. We won't return if that is the case
-        is_all_decided = True
-        for b in nodes:
-            if not decided[b.sender]:
-                is_all_decided = False
-
-        # Let's only return when all the nodes are decided
-        if not is_all_decided:
-            return
-
-        # We already decided on all nodes, so let's return the data and call it a day!
-        print(json.dumps(graph))
-        sys.exit(0)
+        return graph

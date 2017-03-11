@@ -1,4 +1,6 @@
 import random as r  # to ensure the tie-breaking property
+import sys
+import json
 
 from settings import VALIDATOR_NAMES
 from view import View
@@ -11,6 +13,9 @@ class Network:
         for v in VALIDATOR_NAMES:
             self.validators[v] = Validator(v)
         self.global_view = set()
+
+        # Plot view data used for our visualizations
+        self.plot_view_data = []
 
     def propagate_bet_to_validator(self, bet, validator_name):
         assert bet in self.global_view, "...expected only to propagate bets from the global view"
@@ -35,8 +40,6 @@ class Network:
             self.propagate_bet_to_validator(bet, destination)
             self.get_bet_from_validator(destination)
 
-    # def let_validator_push
-
     def random_initialization(self):
         for v in VALIDATOR_NAMES:
             self.get_bet_from_validator(v)
@@ -45,4 +48,16 @@ class Network:
             print str(self.global_view)
 
     def report(self, decided):
-        View(self.global_view).plot_view(decided)
+        self.plot_view_data.append(View(self.global_view).plot_view(decided))
+
+        is_all_decided = True
+        for sender, is_decided in decided.iteritems():
+            if not is_decided:
+                is_all_decided = False
+
+        if not is_all_decided:
+            return
+
+        # We already decided on all nodes, so let's return the data and call it a day!
+        print(json.dumps(self.plot_view_data))
+        sys.exit(0)
