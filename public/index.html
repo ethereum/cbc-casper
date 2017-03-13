@@ -17,7 +17,7 @@
         }
 
         text {
-          font: 5px sans-serif;
+          font: 10px sans-serif;
           text-anchor: middle;
           pointer-events: none;
         }
@@ -26,116 +26,20 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
         <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
     </head>
     <body>
-        <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"> -->
-        <!--   Run Simulation -->
-        <!-- </button> -->
+        <button onclick="runSimulation()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Run Simulation
+        </button>
+        <button onclick="plotGraph()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Render Next
+        </button>
+        <div style="width:400px;">
+          <input class="mdl-slider mdl-js-slider" type="range" id="stage-slider" oninput="sliderInput()" min="0" max="100" value="0" tabindex="0">
+        </div>
         <svg width="960" height="600"></svg>
         <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
-
-        <script>
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
-
-var color = d3.scaleOrdinal(d3.schemeCategory20);
-
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-
-d3.json("/results", function(error, graph) {
-  console.log(graph);
-  if (error) throw error;
-
-  var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-  /* Define the data for the circles */
-  var elem = svg.selectAll("g circle")
-      .data(graph.nodes)
-  var elemEnter = elem.enter()
-	    .append("g")
-      .attr("class", "nodes")
-
-  var node = elemEnter.append("circle")
-      .attr("r", 5)
-      .attr("fill", function(d) { return color(d.group); })
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-  /* Create the text for each block */
-  var text = elemEnter.append("text")
-	  .text(function(d){return d.estimate})
-
-  node.append("title")
-      .text(function(d) { return d.id; });
-
-  //Add SVG Text Element Attributes
-  simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(graph.links);
-
-  var test = true;
-  function ticked() {
-    if (test) {
-      test = false;
-      console.log(node);
-    }
-
-    node
-        .each(gravity(.2 * 2))
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; })
-
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    text
-        .attr("x", function(d) { return d.x; })
-        .attr("y", function(d) { return d.y; })
-  }
-
-// Move nodes toward their natural position
-function gravity(alpha) {
-  return function(d) {
-    d.y += ((height-d.yPos*height*0.9) - d.y) * alpha;
-    d.x += ((d.xPos*width) - d.x) * alpha;
-  };
-}
-
-});
-
-
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.01).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
-
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
-        </script>
+        <script type="text/javascript" src="./app.js"></script>
     </body>
 </html>
