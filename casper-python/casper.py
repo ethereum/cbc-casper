@@ -20,7 +20,7 @@ network.random_initialization()
 if __debug__:
     print "WEIGHTS", WEIGHTS
 
-decided = dict.fromkeys(VALIDATOR_NAMES, 0)
+decided = dict.fromkeys(VALIDATOR_NAMES, False)
 
 while(True):
     network.report(decided)
