@@ -44,6 +44,10 @@ class View:
         # ...and finally, add the bet!
         self.bets.add(bet)
 
+    def add_view(self,view):
+        for b in view.bets:
+            self.add_bet(b)
+
     def remove_bets(self, bets_to_remove_from_view):
         self.recompute_extension = True
         self.bets.difference_update(bets_to_remove_from_view)

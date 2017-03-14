@@ -23,6 +23,9 @@ class Validator:
         self.decided = False
         self.my_latest_bet = None
 
+        self.already_committed_view = View(set())
+
+
     def decide_if_safe(self):
 
         print "entering decide if safe!"
@@ -87,6 +90,16 @@ class Validator:
         for v in VALIDATOR_NAMES:
             if self.latest_observed_bets[v] is not None:
                 justification.add(self.latest_observed_bets[v])
+
+        to_be_removed = set()
+        for j in justification:
+            if j in self.already_committed_view.bets:
+                to_be_removed.add(j)
+
+        justification.difference_update(to_be_removed)
+
+        self.already_committed_view.add_view(View(justification))
+
         sender = self.name
 
         self.my_latest_bet = Bet(estimate, justification, sender)
