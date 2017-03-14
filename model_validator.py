@@ -31,6 +31,8 @@ class Model_Validator:
 
         self.my_latest_bet = view.LatestBets()[self.model_of]
 
+        self.already_committed_view = View(set())
+
         # These are the bets the validator "can see" from a view given by self.my_latest_bet...
         # ...in the sense that these bets are not already in the extension of its view
         self.viewable = dict()
@@ -201,6 +203,14 @@ class Model_Validator:
                 for v in VALIDATOR_NAMES:
                     if self.latest_observed_bets[v] is not None:
                         justification.add(self.latest_observed_bets[v])
+
+                to_be_removed = set()
+                for j in justification:
+                    if j in self.already_committed_view.bets:
+                        to_be_removed.add(j)
+                justification.difference_update(to_be_removed)
+
+                self.already_committed_view.add_view(View(justification))
 
                 # make the new bet
                 new_latest_bet = Bet(target_estimate, justification, self.model_of)
