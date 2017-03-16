@@ -36,10 +36,13 @@ class Adversary:
         # the attacker keeps a copy of the parameter view, to which she will add attacking bets...
         self.attack_view = copy.deepcopy(view)
 
+        # ...and she will keep track of the latest estimates from these validators, if unique
+        self.latest_bets = view.LatestBets()
+
         # ...and she also keeps models of every validator!
         self.validator_models = dict()
         for v in VALIDATOR_NAMES:
-            self.validator_models[v] = Model_Validator(v, view)
+            self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v])
 
         # she's going to use this dictionary to keep track of the attack surface
         self.attack_surface = dict()
@@ -50,9 +53,6 @@ class Adversary:
         self.voting_with_attacker = set()
         self.voting_against_attacker = set()
         self.not_voted_yet = set()
-
-        # ...and she will keep track of the latest estimates from these validators, if unique
-        self.latest_bets = view.LatestBets()
 
         for v in VALIDATOR_NAMES:
             if self.latest_bets[v] is None:

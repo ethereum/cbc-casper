@@ -19,7 +19,8 @@ class Model_Validator:
     my_latest_bet_value_error = """...expected dictionary latest_observed_bets to only contain values
      of a bet or the empty set"""
 
-    def __init__(self, model_of_validator, view):
+    @profile
+    def __init__(self, model_of_validator, view, my_latest_bet):
 
         # lets keep a record of the validator that the model is of...
         # this is useful for adding bets from this validator using class functions other than __init__
@@ -29,7 +30,7 @@ class Model_Validator:
         # for good measure, lets make sure that we really have a view, here...
         assert isinstance(view, View), "expected view in __init__ of Model_Validator"
 
-        self.my_latest_bet = view.LatestBets()[self.model_of]
+        self.my_latest_bet = my_latest_bet
 
         self.already_committed_view = View(set())
 
