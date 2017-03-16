@@ -42,7 +42,7 @@ class Adversary:
         # ...and she also keeps models of every validator!
         self.validator_models = dict()
         for v in VALIDATOR_NAMES:
-            self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v])
+            self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v],self.target_estimate)
 
         # she's going to use this dictionary to keep track of the attack surface
         self.attack_surface = dict()
@@ -125,7 +125,7 @@ class Adversary:
             for v in self.not_voted_yet:
 
                 # these ones are easy...!
-                new_bet = self.validator_models[v].make_new_latest_bet_with_estimate(self.target_estimate)
+                new_bet = self.validator_models[v].make_new_latest_bet()
                 # btw: never returns an exception
 
                 # ...becuase progress here is guaranteed!
@@ -183,7 +183,7 @@ class Adversary:
 
                 # ...try to add a new bet from this validator with the estimate of the attacker's choosing
                 try:
-                    new_bet = self.validator_models[v].make_new_latest_bet_with_estimate(self.target_estimate)
+                    new_bet = self.validator_models[v].make_new_latest_bet()
 
                 # If we failed to add a bet with the estimate of the attacker's choosing for this validator..
                 # ..continue to the next one so we can keep trying

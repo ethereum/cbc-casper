@@ -20,7 +20,10 @@ class Model_Validator:
      of a bet or the empty set"""
 
     @profile
-    def __init__(self, model_of_validator, view, my_latest_bet):
+    def __init__(self, model_of_validator, view, my_latest_bet, target_estimate):
+
+        # be safe, type check!
+        assert target_estimate in ESTIMATE_SPACE, "...expected an estimate!"
 
         # lets keep a record of the validator that the model is of...
         # this is useful for adding bets from this validator using class functions other than __init__
@@ -31,14 +34,13 @@ class Model_Validator:
         assert isinstance(view, View), "expected view in __init__ of Model_Validator"
 
         self.my_latest_bet = my_latest_bet
+        self.target_estimate = target_estimate
 
         self.already_committed_view = View(set())
 
         # These are the bets the validator "can see" from a view given by self.my_latest_bet...
         # ...in the sense that these bets are not already in the extension of its view
         self.viewable = dict()
-        for v in VALIDATOR_NAMES:
-            self.viewable[v] = set()
 
         # will track the latest bets observed by this model validator
         self.latest_observed_bets = dict()
@@ -53,7 +55,8 @@ class Model_Validator:
             # for validators without anything in their view, any bets are later bets are viewable bets!
             # ...so we add them all in!
             for b in view.Extension():
-                self.viewable[b.sender].add(b)
+                if b.estimate == self.target_estimate and b.sender not in self.viewable:
+                    self.viewable[b.sender] = b
 
         # if we do have a latest bet from this validator, then...
         else:
@@ -65,10 +68,17 @@ class Model_Validator:
 
             # then all bets that are causally after these bets are viewable by this validator
             for b in view.Extension():
+
+                if b.sender in self.viewable:
+                    continue
+
+                if b.estimate != self.target_estimate:
+                    continue
+
                 # ...we use the is_dependency relation to test if b is causally after the
                 # latest bet observed from that sender
                 if self.latest_observed_bets[b.sender] is None:
-                    self.viewable[b.sender].add(b)
+                    self.viewable[b.sender] = b
                 else:
                     assert isinstance(self.latest_observed_bets[b.sender], Bet), """...expected dictionary
                      latest_observed_bets to only contain values of a bet or the empty set"""
@@ -76,7 +86,7 @@ class Model_Validator:
                     # if b is later than the latest observed bet from b.sender,
                     # then b is viewable to this model validator
                     if self.latest_observed_bets[b.sender].is_dependency(b):
-                        self.viewable[b.sender].add(b)
+                        self.viewable[b.sender] = b
 
     # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
     def my_estimate(self):
@@ -110,59 +120,33 @@ class Model_Validator:
     # It will only succeed if:
     # * the latest bet from the sender in its dependency
     # * or we haven't heard from the sender before
+    @profile
     def make_viewable(self, bet):
 
         # be safe, type check.
         assert isinstance(bet, Bet), "...expected a bet!"
 
+        if bet.estimate != self.target_estimate or bet.sender in self.viewable:
+            return
+
         # If we haven't observed anything yet, anything is viewable!
         if self.latest_observed_bets[bet.sender] is None:
-            self.viewable[bet.sender].add(bet)
-            return True
-        else:
-            assert isinstance(self.latest_observed_bets[bet.sender], Bet), self.latest_observed_bets_value_error
-            # This is the "normal case", where a bet from a validator is viewable only if
-            # the latest bet is in its dependency
-            if self.latest_observed_bets[bet.sender].is_dependency(bet):
-                self.viewable[bet.sender].add(bet)
-                return True
-            else:
-                return False
+            self.viewable[bet.sender] = bet
+            return
 
-    # this method goes through the viewables and removes any bets that are a dependency latest bets from the same sender
-    # this function should be run every time a model validator is shown a new latest_bet
-    @profile
-    def update_viewable(self):
+        assert isinstance(self.latest_observed_bets[bet.sender], Bet), self.latest_observed_bets_value_error
+        # This is the "normal case", where a bet from a validator is viewable only if
+        # the latest bet is in its dependency
+        if self.latest_observed_bets[bet.sender].is_dependency(bet):
+            self.viewable[bet.sender] = bet
 
-        # ...looping over the validators
-        for v in VALIDATOR_NAMES:
-
-            # ...if we do have a latest bet from them...
-            if self.latest_observed_bets[v] is None:
-                continue
-            else:
-                assert isinstance(self.latest_observed_bets[v], Bet), self.latest_observed_bets_value_error
-
-                # then we can remove all bets in viewable which are dependencies of this latest bet...
-                # ...but we can't remove them during the iteration, so we store the bets to be removed in this set...
-                to_remove_from_viewable = set()
-
-                for b in self.viewable[v]:
-                    if b.is_dependency(self.latest_observed_bets[v]):
-                        to_remove_from_viewable.add(b)
-
-                # finally, updating the viewable for this validator
-                self.viewable[v] = self.viewable[v].difference(to_remove_from_viewable)
 
     # This function attempts to make a new latest bet for this validator (self) with a given estimate
     @profile
-    def make_new_latest_bet_with_estimate(self, target_estimate):
-
-        # be safe, type check!
-        assert target_estimate in ESTIMATE_SPACE, "...expected an estimate!"
+    def make_new_latest_bet(self):
 
         if self.my_latest_bet is None:
-            new_bet = Bet(target_estimate, [], self.model_of)
+            new_bet = Bet(self.target_estimate, [], self.model_of)
             self.my_latest_bet = new_bet
             return new_bet
 
@@ -171,34 +155,19 @@ class Model_Validator:
         # empty set would have led to a return above
 
         # if this validator already has the target estimate as its single latest bet, do nothing... 0,0,1,1
-        if self.my_latest_bet.estimate == target_estimate:
+        if self.my_latest_bet.estimate == self.target_estimate:
             return self.my_latest_bet
 
         # for each validator..
-        for v in VALIDATOR_NAMES:
-
-            if self.latest_observed_bets[v] is None or self.latest_observed_bets[v].estimate != target_estimate:
-
-                # and if their latest estimate is not the target estimate...
-
-                # ... in the set of their bets "viewable" to this validator...
-                # (note our reliance on the viewable set to make latest bets)
-                for b in self.viewable[v]:
-                    # ...and if we find one with the target estimate
-                    if b.estimate == target_estimate:
-                        self.latest_observed_bets[v] = b
-                        break
-
-        # recall that we need to update the viewable set after making any changes to the latest bets!
-        self.update_viewable()
+        for v in self.viewable:
+            self.latest_observed_bets[v] = self.viewable[v]
 
         # if the validators' potential new canonical estimator is target estimate...
         # ...then we'll make a new bet with that estimate and return it...
         # ...otherwise we throw an exception
 
         try:
-
-            if self.my_estimate() == target_estimate:
+            if self.my_estimate() == self.target_estimate:
 
                 justification = set()
                 for v in VALIDATOR_NAMES:
@@ -214,7 +183,7 @@ class Model_Validator:
                 self.already_committed_view.add_view(View(justification))
 
                 # make the new bet
-                new_latest_bet = Bet(target_estimate, justification, self.model_of)
+                new_latest_bet = Bet(self.target_estimate, justification, self.model_of)
 
                 # and update the model parameters accordingly:
                 self.my_latest_bet = new_latest_bet
