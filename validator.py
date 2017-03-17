@@ -18,8 +18,7 @@ class Validator:
         self.name = name
         self.view = View(set())
         self.latest_estimate = None
-        self.latest_bet = None
-        self.latest_observed_bets = dict.fromkeys(VALIDATOR_NAMES, None)
+        self.latest_observed_bets = dict()
         self.decided = False
         self.my_latest_bet = None
 
@@ -47,7 +46,7 @@ class Validator:
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
-            if self.latest_observed_bets[v] is not None:
+            if v in self.latest_observed_bets:
                 scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
 
         max_score = 0
@@ -88,7 +87,7 @@ class Validator:
         estimate = self.get_latest_estimate()
         justification = set()
         for v in VALIDATOR_NAMES:
-            if self.latest_observed_bets[v] is not None:
+            if v in self.latest_observed_bets:
                 justification.add(self.latest_observed_bets[v])
 
         to_be_removed = set()
@@ -114,7 +113,7 @@ class Validator:
 
         to_remove_from_view = []
         for b in self.view.bets:
-            if self.latest_observed_bets[b.sender] is None:
+            if b.sender not in self.latest_observed_bets:
                 self.latest_observed_bets[b.sender] = b
                 continue
 
