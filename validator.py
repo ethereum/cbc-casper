@@ -30,7 +30,7 @@ class Validator:
         print "entering decide if safe!"
         print "self.latest_estimate", self.latest_estimate
         if self.latest_estimate is None:
-            return False
+            raise Exception("cannot decide if safe without an estimate")
 
         # print str(self.view)
         adversary = Adversary(self.view, self.latest_estimate)
@@ -109,10 +109,11 @@ class Validator:
         self.decide_if_safe()
         return self.my_latest_bet
 
-    def update_view_and_latest_bets(self):
+    @profile
+    def update_view_and_latest_bets(self, showed_bets):
 
         to_remove_from_view = []
-        for b in self.view.bets:
+        for b in showed_bets:
             if b.sender not in self.latest_observed_bets:
                 self.latest_observed_bets[b.sender] = b
                 continue
@@ -121,6 +122,8 @@ class Validator:
             if self.latest_observed_bets[b.sender].is_dependency(b):
                 self.latest_observed_bets[b.sender] = b
                 continue
+
+            View(b.justification).LatestBets()
 
             assert (b == self.latest_observed_bets[b.sender] or
                     b.is_dependency(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
@@ -131,7 +134,7 @@ class Validator:
     def show_single_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
-            self.update_view_and_latest_bets()
+            self.update_view_and_latest_bets(set(bet))
         else:
             print "unable to show bet to decided node"
 
@@ -139,6 +142,6 @@ class Validator:
         if not self.decided:
             for bet in bets:
                 self.view.add_bet(bet)
-            self.update_view_and_latest_bets()
+            self.update_view_and_latest_bets(bets)
         else:
             print "unable to show bet to decided node"

@@ -54,7 +54,7 @@ class Model_Validator:
 
             # for validators without anything in their view, any bets are later bets are viewable bets!
             # ...so we add them all in!
-            for b in view.Extension():
+            for b in view.get_extension():
                 if b.estimate == self.target_estimate and b.sender not in self.viewable:
                     self.viewable[b.sender] = b
 
@@ -64,10 +64,10 @@ class Model_Validator:
 
             # we can get the latest bets in our standard way
             my_view = View(set([self.my_latest_bet]))
-            self.latest_observed_bets = my_view.LatestBets()
+            self.latest_observed_bets = my_view.get_latest_bets()
 
             # then all bets that are causally after these bets are viewable by this validator
-            for b in view.Extension():
+            for b in view.get_extension():
 
                 if b.sender in self.viewable:
                     continue

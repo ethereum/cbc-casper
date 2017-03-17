@@ -37,7 +37,7 @@ class Adversary:
         self.attack_view = copy.deepcopy(view)
 
         # ...and she will keep track of the latest estimates from these validators, if unique
-        self.latest_bets = view.LatestBets()
+        self.latest_bets = view.get_latest_bets()
 
         # ...and she also keeps models of every validator!
         self.validator_models = dict()

@@ -66,7 +66,7 @@ class View:
         return dependencies
 
     # the "extension" of a view is the union of the bets in a view and the bets in its dependency!
-    def Extension(self):
+    def get_extension(self):
         if not self.recompute_extension:
             return self.extension
         # store the extension in the cache
@@ -84,7 +84,7 @@ class View:
     # this algorithm encodes a map from validators to their lates bets, in a particular view...
     # ...it returns a Python dictionary of the most recent bets, indexed by validator...
     # ...and it stores empty set to handle key exceptions!
-    def LatestBets(self):
+    def get_latest_bets(self):
         if not self.recompute_latest_bets:
             return self.latest_bets
 
@@ -95,7 +95,7 @@ class View:
 
         # we are going to search every bet in the extension of view to be sure to find all of the latest bets...
         # ...we'll call the bet we're currently inspecting "candidate"
-        for candidate_bet in (self.Extension()):
+        for candidate_bet in (self.get_extension()):
 
             # we're going to be filtering first by validator
             sender = candidate_bet.sender
@@ -134,7 +134,7 @@ class View:
     def canonical_estimate(self):
 
         # first, grab the latest bets...
-        latest_bets = self.LatestBets()
+        latest_bets = self.get_latest_bets()
 
         # now compute the scores of each estimate
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
@@ -163,7 +163,7 @@ class View:
 
         G = nx.DiGraph()
 
-        nodes = self.Extension()
+        nodes = self.get_extension()
 
         for b in nodes:
             G.add_edges_from([(b, b)])
