@@ -159,7 +159,7 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
-    def plot_view(self, decided):
+    def plot_view(self, safe_bets):
 
         G = nx.DiGraph()
 
@@ -172,8 +172,6 @@ class View:
 
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
         # G.add_edges_from([('C','F')])
-
-        print "decided", decided
 
         def display_height(bet, i=0):
 
@@ -193,12 +191,13 @@ class View:
 
         node_color_map = {}
         for b in nodes:
-            if decided[b.sender] is True:
+            if b in safe_bets:
                 node_color_map[b] = 'green'
             else:
                 node_color_map[b] = 'white'
 
         color_values = [node_color_map.get(node) for node in G.nodes()]
+
 
         labels = {}
         for b in nodes:
@@ -209,23 +208,3 @@ class View:
 
         nx.draw(G, positions, node_color=color_values, node_size=1500, edge_color='black', edge_cmap=plt.cm.Reds)
         pylab.show()
-
-    def is_view_minimal_for_adversary(self):
-        #check whether
-
-        #collect all of the a's for latest bets b in view, satisfying:
-
-        #if a is latest bet observed by b,
-        #then a and any bets after a need to be in the attack surface
-
-        #if bet in view was not collected by the above, then view is not minimal
-
-        ###
-        ###  validator -> their latest bets -> {}U{a later bet with target estimate}
-        ###  the attacker needs to know, what each validator has last seen from each validator
-        ###  and whether for these validators, they can observe a later bet with target estimate from each given validator
-        ###
-
-        view_copy = copy(self)
-
-        latest = view_copy.LatestBets()

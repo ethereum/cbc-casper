@@ -20,9 +20,10 @@ network.random_initialization()
 print "WEIGHTS", WEIGHTS
 
 decided = dict.fromkeys(VALIDATOR_NAMES, 0)
+safe_bets = set()
 
 while(True):
-    network.report(decided)
+    network.report(safe_bets)
 
     l = []
 
@@ -35,9 +36,11 @@ while(True):
                 network.propagate_bet_to_validator(l[j], i)
 
         if not decided[i]:
-            network.get_bet_from_validator(i)
-            for v in VALIDATOR_NAMES:
-                decided[v] = network.validators[v].decided
+            new_bet = network.get_bet_from_validator(i)
+            decided[i] = network.validators[i].decided
+
+            if decided[i]:
+                safe_bets.add(new_bet)
             # print "decided:", decided
 
 '''

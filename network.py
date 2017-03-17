@@ -24,6 +24,7 @@ class Network:
 
         new_bet = self.validators[validator_name].make_new_latest_bet()
         self.global_view.add(new_bet)
+        return new_bet
 
     def random_propagation_and_bet(self):
 
@@ -43,5 +44,5 @@ class Network:
 
         print str(self.global_view)
 
-    def report(self, decided):
-        View(self.global_view).plot_view(decided)
+    def report(self, safe_bets):
+        View(self.global_view).plot_view(safe_bets)
