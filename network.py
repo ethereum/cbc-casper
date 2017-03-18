@@ -42,7 +42,5 @@ class Network:
         for v in VALIDATOR_NAMES:
             self.get_bet_from_validator(v)
 
-        print str(self.global_view)
-
     def report(self, safe_bets):
         View(self.global_view).plot_view(safe_bets)

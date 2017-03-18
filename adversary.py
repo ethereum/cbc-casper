@@ -38,7 +38,7 @@ class Adversary:
 
         # ...and she will keep track of the latest estimates from these validators, if unique
         self.latest_bets = latest_observed_bets
-        self.vicarious_latest_bets = copy.deepcopy(vicarious_latest_bets)
+        self.vicarious_latest_bets = vicarious_latest_bets
 
         # ...and she also keeps models of every validator!
         self.validator_models = dict()

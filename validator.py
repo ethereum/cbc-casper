@@ -2,6 +2,7 @@ from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
 from view import View
 from adversary import Adversary
+import copy
 import random as r
 
 r.seed()
@@ -36,7 +37,7 @@ class Validator:
 
         # print str(self.view)
         # OUR GOAL IS TO DO ALL OF THE GET_LATEST_BETS AND GET_EXTENSION CALCULATIONS DONE IN THE ADVERSARY IN THE VALIDATOR INSTEAD
-        adversary = Adversary(self.view, self.latest_estimate, self.latest_observed_bets, self.vicarious_latest_bets)
+        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), self.vicarious_latest_bets)
 
         print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
@@ -132,7 +133,6 @@ class Validator:
                 self.latest_observed_bets[b.sender] = b
                 continue
 
-            print "b, latest_observed_bets[b.sender]", b, self.latest_observed_bets[b.sender]
             assert (b == self.latest_observed_bets[b.sender] or
                     b.is_dependency(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
 
