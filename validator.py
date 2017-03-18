@@ -19,6 +19,9 @@ class Validator:
         self.view = View(set())
         self.latest_estimate = None
         self.latest_observed_bets = dict()
+        self.vicarious_latest_bets = dict()
+        for v in VALIDATOR_NAMES:
+            self.vicarious_latest_bets[v] = dict()
         self.decided = False
         self.my_latest_bet = None
 
@@ -33,7 +36,8 @@ class Validator:
             raise Exception("cannot decide if safe without an estimate")
 
         # print str(self.view)
-        adversary = Adversary(self.view, self.latest_estimate)
+        # OUR GOAL IS TO DO ALL OF THE GET_LATEST_BETS AND GET_EXTENSION CALCULATIONS DONE IN THE ADVERSARY IN THE VALIDATOR INSTEAD
+        adversary = Adversary(self.view, self.latest_estimate)# self.latest_observed_bets, self.vicarious_latest_bets)
 
         print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
@@ -113,7 +117,13 @@ class Validator:
     def update_view_and_latest_bets(self, showed_bets):
 
         to_remove_from_view = []
-        for b in showed_bets:
+
+        #bets that this validator just now sees for the first time
+        newly_discovered_bets = View(showed_bets).get_extension().difference(self.already_committed_view.bets)
+
+        #updating latest bets..
+        for b in newly_discovered_bets:
+
             if b.sender not in self.latest_observed_bets:
                 self.latest_observed_bets[b.sender] = b
                 continue
@@ -123,18 +133,25 @@ class Validator:
                 self.latest_observed_bets[b.sender] = b
                 continue
 
-            View(b.justification).LatestBets()
-
             assert (b == self.latest_observed_bets[b.sender] or
                     b.is_dependency(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
+
             to_remove_from_view.append(b)
+
+        #updating vicarious_latest_bets..
+        for b in newly_discovered_bets:
+            for v in self.latest_observed_bets:
+                if b.sender != v and b.is_dependency(self.latest_observed_bets[v]):
+                    if b.sender not in self.vicarious_latest_bets[v] or self.vicarious_latest_bets[v][b.sender].is_dependency(b):
+                        self.vicarious_latest_bets[v][b.sender] = b
+
 
         self.view.remove_bets(to_remove_from_view)
 
     def show_single_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
-            self.update_view_and_latest_bets(set(bet))
+            self.update_view_and_latest_bets(set([bet]))
         else:
             print "unable to show bet to decided node"
 
