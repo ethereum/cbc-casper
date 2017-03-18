@@ -42,7 +42,10 @@ class Adversary:
         # ...and she also keeps models of every validator!
         self.validator_models = dict()
         for v in VALIDATOR_NAMES:
-            self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v],self.target_estimate)
+            if v in self.latest_bets:
+                self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v],self.target_estimate)
+            else:
+                self.validator_models[v] = Model_Validator(v, view, None, self.target_estimate)
 
         # she's going to use this dictionary to keep track of the attack surface
         self.attack_surface = dict()
@@ -55,7 +58,7 @@ class Adversary:
         self.not_voted_yet = set()
 
         for v in VALIDATOR_NAMES:
-            if self.latest_bets[v] is None:
+            if v not in self.latest_bets:
                 self.not_voted_yet.add(v)
             else:
                 assert isinstance(self.latest_bets[v], Bet), "...expected latest_bets to have None or a Bet"
@@ -182,12 +185,12 @@ class Adversary:
                      exactly one latest bet"""
 
                 # ...try to add a new bet from this validator with the estimate of the attacker's choosing
-                try:
-                    new_bet = self.validator_models[v].make_new_latest_bet()
+
+                success, new_bet = self.validator_models[v].make_new_latest_bet()
 
                 # If we failed to add a bet with the estimate of the attacker's choosing for this validator..
                 # ..continue to the next one so we can keep trying
-                except:
+                if not success:
                     continue
 
                 # If new bet successful...

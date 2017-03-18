@@ -49,8 +49,7 @@ class Model_Validator:
         if self.my_latest_bet is None:
 
             # ...an empty dictionary of latest observed bets...
-            for v in VALIDATOR_NAMES:
-                self.latest_observed_bets[v] = None
+            self.latest_observed_bets = dict()
 
             # for validators without anything in their view, any bets are later bets are viewable bets!
             # ...so we add them all in!
@@ -77,7 +76,7 @@ class Model_Validator:
 
                 # ...we use the is_dependency relation to test if b is causally after the
                 # latest bet observed from that sender
-                if self.latest_observed_bets[b.sender] is None:
+                if b.sender not in self.latest_observed_bets:
                     self.viewable[b.sender] = b
                 else:
                     assert isinstance(self.latest_observed_bets[b.sender], Bet), """...expected dictionary
@@ -95,7 +94,7 @@ class Model_Validator:
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
 
         for v in VALIDATOR_NAMES:
-            if self.latest_observed_bets[v] is None:
+            if v not in self.latest_observed_bets:
                 continue
             else:
                 assert isinstance(self.latest_observed_bets[v], Bet), """...expected dictionary
@@ -130,7 +129,7 @@ class Model_Validator:
             return
 
         # If we haven't observed anything yet, anything is viewable!
-        if self.latest_observed_bets[bet.sender] is None:
+        if bet.sender not in self.latest_observed_bets:
             self.viewable[bet.sender] = bet
             return
 
@@ -160,37 +159,33 @@ class Model_Validator:
 
         # for each validator..
         for v in self.viewable:
+            #...show the viewable (which has the target estimate)
             self.latest_observed_bets[v] = self.viewable[v]
 
         # if the validators' potential new canonical estimator is target estimate...
         # ...then we'll make a new bet with that estimate and return it...
-        # ...otherwise we throw an exception
 
-        try:
-            if self.my_estimate() == self.target_estimate:
+        if self.my_estimate() == self.target_estimate:
+            justification = set()
+            for v in VALIDATOR_NAMES:
+                if v in self.latest_observed_bets:
+                    justification.add(self.latest_observed_bets[v])
 
-                justification = set()
-                for v in VALIDATOR_NAMES:
-                    if self.latest_observed_bets[v] is not None:
-                        justification.add(self.latest_observed_bets[v])
+            to_be_removed = set()
+            for j in justification:
+                if j in self.already_committed_view.bets:
+                    to_be_removed.add(j)
+            justification.difference_update(to_be_removed)
 
-                to_be_removed = set()
-                for j in justification:
-                    if j in self.already_committed_view.bets:
-                        to_be_removed.add(j)
-                justification.difference_update(to_be_removed)
+            self.already_committed_view.add_view(View(justification))
 
-                self.already_committed_view.add_view(View(justification))
+            # make the new bet
+            new_latest_bet = Bet(self.target_estimate, justification, self.model_of)
 
-                # make the new bet
-                new_latest_bet = Bet(self.target_estimate, justification, self.model_of)
+            # and update the model parameters accordingly:
+            self.my_latest_bet = new_latest_bet
 
-                # and update the model parameters accordingly:
-                self.my_latest_bet = new_latest_bet
+            # finally return
+            return True, new_latest_bet
 
-                # finally return
-                return new_latest_bet
-            else:
-                raise Exception("Unable to make legal bet with the target estimate at the given position")
-        except:
-            raise Exception("...expected a non-empty view")
+        return False, None

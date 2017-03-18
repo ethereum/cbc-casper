@@ -90,8 +90,6 @@ class View:
 
         # here's the dictionary that we'll populate and return
         latest_bets = dict()
-        for v in VALIDATOR_NAMES:
-            latest_bets[v] = None
 
         # we are going to search every bet in the extension of view to be sure to find all of the latest bets...
         # ...we'll call the bet we're currently inspecting "candidate"
@@ -102,7 +100,7 @@ class View:
 
             # if we haven't heard anything from this validator...
             # ...we can trivially say that the candidate is the latest bet we've seen, from this validator..
-            if latest_bets[sender] is None:
+            if sender not in latest_bets:
                 latest_bets[sender] = candidate_bet
                 continue  # ...and then we're totally free to go to the next candidate!
 
@@ -139,7 +137,7 @@ class View:
         # now compute the scores of each estimate
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
-            if latest_bets[v] is None:
+            if v not in latest_bets[v]:
                 continue
             else:
                 assert isinstance(latest_bets[v], Bet), "...expected only bets or the emptyset in the latest bets"
