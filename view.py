@@ -7,6 +7,8 @@ from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
 # Views are sets of bets...
 # ...with corresponding class functions!
+
+
 class View:
     def __init__(self, bets):
         # be safe, type check!
@@ -44,7 +46,7 @@ class View:
         # ...and finally, add the bet!
         self.bets.add(bet)
 
-    def add_view(self,view):
+    def add_view(self, view):
         for b in view.bets:
             self.add_bet(b)
 
@@ -195,7 +197,6 @@ class View:
                 node_color_map[b] = 'white'
 
         color_values = [node_color_map.get(node) for node in G.nodes()]
-
 
         labels = {}
         for b in nodes:

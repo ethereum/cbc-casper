@@ -20,7 +20,7 @@ class Model_Validator:
      of a bet or the empty set"""
 
     @profile
-    def __init__(self, model_of_validator, view, my_latest_bet, target_estimate):
+    def __init__(self, model_of_validator, view, my_latest_bet, my_latest_observed_bets, target_estimate):
 
         # be safe, type check!
         assert target_estimate in ESTIMATE_SPACE, "...expected an estimate!"
@@ -43,13 +43,10 @@ class Model_Validator:
         self.viewable = dict()
 
         # will track the latest bets observed by this model validator
-        self.latest_observed_bets = dict()
+        self.latest_observed_bets = my_latest_observed_bets
 
         # if this validator has no latest bets in the view, then we store...
         if self.my_latest_bet is None:
-
-            # ...an empty dictionary of latest observed bets...
-            self.latest_observed_bets = dict()
 
             # for validators without anything in their view, any bets are later bets are viewable bets!
             # ...so we add them all in!
@@ -63,7 +60,6 @@ class Model_Validator:
 
             # we can get the latest bets in our standard way
             my_view = View(set([self.my_latest_bet]))
-            self.latest_observed_bets = my_view.get_latest_bets()
 
             # then all bets that are causally after these bets are viewable by this validator
             for b in view.get_extension():
@@ -139,7 +135,6 @@ class Model_Validator:
         if self.latest_observed_bets[bet.sender].is_dependency(bet):
             self.viewable[bet.sender] = bet
 
-
     # This function attempts to make a new latest bet for this validator (self) with a given estimate
     @profile
     def make_new_latest_bet(self):
@@ -159,7 +154,7 @@ class Model_Validator:
 
         # for each validator..
         for v in self.viewable:
-            #...show the viewable (which has the target estimate)
+            # ...show the viewable (which has the target estimate)
             self.latest_observed_bets[v] = self.viewable[v]
 
         # if the validators' potential new canonical estimator is target estimate...

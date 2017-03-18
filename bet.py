@@ -88,7 +88,7 @@ class Bet:
     # this function checks if this bet (self) is a dependency of some bet B...
 
     @profile
-    def is_dependency(self,B):
+    def is_dependency(self, B):
 
         assert isinstance(B, Bet), "...expected a bet!"
 

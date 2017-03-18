@@ -21,7 +21,7 @@ from model_validator import Model_Validator
 
 
 class Adversary:
-    def __init__(self, view, victim_estimate):
+    def __init__(self, view, victim_estimate, latest_observed_bets, vicarious_latest_bets):
 
         # be safe! start with type checking.
         assert isinstance(view, View), "...expected a View!"
@@ -37,15 +37,16 @@ class Adversary:
         self.attack_view = copy.deepcopy(view)
 
         # ...and she will keep track of the latest estimates from these validators, if unique
-        self.latest_bets = view.get_latest_bets()
+        self.latest_bets = latest_observed_bets
+        self.vicarious_latest_bets = copy.deepcopy(vicarious_latest_bets)
 
         # ...and she also keeps models of every validator!
         self.validator_models = dict()
         for v in VALIDATOR_NAMES:
             if v in self.latest_bets:
-                self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v],self.target_estimate)
+                self.validator_models[v] = Model_Validator(v, view, self.latest_bets[v], self.vicarious_latest_bets[v], self.target_estimate)
             else:
-                self.validator_models[v] = Model_Validator(v, view, None, self.target_estimate)
+                self.validator_models[v] = Model_Validator(v, view, None, self.vicarious_latest_bets[v], self.target_estimate)
 
         # she's going to use this dictionary to keep track of the attack surface
         self.attack_surface = dict()
