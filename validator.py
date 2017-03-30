@@ -13,6 +13,8 @@ r.seed()
 # ability to make new latest bet w given estimate or throwing
 # ability to "decide" on a value of the consensus
 
+REPORT = False
+
 
 class Validator:
     def __init__(self, name):
@@ -35,9 +37,23 @@ class Validator:
         if self.latest_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
 
-        # print str(self.view)
-        # OUR GOAL IS TO DO ALL OF THE GET_LATEST_BETS AND GET_EXTENSION CALCULATIONS DONE IN THE ADVERSARY IN THE VALIDATOR INSTEAD
-        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), self.vicarious_latest_bets)
+        if REPORT:
+            lb = View([])
+            for v in VALIDATOR_NAMES:
+                if v in self.latest_observed_bets:
+                    lb.add_bet(self.latest_observed_bets[v])
+            print "ADVERSARY IS BEING FED THIS AS LATEST BETS:"
+            lb.plot_view(lb.bets)
+
+            vic_lb = View([])
+            for v in VALIDATOR_NAMES:
+                for w in VALIDATOR_NAMES:
+                    if w in self.vicarious_latest_bets[v]:
+                        vic_lb.add_bet(self.vicarious_latest_bets[v][w])
+            print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
+            vic_lb.plot_view(vic_lb.bets)
+            
+        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets))
 
         print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
@@ -118,8 +134,15 @@ class Validator:
 
         to_remove_from_view = []
 
+        '''
+        PART 1 - updating latest bets
+        '''
+
+
         # bets that this validator just now sees for the first time
         newly_discovered_bets = View(showed_bets).get_extension().difference(self.already_committed_view.bets)
+        #print "NEWLY DISCOVERED"
+        #View(newly_discovered_bets).plot_view(newly_discovered_bets)
 
         # updating latest bets..
         for b in newly_discovered_bets:
@@ -138,12 +161,24 @@ class Validator:
 
             to_remove_from_view.append(b)
 
-        # updating vicarious_latest_bets..
-        for b in newly_discovered_bets:
-            for v in self.latest_observed_bets:
-                if b.sender != v and b.is_dependency(self.latest_observed_bets[v]):
-                    if b.sender not in self.vicarious_latest_bets[v] or self.vicarious_latest_bets[v][b.sender].is_dependency(b):
-                        self.vicarious_latest_bets[v][b.sender] = b
+        '''
+        PART 2 - updating vicarious latest bets
+        '''
+
+        # updating vicarious_latest_bets for validator v, for all v..
+        for v in self.latest_observed_bets:
+
+            previously_latest_bets = set()
+            for w in self.vicarious_latest_bets[v]:
+                previously_latest_bets.add(self.vicarious_latest_bets[v][w])
+
+            previous_view = View(previously_latest_bets).get_extension()
+
+            vicarious_newly_discovered_bets = View([self.latest_observed_bets[v]]).get_extension().difference(previous_view)
+
+            for b in vicarious_newly_discovered_bets:
+                if b.sender not in self.vicarious_latest_bets[v] or self.vicarious_latest_bets[v][b.sender].is_dependency(b):
+                    self.vicarious_latest_bets[v][b.sender] = b
 
         self.view.remove_bets(to_remove_from_view)
 

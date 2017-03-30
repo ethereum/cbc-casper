@@ -109,7 +109,7 @@ class Model_Validator:
         if max_score > 0:
             return max_score_estimate
         else:
-            raise Exception("...expected a non-empty view")
+            return self.target_estimate
 
     # this important method makes a bet viewable to the model validator
     # It will only succeed if:
