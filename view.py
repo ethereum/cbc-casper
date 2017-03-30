@@ -159,7 +159,7 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
-    def plot_view(self, safe_bets):
+    def plot_view(self, coloured_bets, colour='green'):
 
         G = nx.DiGraph()
 
@@ -191,8 +191,8 @@ class View:
 
         node_color_map = {}
         for b in nodes:
-            if b in safe_bets:
-                node_color_map[b] = 'green'
+            if b in coloured_bets:
+                node_color_map[b] = colour
             else:
                 node_color_map[b] = 'white'
 

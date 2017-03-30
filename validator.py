@@ -43,7 +43,7 @@ class Validator:
                 if v in self.latest_observed_bets:
                     lb.add_bet(self.latest_observed_bets[v])
             print "ADVERSARY IS BEING FED THIS AS LATEST BETS:"
-            lb.plot_view(lb.bets)
+            lb.plot_view(lb.bets, 'yellow')
 
             vic_lb = View([])
             for v in VALIDATOR_NAMES:
@@ -51,7 +51,7 @@ class Validator:
                     if w in self.vicarious_latest_bets[v]:
                         vic_lb.add_bet(self.vicarious_latest_bets[v][w])
             print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
-            vic_lb.plot_view(vic_lb.bets)
+            vic_lb.plot_view(vic_lb.bets, 'yellow')
             
         adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets))
 
