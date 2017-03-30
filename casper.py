@@ -37,17 +37,19 @@ if sys.argv[1:] == ['rounds']:
         #    network.validators[i].view.plot_view(safe_bets)
 
         last_bets = []
+        validator_received_bet = set()
 
         for i in xrange(NUM_VALIDATORS):
             last_bets.append(network.validators[i].my_latest_bet)
 
         for i in xrange(NUM_VALIDATORS):
             for j in xrange(NUM_VALIDATORS):
-                if i != j and (r.randint(0, 4
-                    ) == 0):
-                    network.propagate_bet_to_validator(last_bets[j], i)
+                if i != j and (r.randint(0, 4) == 0):
+                    network.propagate_bet_to_validator(last_bets[i], j)
+                    validator_received_bet.add(j)
 
-            if not decided[i]:
+        for i in xrange(NUM_VALIDATORS):
+            if not decided[i] and i in validator_received_bet:
                 new_bet = network.get_bet_from_validator(i)
                 decided[i] = network.validators[i].decided
 
