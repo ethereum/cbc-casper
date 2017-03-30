@@ -130,3 +130,19 @@ class Bet:
 
         # we did it!
         return dependencies
+
+    def make_redundancy_free(self):
+
+        dont_check = set()
+        for b in self.justification:
+            dont_check.add((b, b))
+
+        to_remove_from_justification = set()
+        J = list(self.justification)
+        for b1 in J:
+            for b2 in J:
+                if (b1, b2) not in dont_check:
+                    if b1.is_dependency(b2):
+                        to_remove_from_justification.add(b1)
+                        dont_check.add((b2, b1))
+        self.justification.difference_update(to_remove_from_justification)

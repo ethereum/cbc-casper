@@ -122,6 +122,8 @@ class Validator:
         sender = self.name
 
         self.my_latest_bet = Bet(estimate, justification, sender)
+        self.my_latest_bet.make_redundancy_free()
+
         self.latest_estimate = estimate
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
