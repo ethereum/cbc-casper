@@ -28,8 +28,6 @@ class Validator:
         self.decided = False
         self.my_latest_bet = None
 
-        self.already_committed_view = View(set())
-
     def decide_if_safe(self):
 
         print "entering decide if safe!"
@@ -99,10 +97,14 @@ class Validator:
             self.latest_estimate = r.choice(tuple(ESTIMATE_SPACE))
             self.my_latest_bet = self.make_bet_with_null_justification(self.latest_estimate)
             self.view.add_bet(self.my_latest_bet)
-            self.latest_observed_bets[self.name] = self.my_latest_bet
 
             self.decide_if_safe()
             return self.my_latest_bet
+
+        if self.my_latest_bet is None:
+            already_committed_view = View(set())
+        else:
+            already_committed_view = View(View(self.my_latest_bet.justification).get_extension())
 
         estimate = self.get_latest_estimate()
         justification = set()
@@ -112,12 +114,10 @@ class Validator:
 
         to_be_removed = set()
         for j in justification:
-            if j in self.already_committed_view.bets:
+            if j in already_committed_view.bets:
                 to_be_removed.add(j)
 
         justification.difference_update(to_be_removed)
-
-        self.already_committed_view.add_view(View(justification))
 
         sender = self.name
 
@@ -138,11 +138,13 @@ class Validator:
         PART 1 - updating latest bets
         '''
 
+        if self.my_latest_bet is None:
+            already_committed_view = View(set())
+        else:
+            already_committed_view = View(View(self.my_latest_bet.justification).get_extension())
 
         # bets that this validator just now sees for the first time
-        newly_discovered_bets = View(showed_bets).get_extension().difference(self.already_committed_view.bets)
-        #print "NEWLY DISCOVERED"
-        #View(newly_discovered_bets).plot_view(newly_discovered_bets)
+        newly_discovered_bets = View(showed_bets).get_extension().difference(already_committed_view.bets)
 
         # updating latest bets..
         for b in newly_discovered_bets:
