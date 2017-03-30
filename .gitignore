@@ -4,3 +4,4 @@ venv
 *.lprof
 *.prof
 *.orig
+results.txt
