@@ -10,6 +10,7 @@ from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
 
 class View:
+    @profile
     def __init__(self, bets):
         # be safe, type check!
         for b in bets:
@@ -86,6 +87,7 @@ class View:
     # this algorithm encodes a map from validators to their lates bets, in a particular view...
     # ...it returns a Python dictionary of the most recent bets, indexed by validator...
     # ...and it stores empty set to handle key exceptions!
+    @profile
     def get_latest_bets(self):
         if not self.recompute_latest_bets:
             return self.latest_bets

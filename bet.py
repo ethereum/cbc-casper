@@ -13,6 +13,7 @@ class Bet:
     # ...these things are not very conceptually important...
 
     # constructor!
+    @profile
     def __init__(self, estimate, justification, sender):
 
         # be safe. type check!...
@@ -34,6 +35,7 @@ class Bet:
         bet_number += 1
 
     # equality check
+    @profile
     def __eq__(self, B):
 
         # the empty set is not a bet!
@@ -131,6 +133,7 @@ class Bet:
         # we did it!
         return dependencies
 
+    @profile
     def make_redundancy_free(self):
 
         dont_check = set()

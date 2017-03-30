@@ -17,8 +17,6 @@ from view import View
 from adversary import Adversary
 from network import Network
 
-
-
 if sys.argv[1:] == ['rounds']:
 
     network = Network()
@@ -65,7 +63,7 @@ if sys.argv[1:] == ['rounds']:
                     safe_bets.add(new_bet)
 
 elif sys.argv[1:] == ['blockchain']:
-    
+
     network = Network()
 
     print "WEIGHTS", WEIGHTS
@@ -81,7 +79,7 @@ elif sys.argv[1:] == ['blockchain']:
     while(True):
         network.report(safe_bets)
 
-        #for i in xrange(NUM_VALIDATORS):
+        # for i in xrange(NUM_VALIDATORS):
         #    network.validators[i].view.plot_view(safe_bets)
 
         current_validator = iterator % NUM_VALIDATORS

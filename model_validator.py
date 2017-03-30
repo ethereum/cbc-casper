@@ -84,6 +84,7 @@ class Model_Validator:
                         self.viewable[b.sender] = b
 
     # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
+    @profile
     def my_estimate(self):
 
         # otherwise we compute the max score byzantine free estimate
