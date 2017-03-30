@@ -38,6 +38,15 @@ class Network:
 
     # def let_validator_push
 
+    def view_initialization(self, view):
+        assert isinstance(view, View)
+        self.global_view = view.bets
+
+        latest = view.get_latest_bets()
+
+        for v in latest:
+            self.validators[v].my_latest_bet = latest[v]
+
     def random_initialization(self):
         for v in VALIDATOR_NAMES:
             self.get_bet_from_validator(v)
