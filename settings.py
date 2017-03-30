@@ -3,7 +3,7 @@ import random as r  # to ensure the tie-breaking property
 r.seed()
 
 # the size of the validator set is assumed to be known in advance
-NUM_VALIDATORS = 25
+NUM_VALIDATORS = 5
 
 # we will refer to them by names in this set
 VALIDATOR_NAMES = set(range(NUM_VALIDATORS))
