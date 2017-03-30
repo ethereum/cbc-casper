@@ -90,31 +90,32 @@ class Bet:
     # this function checks if this bet (self) is a dependency of some bet B...
 
     @profile
+    def recursive_is_dependency(self, B, is_checked):
+
+        # be safe, type check!
+        # self is definitely a dependency of B if it is in the justification...
+        if self in B.justification:
+            return True
+
+        is_checked[B] = True
+
+        # ...or if it is in the dependency of anything in the justification!
+        for b in B.justification:
+            if b not in is_checked:
+                if self.recursive_is_dependency(b, is_checked):
+                    return True
+
+        # if neither of these, then "self" is not a dependency of B!
+        return False
+
+    @profile
     def is_dependency(self, B):
 
         assert isinstance(B, Bet), "...expected a bet!"
 
         is_checked = dict()
 
-        def recursive_is_dependency(B):
-
-            # be safe, type check!
-            # self is definitely a dependency of B if it is in the justification...
-            if self in B.justification:
-                return True
-
-            is_checked[B] = True
-
-            # ...or if it is in the dependency of anything in the justification!
-            for b in B.justification:
-                if b not in is_checked:
-                    if recursive_is_dependency(b):
-                        return True
-
-            # if neither of these, then "self" is not a dependency of B!
-            return False
-
-        return recursive_is_dependency(B)
+        return self.recursive_is_dependency(B, is_checked)
 
     # this one gets all the bets in the dependency of this bet (self)...
     # ...it puts them into a set, and returns that!
