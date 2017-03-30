@@ -28,6 +28,8 @@ if sys.argv[1:] == ['rounds']:
     decided = dict.fromkeys(VALIDATOR_NAMES, 0)
     safe_bets = set()
 
+    NUM_MESSAGES_PER_ROUND = NUM_VALIDATORS
+
     network.random_initialization()
     while(True):
 
@@ -39,12 +41,18 @@ if sys.argv[1:] == ['rounds']:
         last_bets = []
         validator_received_bet = set()
 
+        messages = []
+        for i in xrange(NUM_MESSAGES_PER_ROUND):
+            x1 = r.sample(VALIDATOR_NAMES, 1)[0]
+            x2 = r.sample(VALIDATOR_NAMES.difference(set([x1])), 1)[0]
+            messages.append([x1, x2])
+
         for i in xrange(NUM_VALIDATORS):
             last_bets.append(network.validators[i].my_latest_bet)
 
         for i in xrange(NUM_VALIDATORS):
             for j in xrange(NUM_VALIDATORS):
-                if i != j and (r.randint(0, 4) == 0):
+                if i != j and [i, j] in messages:
                     network.propagate_bet_to_validator(last_bets[i], j)
                     validator_received_bet.add(j)
 
