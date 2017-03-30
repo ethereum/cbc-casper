@@ -30,6 +30,8 @@ class View:
     # View:
     # (1, {(1, {}, 0)}, 1)
     # (0, {}, 0)
+
+    @profile
     def __str__(self):
         s = "View: \n"
         for b in self.bets:
@@ -47,10 +49,12 @@ class View:
         # ...and finally, add the bet!
         self.bets.add(bet)
 
+    @profile
     def add_view(self, view):
         for b in view.bets:
             self.add_bet(b)
 
+    @profile
     def remove_bets(self, bets_to_remove_from_view):
         self.recompute_extension = True
         self.bets.difference_update(bets_to_remove_from_view)
@@ -61,6 +65,8 @@ class View:
     # THIS CAN BE OPTIMIZED BY, INSTEAD OF RUNNING THE DEPENDENCY FUNCTION FROM THE BET
     # CLASS FOR EVERY BET IN THE VIEW,...
     # ...REWRITING IT SO THAT THE DAG IS NOT REDUNDANTLY TRAVERSED
+
+    @profile
     def dependency(self):
         dependencies = set()
         for bet in self.bets:
@@ -69,6 +75,7 @@ class View:
         return dependencies
 
     # the "extension" of a view is the union of the bets in a view and the bets in its dependency!
+    @profile
     def get_extension(self):
         if not self.recompute_extension:
             return self.extension
@@ -133,6 +140,7 @@ class View:
         return latest_bets
 
     # this computes the maximum weight estimate from the latest bets in the view
+    @profile
     def canonical_estimate(self):
 
         # first, grab the latest bets...
@@ -161,6 +169,7 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
+    @profile
     def plot_view(self, coloured_bets, colour='green'):
 
         G = nx.DiGraph()

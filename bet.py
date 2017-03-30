@@ -78,6 +78,8 @@ class Bet:
     # ...which more trivially implies hash(A) == hash(B)...
     # ...so that we don't need to think about counterintuive Python set() behaviour...
     # ...for example if we have set([A]).add(B) = set([A,B]) with hash(A) != hash(B) even though A == B!
+
+    @profile
     def __hash__(self):
         return hash(self.id_number)
 
@@ -119,6 +121,7 @@ class Bet:
 
     # this one gets all the bets in the dependency of this bet (self)...
     # ...it puts them into a set, and returns that!
+    @profile
     def dependency(self):
         dependencies = set()
 
