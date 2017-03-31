@@ -21,7 +21,6 @@ class Validator:
     def __init__(self, name):
         self.name = name
         self.view = View(set())
-        self.latest_estimate = None
         self.latest_observed_bets = dict()
         self.vicarious_latest_bets = dict()
         self.viewables = dict()
@@ -30,80 +29,6 @@ class Validator:
             self.viewables[v] = dict()
         self.decided = False
         self.my_latest_bet = None
-
-    def get_viewables(self):
-        # if this validator has no latest bets in the view, then we store...
-
-        for w in VALIDATOR_NAMES:
-            if w not in self.latest_observed_bets:
-
-                # for validators without anything in their view, any bets are later bets are viewable bets!
-                # ...so we add them all in!
-                for b in self.view.get_extension():
-                    if b.estimate == 1 - self.latest_estimate and b.sender not in self.viewables[w]:
-                        self.viewables[w][b.sender] = b
-
-            # if we do have a latest bet from this validator, then...
-            else:
-                assert isinstance(self.latest_observed_bets[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
-
-                # then all bets that are causally after these bets are viewable by this validator
-                for b in self.view.get_extension():
-
-                    if b.sender in self.viewables[w]:
-                        continue
-
-                    if b.estimate != 1 - self.latest_estimate:
-                        continue
-
-                    # ...we use the is_dependency relation to test if b is causally after the
-                    # latest bet observed from that sender
-                    if b.sender not in self.vicarious_latest_bets[w]:
-                        self.viewables[w][b.sender] = b
-                    else:
-                        assert isinstance(self.vicarious_latest_bets[w][b.sender], Bet), """...expected dictionary
-                         latest_observed_bets to only contain values of a bet or the empty set"""
-
-                        # if b is later than the latest observed bet from b.sender,
-                        # then b is viewable to this model validator
-                        if self.vicarious_latest_bets[w][b.sender].is_dependency(b):
-                            self.viewables[w][b.sender] = b
-
-    @profile
-    def decide_if_safe(self):
-
-        print "entering decide if safe!"
-        print "self.latest_estimate", self.latest_estimate
-        if self.latest_estimate is None:
-            raise Exception("cannot decide if safe without an estimate")
-
-        if REPORT:
-            lb = View([])
-            for v in VALIDATOR_NAMES:
-                if v in self.latest_observed_bets:
-                    lb.add_bet(self.latest_observed_bets[v])
-            print "ADVERSARY IS BEING FED THIS AS LATEST BETS:"
-            lb.plot_view(lb.bets, 'yellow')
-
-            vic_lb = View([])
-            for v in VALIDATOR_NAMES:
-                for w in VALIDATOR_NAMES:
-                    if w in self.vicarious_latest_bets[v]:
-                        vic_lb.add_bet(self.vicarious_latest_bets[v][w])
-            print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
-            vic_lb.plot_view(vic_lb.bets, 'yellow')
-
-        self.get_viewables()
-
-        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
-
-        print "about to conduct ideal attack"
-        unsafe, _ = adversary.ideal_network_attack()
-
-        print "are we safe?, ", not unsafe
-
-        self.decided = not unsafe
-        return not unsafe
 
     @profile
     def get_latest_estimate(self):
@@ -129,6 +54,82 @@ class Validator:
         return max_score_estimate
 
     @profile
+    def get_viewables(self):
+        # if this validator has no latest bets in the view, then we store...
+
+        for w in VALIDATOR_NAMES:
+            if w not in self.latest_observed_bets:
+
+                # for validators without anything in their view, any bets are later bets are viewable bets!
+                # ...so we add them all in!
+                for b in self.view.get_extension():
+                    if b.estimate == 1 - self.get_latest_estimate() and b.sender not in self.viewables[w]:
+                        self.viewables[w][b.sender] = b
+
+            # if we do have a latest bet from this validator, then...
+            else:
+                assert isinstance(self.latest_observed_bets[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
+
+                # then all bets that are causally after these bets are viewable by this validator
+                for b in self.view.get_extension():
+
+                    if b.sender in self.viewables[w]:
+                        continue
+
+                    if b.estimate != 1 - self.get_latest_estimate():
+                        continue
+
+                    # ...we use the is_dependency relation to test if b is causally after the
+                    # latest bet observed from that sender
+                    if b.sender not in self.vicarious_latest_bets[w]:
+                        self.viewables[w][b.sender] = b
+                    else:
+                        assert isinstance(self.vicarious_latest_bets[w][b.sender], Bet), """...expected dictionary
+                         latest_observed_bets to only contain values of a bet or the empty set"""
+
+                        # if b is later than the latest observed bet from b.sender,
+                        # then b is viewable to this model validator
+                        if self.vicarious_latest_bets[w][b.sender].is_dependency(b):
+                            self.viewables[w][b.sender] = b
+
+    @profile
+    def decide_if_safe(self):
+
+        print "entering decide if safe!"
+        print "self.get_latest_estimate()", self.get_latest_estimate()
+        if self.get_latest_estimate() is None:
+            raise Exception("cannot decide if safe without an estimate")
+
+        if REPORT:
+            lb = View([])
+            for v in VALIDATOR_NAMES:
+                if v in self.latest_observed_bets:
+                    lb.add_bet(self.latest_observed_bets[v])
+            print "ADVERSARY IS BEING FED THIS AS LATEST BETS:"
+            lb.plot_view(lb.bets, 'yellow')
+
+            vic_lb = View([])
+            for v in VALIDATOR_NAMES:
+                for w in VALIDATOR_NAMES:
+                    if w in self.vicarious_latest_bets[v]:
+                        vic_lb.add_bet(self.vicarious_latest_bets[v][w])
+            print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
+            vic_lb.plot_view(vic_lb.bets, 'yellow')
+
+        self.get_viewables()
+
+        adversary = Adversary(self.view, self.get_latest_estimate(), copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
+
+        print "about to conduct ideal attack"
+        unsafe, _ = adversary.ideal_network_attack()
+
+        print "are we safe?, ", not unsafe
+
+        self.decided = not unsafe
+        return not unsafe
+
+
+    @profile
     def make_bet_with_null_justification(self, estimate):
         assert (len(self.view.bets) == 0 and
                 self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
@@ -141,8 +142,8 @@ class Validator:
     def make_new_latest_bet(self):
 
         if len(self.view.bets) == 0 and self.my_latest_bet is None:
-            self.latest_estimate = r.choice(tuple(ESTIMATE_SPACE))
-            self.my_latest_bet = self.make_bet_with_null_justification(self.latest_estimate)
+            estimate = r.choice(tuple(ESTIMATE_SPACE))
+            self.my_latest_bet = self.make_bet_with_null_justification(estimate)
             self.view.add_bet(self.my_latest_bet)
 
             self.decide_if_safe()
@@ -171,7 +172,6 @@ class Validator:
         self.my_latest_bet = Bet(estimate, justification, sender)
         self.my_latest_bet.make_redundancy_free()
 
-        self.latest_estimate = estimate
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
 

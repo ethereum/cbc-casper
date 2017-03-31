@@ -46,9 +46,9 @@ class Adversary:
         self.validator_models = dict()
         for v in VALIDATOR_NAMES:
             if v in self.latest_bets:
-                self.validator_models[v] = Model_Validator(v, self.latest_bets[v], self.vicarious_latest_bets[v], viewables[v], self.target_estimate)
+                self.validator_models[v] = Model_Validator(v, self.latest_bets[v], self.vicarious_latest_bets[v], copy.deepcopy(viewables[v]), self.target_estimate)
             else:
-                self.validator_models[v] = Model_Validator(v, None, self.vicarious_latest_bets[v], viewables[v], self.target_estimate)
+                self.validator_models[v] = Model_Validator(v, None, self.vicarious_latest_bets[v], copy.deepcopy(viewables[v]), self.target_estimate)
 
         # she's going to use this dictionary to keep track of the attack surface
         self.attack_surface = dict()
