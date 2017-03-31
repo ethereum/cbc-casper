@@ -26,8 +26,9 @@ if sys.argv[1:] == ['rounds']:
     decided = dict.fromkeys(VALIDATOR_NAMES, 0)
     safe_bets = set()
 
-    NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)
+    NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)/20
     REPORT_INTERVAL = 20
+    REPORT_SUBJECTIVE_VIEWS = False
 
     network.random_initialization()
 
@@ -36,12 +37,13 @@ if sys.argv[1:] == ['rounds']:
 
         if iterator % REPORT_INTERVAL == 0:
             network.report(safe_bets)
+            if REPORT_SUBJECTIVE_VIEWS:
+                for i in xrange(NUM_VALIDATORS):
+                    network.validators[i].view.plot_view(safe_bets)
+
         iterator += 1
-        # for i in xrange(NUM_VALIDATORS):
-        #    network.validators[i].view.plot_view(safe_bets)
 
         pairs = []
-
         for i in xrange(NUM_VALIDATORS):
             for j in xrange(NUM_VALIDATORS):
                 if i != j:
@@ -57,6 +59,10 @@ if sys.argv[1:] == ['rounds']:
         validator_received_bet = set()
         for i in xrange(NUM_VALIDATORS):
             last_bets.append(network.validators[i].my_latest_bet)
+
+        for sb in list(safe_bets):
+            if sb not in last_bets:
+                raise Exception("safe bets should be in last bets")  # sanity check
 
         for path in messages:
             i = path[0]
