@@ -31,7 +31,7 @@ class Bet:
 
         # ...sorting some things out just for debugging please ignore this!
         global bet_number
-        self.id_number = "validator " + str(sender) + ", bet_num " + str(bet_number)
+        self.id_number = bet_number
         bet_number += 1
 
     # equality check
@@ -81,7 +81,7 @@ class Bet:
 
     @profile
     def __hash__(self):
-        return hash(self.id_number)
+        return self.id_number
 
     #####################################################################################
     # a bet A is a dependency of a bet B if either...
