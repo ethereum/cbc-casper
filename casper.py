@@ -39,20 +39,27 @@ if sys.argv[1:] == ['rounds']:
         last_bets = []
         validator_received_bet = set()
 
+        pairs = []
+
+        for i in xrange(NUM_VALIDATORS):
+            for j in xrange(NUM_VALIDATORS):
+                if i != j:
+                    pairs.append([i, j])
+
         messages = []
         for i in xrange(NUM_MESSAGES_PER_ROUND):
-            x1 = r.sample(VALIDATOR_NAMES, 1)[0]
-            x2 = r.sample(VALIDATOR_NAMES.difference(set([x1])), 1)[0]
-            messages.append([x1, x2])
+            message_path = r.sample(pairs, 1)
+            messages.append(message_path[0])
+            pairs.remove(message_path[0])
 
         for i in xrange(NUM_VALIDATORS):
             last_bets.append(network.validators[i].my_latest_bet)
 
-        for i in xrange(NUM_VALIDATORS):
-            for j in xrange(NUM_VALIDATORS):
-                if i != j and [i, j] in messages:
-                    network.propagate_bet_to_validator(last_bets[i], j)
-                    validator_received_bet.add(j)
+        for path in messages:
+            i = path[0]
+            j = path[1]
+            network.propagate_bet_to_validator(last_bets[i], j)
+            validator_received_bet.add(j)
 
         for i in xrange(NUM_VALIDATORS):
             if not decided[i] and i in validator_received_bet:
