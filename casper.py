@@ -27,12 +27,16 @@ if sys.argv[1:] == ['rounds']:
     safe_bets = set()
 
     NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)
+    REPORT_INTERVAL = 20
 
     network.random_initialization()
+
+    iterator = 0
     while(True):
 
-        network.report(safe_bets)
-
+        if iterator % REPORT_INTERVAL == 0:
+            network.report(safe_bets)
+        iterator += 1
         # for i in xrange(NUM_VALIDATORS):
         #    network.validators[i].view.plot_view(safe_bets)
 
