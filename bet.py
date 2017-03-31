@@ -13,7 +13,6 @@ class Bet:
     # ...these things are not very conceptually important...
 
     # constructor!
-    @profile
     def __init__(self, estimate, justification, sender):
 
         # be safe. type check!...
@@ -35,7 +34,6 @@ class Bet:
         bet_number += 1
 
     # equality check
-    @profile
     def __eq__(self, B):
 
         # the empty set is not a bet!
@@ -58,7 +56,6 @@ class Bet:
 
     # this is not an efficient serialization, because bets are included redundantly
     # but this does serialize bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
-    @profile
     def __str__(self):
         string = "("
         string += str(self.estimate) + ", {"

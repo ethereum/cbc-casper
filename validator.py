@@ -31,7 +31,6 @@ class Validator:
         self.my_latest_bet = None
         self.my_latest_estimate = None
 
-    @profile
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
@@ -134,8 +133,6 @@ class Validator:
         self.decided = not unsafe
         return not unsafe
 
-
-    @profile
     def make_bet_with_null_justification(self, estimate):
         assert (len(self.view.bets) == 0 and
                 self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
@@ -144,7 +141,6 @@ class Validator:
         self.latest_observed_bets[self.name] = self.my_latest_bet
         return self.my_latest_bet
 
-    @profile
     def make_new_latest_bet(self):
 
         if len(self.view.bets) == 0 and self.my_latest_bet is None:
@@ -176,7 +172,7 @@ class Validator:
         sender = self.name
 
         self.my_latest_bet = Bet(estimate, justification, sender)
-        self.my_latest_bet.make_redundancy_free()
+        # self.my_latest_bet.make_redundancy_free()
         self.my_latest_estimate = estimate
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
@@ -246,7 +242,6 @@ class Validator:
         else:
             print "unable to show bet to decided node"
 
-    @profile
     def show_set_of_bets(self, bets):
         if not self.decided:
             for bet in bets:

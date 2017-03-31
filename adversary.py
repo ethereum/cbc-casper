@@ -93,14 +93,12 @@ class Adversary:
         self.operations_log = []
 
     # this method updates the attack delta using the Adversary's record of the victim and target estimate weights...
-    @profile
     def update_attack_delta(self):
         self.attack_delta = self.weight_of_victim_estimate - self.weight_of_target_estimate
 
     # ...and this one returns "True" if the attack delta is less than or equal to zero
     # (indicating target weight >= victim weight)...
     # ...and it returns "False" otherwise...
-    @profile
     def is_attack_complete(self):
         if self.attack_delta <= 0:
             return True
