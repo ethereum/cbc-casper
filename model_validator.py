@@ -131,10 +131,10 @@ class Model_Validator:
             return
 
         assert isinstance(self.latest_observed_bets[bet.sender], Bet), self.latest_observed_bets_value_error
-        # This is the "normal case", where a bet from a validator is viewable only if
-        # the latest bet is in its dependency
-        if self.latest_observed_bets[bet.sender].is_dependency(bet):
-            self.viewable[bet.sender] = bet
+
+        # We don't need to check if the received bet is after our latest bet observed for bet.sender..
+        # ...because this is only called by the adversary in a non-equivocating setting
+        self.viewable[bet.sender] = bet
 
     # This function attempts to make a new latest bet for this validator (self) with a given estimate
     @profile
