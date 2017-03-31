@@ -26,7 +26,7 @@ if sys.argv[1:] == ['rounds']:
     decided = dict.fromkeys(VALIDATOR_NAMES, 0)
     safe_bets = set()
 
-    NUM_MESSAGES_PER_ROUND = NUM_VALIDATORS
+    NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)
 
     network.random_initialization()
     while(True):
