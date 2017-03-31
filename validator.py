@@ -47,9 +47,6 @@ class Validator:
             else:
                 assert isinstance(self.latest_observed_bets[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
 
-                # we can get the latest bets in our standard way
-                my_view = View(set([self.latest_observed_bets[w]]))
-
                 # then all bets that are causally after these bets are viewable by this validator
                 for b in self.view.get_extension():
 
