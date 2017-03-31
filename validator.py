@@ -29,6 +29,7 @@ class Validator:
             self.viewables[v] = dict()
         self.decided = False
         self.my_latest_bet = None
+        self.my_latest_estimate = None
 
     @profile
     def get_latest_estimate(self):
@@ -67,7 +68,7 @@ class Validator:
                 # for validators without anything in their view, any bets are later bets are viewable bets!
                 # ...so we add them all in!
                 for b in self.view.get_extension():
-                    if b.estimate == 1 - self.get_latest_estimate() and b.sender not in viewables[w]:
+                    if b.estimate == 1 - self.my_latest_estimate and b.sender not in viewables[w]:
                         viewables[w][b.sender] = b
 
             # if we do have a latest bet from this validator, then...
@@ -80,7 +81,7 @@ class Validator:
                     if b.sender in viewables[w]:
                         continue
 
-                    if b.estimate != 1 - self.get_latest_estimate():
+                    if b.estimate != 1 - self.my_latest_estimate:
                         continue
 
                     # ...we use the is_dependency relation to test if b is causally after the
@@ -101,7 +102,7 @@ class Validator:
     def decide_if_safe(self):
 
         print "entering decide if safe!"
-        print "self.get_latest_estimate()", self.get_latest_estimate()
+        print "self.my_latest_estimate", self.my_latest_estimate
         if self.get_latest_estimate() is None:
             raise Exception("cannot decide if safe without an estimate")
 
@@ -123,7 +124,7 @@ class Validator:
 
         self.viewables = self.get_viewables()
 
-        adversary = Adversary(self.view, self.get_latest_estimate(), copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
+        adversary = Adversary(self.view, self.my_latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
 
         print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
@@ -151,6 +152,7 @@ class Validator:
             self.my_latest_bet = self.make_bet_with_null_justification(estimate)
             self.view.add_bet(self.my_latest_bet)
 
+            self.my_latest_estimate = estimate
             self.decide_if_safe()
             return self.my_latest_bet
 
@@ -176,7 +178,7 @@ class Validator:
 
         self.my_latest_bet = Bet(estimate, justification, sender)
         self.my_latest_bet.make_redundancy_free()
-
+        self.my_latest_estimate = estimate
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
 
