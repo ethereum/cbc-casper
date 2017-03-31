@@ -20,7 +20,7 @@ class Model_Validator:
      of a bet or the empty set"""
 
     @profile
-    def __init__(self, model_of_validator, view, my_latest_bet, my_latest_observed_bets, target_estimate):
+    def __init__(self, model_of_validator, my_latest_bet, my_latest_observed_bets, viewable, target_estimate):
 
         # be safe, type check!
         assert target_estimate in ESTIMATE_SPACE, "...expected an estimate!"
@@ -30,9 +30,6 @@ class Model_Validator:
         assert model_of_validator in VALIDATOR_NAMES, "expected validator in __init__ of Model_Validator"
         self.model_of = model_of_validator
 
-        # for good measure, lets make sure that we really have a view, here...
-        assert isinstance(view, View), "expected view in __init__ of Model_Validator"
-
         self.my_latest_bet = my_latest_bet
         self.target_estimate = target_estimate
 
@@ -40,48 +37,10 @@ class Model_Validator:
 
         # These are the bets the validator "can see" from a view given by self.my_latest_bet...
         # ...in the sense that these bets are not already in the extension of its view
-        self.viewable = dict()
+        self.viewable = viewable
 
         # will track the latest bets observed by this model validator
         self.latest_observed_bets = my_latest_observed_bets
-
-        # if this validator has no latest bets in the view, then we store...
-        if self.my_latest_bet is None:
-
-            # for validators without anything in their view, any bets are later bets are viewable bets!
-            # ...so we add them all in!
-            for b in view.get_extension():
-                if b.estimate == self.target_estimate and b.sender not in self.viewable:
-                    self.viewable[b.sender] = b
-
-        # if we do have a latest bet from this validator, then...
-        else:
-            assert isinstance(self.my_latest_bet, Bet), "...expected my_latest_bet to be a bet or the empty set"
-
-            # we can get the latest bets in our standard way
-            my_view = View(set([self.my_latest_bet]))
-
-            # then all bets that are causally after these bets are viewable by this validator
-            for b in view.get_extension():
-
-                if b.sender in self.viewable:
-                    continue
-
-                if b.estimate != self.target_estimate:
-                    continue
-
-                # ...we use the is_dependency relation to test if b is causally after the
-                # latest bet observed from that sender
-                if b.sender not in self.latest_observed_bets:
-                    self.viewable[b.sender] = b
-                else:
-                    assert isinstance(self.latest_observed_bets[b.sender], Bet), """...expected dictionary
-                     latest_observed_bets to only contain values of a bet or the empty set"""
-
-                    # if b is later than the latest observed bet from b.sender,
-                    # then b is viewable to this model validator
-                    if self.latest_observed_bets[b.sender].is_dependency(b):
-                        self.viewable[b.sender] = b
 
     # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
     @profile

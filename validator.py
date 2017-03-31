@@ -24,10 +24,53 @@ class Validator:
         self.latest_estimate = None
         self.latest_observed_bets = dict()
         self.vicarious_latest_bets = dict()
+        self.viewables = dict()
         for v in VALIDATOR_NAMES:
             self.vicarious_latest_bets[v] = dict()
+            self.viewables[v] = dict()
         self.decided = False
         self.my_latest_bet = None
+
+    def get_viewables(self):
+        # if this validator has no latest bets in the view, then we store...
+
+        for w in VALIDATOR_NAMES:
+            if w not in self.latest_observed_bets:
+
+                # for validators without anything in their view, any bets are later bets are viewable bets!
+                # ...so we add them all in!
+                for b in self.view.get_extension():
+                    if b.estimate == 1 - self.latest_estimate and b.sender not in self.viewables[w]:
+                        self.viewables[w][b.sender] = b
+
+            # if we do have a latest bet from this validator, then...
+            else:
+                assert isinstance(self.latest_observed_bets[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
+
+                # we can get the latest bets in our standard way
+                my_view = View(set([self.latest_observed_bets[w]]))
+
+                # then all bets that are causally after these bets are viewable by this validator
+                for b in self.view.get_extension():
+
+                    if b.sender in self.viewables[w]:
+                        continue
+
+                    if b.estimate != 1 - self.latest_estimate:
+                        continue
+
+                    # ...we use the is_dependency relation to test if b is causally after the
+                    # latest bet observed from that sender
+                    if b.sender not in self.vicarious_latest_bets[w]:
+                        self.viewables[w][b.sender] = b
+                    else:
+                        assert isinstance(self.vicarious_latest_bets[w][b.sender], Bet), """...expected dictionary
+                         latest_observed_bets to only contain values of a bet or the empty set"""
+
+                        # if b is later than the latest observed bet from b.sender,
+                        # then b is viewable to this model validator
+                        if self.vicarious_latest_bets[w][b.sender].is_dependency(b):
+                            self.viewables[w][b.sender] = b
 
     @profile
     def decide_if_safe(self):
@@ -53,7 +96,9 @@ class Validator:
             print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
             vic_lb.plot_view(vic_lb.bets, 'yellow')
 
-        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets))
+        self.get_viewables()
+
+        adversary = Adversary(self.view, self.latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
 
         print "about to conduct ideal attack"
         unsafe, _ = adversary.ideal_network_attack()
