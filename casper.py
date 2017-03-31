@@ -36,9 +36,6 @@ if sys.argv[1:] == ['rounds']:
         # for i in xrange(NUM_VALIDATORS):
         #    network.validators[i].view.plot_view(safe_bets)
 
-        last_bets = []
-        validator_received_bet = set()
-
         pairs = []
 
         for i in xrange(NUM_VALIDATORS):
@@ -52,6 +49,8 @@ if sys.argv[1:] == ['rounds']:
             messages.append(message_path[0])
             pairs.remove(message_path[0])
 
+        last_bets = []
+        validator_received_bet = set()
         for i in xrange(NUM_VALIDATORS):
             last_bets.append(network.validators[i].my_latest_bet)
 
