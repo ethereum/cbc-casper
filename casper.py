@@ -73,7 +73,7 @@ if sys.argv[1:] == ['rounds']:
         for i in xrange(NUM_VALIDATORS):
             if not decided[i] and i in validator_received_bet:
                 new_bet = network.get_bet_from_validator(i)
-                decided[i] = network.validators[i].decided
+                decided[i] = network.validators[i].decide_if_safe()
 
                 if decided[i]:
                     safe_bets.add(new_bet)

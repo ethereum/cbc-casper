@@ -153,7 +153,6 @@ class Validator:
             self.view.add_bet(self.my_latest_bet)
 
             self.my_latest_estimate = estimate
-            self.decide_if_safe()
             return self.my_latest_bet
 
         if self.my_latest_bet is None:
@@ -182,7 +181,6 @@ class Validator:
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
 
-        self.decide_if_safe()
         return self.my_latest_bet
 
     @profile
