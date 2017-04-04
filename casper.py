@@ -108,7 +108,7 @@ elif sys.argv[1:] == ['blockchain']:
 
         if not decided[next_validator]:
             new_bet = network.get_bet_from_validator(next_validator)
-            decided[next_validator] = network.validators[next_validator].decided
+            decided[next_validator] = network.validators[next_validator].decide_if_safe()
 
             if decided[next_validator]:
                 safe_bets.add(new_bet)
