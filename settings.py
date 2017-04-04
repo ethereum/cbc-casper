@@ -22,7 +22,7 @@ ESTIMATE_SPACE = set([0, 1])
 # here they are... !
 WEIGHTS = dict()
 for v in VALIDATOR_NAMES:
-    WEIGHTS[v] = 100.0 + v + 1/(float)(BIGINT + r.randint(1, BIGINT))
+    WEIGHTS[v] = max(20, r.gauss(mu=60, sigma=40)) + 1.0/(BIGINT + r.uniform(0, 1))
 
 # behold, the binary estimate space!...
 # it's a bit underwhelming, sure, but it's foundational

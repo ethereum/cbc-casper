@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pylab
 
+from math import pi
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
@@ -206,7 +207,9 @@ class View:
             labels[b] = b.estimate
         # labels['B']=r'$b$'
 
+        node_sizes = [700*pow(WEIGHTS[node.sender]/pi, 0.5) for node in G.nodes()]
+
         nx.draw_networkx_labels(G, positions, labels, font_size=20)
 
-        nx.draw(G, positions, node_color=color_values, node_size=1500, edge_color='black', edge_cmap=plt.cm.Reds)
+        nx.draw(G, positions, node_color=color_values, node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
         pylab.show()
