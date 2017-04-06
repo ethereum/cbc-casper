@@ -136,7 +136,7 @@ class Validator:
     def make_bet_with_null_justification(self, estimate):
         assert (len(self.view.bets) == 0 and
                 self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
-        self.my_latest_bet = Bet(estimate, set(), self.name)
+        self.my_latest_bet = Bet(estimate, dict(), self.name)
         self.view.add_bet(self.my_latest_bet)
         self.latest_observed_bets[self.name] = self.my_latest_bet
         return self.my_latest_bet
@@ -151,24 +151,8 @@ class Validator:
             self.my_latest_estimate = estimate
             return self.my_latest_bet
 
-        if self.my_latest_bet is None:
-            already_committed_view = View(set())
-        else:
-            already_committed_view = View(View(self.my_latest_bet.justification).get_extension())
-
         estimate = self.get_latest_estimate()
-        justification = set()
-        for v in VALIDATOR_NAMES:
-            if v in self.latest_observed_bets:
-                justification.add(self.latest_observed_bets[v])
-
-        to_be_removed = set()
-        for j in justification:
-            if j in already_committed_view.bets:
-                to_be_removed.add(j)
-
-        justification.difference_update(to_be_removed)
-
+        justification = self.latest_observed_bets
         sender = self.name
 
         self.my_latest_bet = Bet(estimate, justification, sender)
@@ -191,7 +175,7 @@ class Validator:
         if self.my_latest_bet is None:
             already_committed_view = View(set())
         else:
-            already_committed_view = View(View(self.my_latest_bet.justification).get_extension())
+            already_committed_view = View(View(self.my_latest_bet.justification.values()).get_extension())
 
         # bets that this validator just now sees for the first time
         newly_discovered_bets = View(showed_bets).get_extension().difference(already_committed_view.bets)

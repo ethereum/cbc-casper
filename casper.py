@@ -87,7 +87,7 @@ elif sys.argv[1:] == ['blockchain']:
     decided = dict.fromkeys(VALIDATOR_NAMES, 0)
     safe_bets = set()
 
-    random_bet = Bet(r.randint(0, 1), set(), 0)
+    random_bet = Bet(r.randint(0, 1), dict(), 0)
     initial_view = View(set([random_bet]))
     network.view_initialization(initial_view)
     iterator = 0

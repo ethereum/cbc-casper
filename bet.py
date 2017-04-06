@@ -3,6 +3,7 @@
 # a set of bets or the empty set)
 
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE
+import copy
 
 bet_number = 0
 
@@ -18,15 +19,14 @@ class Bet:
         # be safe. type check!...
         assert sender in VALIDATOR_NAMES, "...expected a validator!"
         assert estimate in ESTIMATE_SPACE, "...expected an estimate!"
-        for b in justification:  # anything iterable, containing bets
-            assert isinstance(b, Bet), "...expected there to be only bets in the justification!"
+        assert type(justification) is dict, "expected justification to be a dict!"
+        for v in justification.keys():  # anything iterable, containing bets
+            assert isinstance(justification[v], Bet), "...expected there to be only bets in the justification!"
 
         # ...then do some assignment
         self.sender = sender
         self.estimate = estimate
-        self.justification = set()
-        for b in justification:
-            self.justification.add(b)
+        self.justification = copy.copy(justification)
 
         # ...sorting some things out just for debugging please ignore this!
         global bet_number
@@ -62,7 +62,7 @@ class Bet:
         i = 0
         # if this following line of code sometimes produces different orders (justification is a set), then
         # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
-        for b in self.justification:
+        for b in self.justification.values():
             string += str(b)
             i += 1
             if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
@@ -93,13 +93,13 @@ class Bet:
 
         # be safe, type check!
         # self is definitely a dependency of B if it is in the justification...
-        if self in B.justification:
+        if self in B.justification.values():
             return True
 
         is_checked[B] = True
 
         # ...or if it is in the dependency of anything in the justification!
-        for b in B.justification:
+        for b in B.justification.values():
             if b not in is_checked:
                 if self.recursive_is_dependency(b, is_checked):
                     return True
@@ -124,7 +124,7 @@ class Bet:
 
         # recurr into the justification to find all dependencies and add them to our set "d"
         def recurr(B):
-            for b in B.justification:  # recursion bottoms on empty iterable
+            for b in B.justification.values():  # recursion bottoms on empty iterable
                 dependencies.add(b)  # note that .add in set() checks if __hash__ does not already appear!
                 recurr(b)
 
@@ -134,6 +134,7 @@ class Bet:
         # we did it!
         return dependencies
 
+'''
     @profile
     def make_redundancy_free(self):
 
@@ -150,3 +151,4 @@ class Bet:
                         to_remove_from_justification.add(b1)
                         dont_check.add((b2, b1))
         self.justification.difference_update(to_remove_from_justification)
+'''

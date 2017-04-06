@@ -97,7 +97,7 @@ class Model_Validator:
     def make_new_latest_bet(self):
 
         if self.my_latest_bet is None:
-            new_bet = Bet(self.target_estimate, [], self.model_of)
+            new_bet = Bet(self.target_estimate, dict(), self.model_of)
             self.my_latest_bet = new_bet
             return new_bet
 
@@ -118,21 +118,9 @@ class Model_Validator:
         # ...then we'll make a new bet with that estimate and return it...
 
         if self.my_estimate() == self.target_estimate:
-            justification = set()
-            for v in VALIDATOR_NAMES:
-                if v in self.latest_observed_bets:
-                    justification.add(self.latest_observed_bets[v])
-
-            to_be_removed = set()
-            for j in justification:
-                if j in self.already_committed_view.bets:
-                    to_be_removed.add(j)
-            justification.difference_update(to_be_removed)
-
-            self.already_committed_view.add_view(View(justification))
 
             # make the new bet
-            new_latest_bet = Bet(self.target_estimate, justification, self.model_of)
+            new_latest_bet = Bet(self.target_estimate, self.latest_observed_bets, self.model_of)
 
             # and update the model parameters accordingly:
             self.my_latest_bet = new_latest_bet

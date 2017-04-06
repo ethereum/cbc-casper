@@ -171,7 +171,7 @@ class View:
 
         for b in nodes:
             G.add_edges_from([(b, b)])
-            for b2 in b.justification:
+            for b2 in b.justification.values():
                 G.add_edges_from([(b2, b)])
 
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
@@ -180,7 +180,7 @@ class View:
         def display_height(bet, i=0):
 
             l = []
-            for b in bet.justification:
+            for b in bet.justification.values():
                 l.append(display_height(b, i+1))
 
             if len(l) > 0:
