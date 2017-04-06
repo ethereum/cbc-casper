@@ -166,8 +166,6 @@ class Validator:
     @profile
     def update_view_and_latest_bets(self, showed_bets):
 
-        to_remove_from_view = []
-
         '''
         PART 1 - updating latest bets
         '''
@@ -195,28 +193,13 @@ class Validator:
             assert (b == self.latest_observed_bets[b.sender] or
                     b.is_dependency(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
 
-            to_remove_from_view.append(b)
-
         '''
         PART 2 - updating vicarious latest bets
         '''
 
         # updating vicarious_latest_bets for validator v, for all v..
         for v in self.latest_observed_bets:
-
-            previously_latest_bets = set()
-            for w in self.vicarious_latest_bets[v]:
-                previously_latest_bets.add(self.vicarious_latest_bets[v][w])
-
-            previous_view = View(previously_latest_bets).get_extension()
-
-            vicarious_newly_discovered_bets = View([self.latest_observed_bets[v]]).get_extension().difference(previous_view)
-
-            for b in vicarious_newly_discovered_bets:
-                if b.sender not in self.vicarious_latest_bets[v] or self.vicarious_latest_bets[v][b.sender].is_dependency(b):
-                    self.vicarious_latest_bets[v][b.sender] = b
-
-        self.view.remove_bets(to_remove_from_view)
+            self.vicarious_latest_bets[v] = self.latest_observed_bets[v].justification
 
     @profile
     def show_single_bet(self, bet):
