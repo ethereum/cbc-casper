@@ -11,7 +11,7 @@ import sys
 
 import random as r  # to ensure the tie-breaking property
 
-from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS
+from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
 from bet import Bet
 from view import View
 from adversary import Adversary
@@ -25,10 +25,6 @@ if sys.argv[1:] == ['rounds']:
 
     decided = dict.fromkeys(VALIDATOR_NAMES, 0)
     safe_bets = set()
-
-    NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)/20
-    REPORT_INTERVAL = 20
-    REPORT_SUBJECTIVE_VIEWS = False
 
     network.random_initialization()
 
