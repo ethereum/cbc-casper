@@ -170,13 +170,11 @@ class Validator:
         PART 1 - updating latest bets
         '''
 
-        if self.my_latest_bet is None:
-            already_committed_view = View(set())
-        else:
-            already_committed_view = View(View(self.my_latest_bet.justification.values()).get_extension())
+        sequence_numbers = dict()
+        for v in self.latest_observed_bets:
+            sequence_numbers[v] = self.latest_observed_bets[v].sequence_number
 
-        # bets that this validator just now sees for the first time
-        newly_discovered_bets = View(showed_bets).get_extension().difference(already_committed_view.bets)
+        newly_discovered_bets = View(showed_bets).get_extension_up_to_sequence_numbers(sequence_numbers)
 
         # updating latest bets..
         for b in newly_discovered_bets:

@@ -80,6 +80,36 @@ class View:
         self.recompute_extension = False
         return self.extension
 
+    @profile
+    def get_extension_up_to_sequence_numbers(self, sequence_numbers):
+
+        sieve = set(self.bets)
+        extension = set()
+
+        while(sieve != set()):
+
+            to_remove_from_sieve = []
+            to_add_to_sieve = []
+
+            for bet in sieve:
+
+                to_remove_from_sieve.append(bet)
+
+                if bet.sender not in sequence_numbers or bet.sequence_number > sequence_numbers[bet.sender]:
+                    extension.add(bet)
+
+                    for b in bet.justification.values():
+                        to_add_to_sieve.append(b)
+
+            for b in to_remove_from_sieve:
+                sieve.remove(b)
+
+            for b in to_add_to_sieve:
+                sieve.add(b)
+
+        return extension
+
+
     #####################################################################################
     # if A is a dependency of B, B is causally dependent on A...
     # ...which means that B is causally (and therefore chronologically) "later" than A...
