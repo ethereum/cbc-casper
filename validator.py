@@ -31,6 +31,11 @@ class Validator:
         self.my_latest_bet = None
         self.my_latest_estimate = None
 
+        # this will store the latest bets seen from validators, for each estimate
+        self.lastest_bets_with_estimate = dict()
+        for e in ESTIMATE_SPACE:
+            self.lastest_bets_with_estimate[e] = dict()
+
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
@@ -66,35 +71,23 @@ class Validator:
 
                 # for validators without anything in their view, any bets are later bets are viewable bets!
                 # ...so we add them all in!
-                for b in self.view.get_extension():
-                    if b.estimate == 1 - self.my_latest_estimate and b.sender not in viewables[w]:
-                        viewables[w][b.sender] = b
+                for v in self.lastest_bets_with_estimate[1 - self.my_latest_estimate].keys():
+                    viewables[w][v] = self.lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
 
             # if we do have a latest bet from this validator, then...
             else:
                 assert isinstance(self.latest_observed_bets[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
 
                 # then all bets that are causally after these bets are viewable by this validator
-                for b in self.view.get_extension():
 
-                    if b.sender in viewables[w]:
+                for v in self.lastest_bets_with_estimate[1 - self.my_latest_estimate].keys():
+                    if v not in self.vicarious_latest_bets[w].keys():
+                        viewables[w][v] = self.lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
                         continue
 
-                    if b.estimate != 1 - self.my_latest_estimate:
-                        continue
+                    if self.vicarious_latest_bets[w][v].sequence_number < self.lastest_bets_with_estimate[1 - self.my_latest_estimate][v].sequence_number:
+                        viewables[w][v] = self.lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
 
-                    # ...we use the is_dependency relation to test if b is causally after the
-                    # latest bet observed from that sender
-                    if b.sender not in self.vicarious_latest_bets[w]:
-                        viewables[w][b.sender] = b
-                    else:
-                        assert isinstance(self.vicarious_latest_bets[w][b.sender], Bet), """...expected dictionary
-                         latest_observed_bets to only contain values of a bet or the empty set"""
-
-                        # if b is later than the latest observed bet from b.sender,
-                        # then b is viewable to this model validator
-                        if self.vicarious_latest_bets[w][b.sender].sequence_number < b.sequence_number:
-                            viewables[w][b.sender] = b
         return viewables
 
     @profile
@@ -181,11 +174,20 @@ class Validator:
 
             if b.sender not in self.latest_observed_bets:
                 self.latest_observed_bets[b.sender] = b
+                self.lastest_bets_with_estimate[b.estimate][b.sender] = b
                 continue
 
             if self.latest_observed_bets[b.sender].sequence_number < b.sequence_number:
                 self.latest_observed_bets[b.sender] = b
+                self.lastest_bets_with_estimate[b.estimate][b.sender] = b
                 continue
+
+            if b.sender not in self.lastest_bets_with_estimate[b.estimate]:
+                self.lastest_bets_with_estimate[b.estimate][b.sender] = b
+                continue
+
+            if self.lastest_bets_with_estimate[b.estimate][b.sender].sequence_number < b.sequence_number:
+                self.lastest_bets_with_estimate[b.estimate][b.sender] = b
 
             assert (b == self.latest_observed_bets[b.sender] or
                     b.is_dependency_from_same_validator(self.latest_observed_bets[b.sender])), "...did not expect any equivocating nodes!"
