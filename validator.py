@@ -93,7 +93,7 @@ class Validator:
 
                         # if b is later than the latest observed bet from b.sender,
                         # then b is viewable to this model validator
-                        if self.vicarious_latest_bets[w][b.sender].is_dependency_from_same_validator(b):
+                        if self.vicarious_latest_bets[w][b.sender].sequence_number < b.sequence_number:
                             viewables[w][b.sender] = b
         return viewables
 
@@ -185,8 +185,7 @@ class Validator:
                 self.latest_observed_bets[b.sender] = b
                 continue
 
-            # ...is_dependency is not defined for self.latest_observed_bets[b.sender] == None
-            if self.latest_observed_bets[b.sender].is_dependency_from_same_validator(b):
+            if self.latest_observed_bets[b.sender].sequence_number < b.sequence_number:
                 self.latest_observed_bets[b.sender] = b
                 continue
 

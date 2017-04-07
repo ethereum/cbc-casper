@@ -28,6 +28,11 @@ class Bet:
         self.estimate = estimate
         self.justification = copy.copy(justification)
 
+        if self.sender not in self.justification:
+            self.sequence_number = 0
+        else:
+            self.sequence_number = self.justification[self.sender].sequence_number + 1
+
         # ...sorting some things out just for debugging please ignore this!
         global bet_number
         self.id_number = bet_number
