@@ -134,6 +134,25 @@ class Bet:
         # we did it!
         return dependencies
 
+    @profile
+    def recursive_is_dependency_from_same_validator(self, B):
+
+        # this is the case where we get to the sender's first Bet before finding this bet
+        if self.sender not in B.justification:
+            return False
+
+        if self == B.justification[self.sender]:
+            return True
+
+        return self.recursive_is_dependency_from_same_validator(B.justification[self.sender])
+
+    @profile
+    def is_dependency_from_same_validator(self, B):
+        assert isinstance(B, Bet), "...expected a bet!"
+        assert B.sender == self.sender, "...expected bets to be from the same validator"
+
+        return self.recursive_is_dependency_from_same_validator(B)
+
 '''
     @profile
     def make_redundancy_free(self):
