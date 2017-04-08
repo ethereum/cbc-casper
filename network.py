@@ -55,5 +55,7 @@ class Network:
     def report(self, safe_bets):
         betset = set()
         for v in VALIDATOR_NAMES:
-            betset.add(self.validators[v].my_latest_bet)
+            if self.validators[v].my_latest_bet != None:
+                betset.add(self.validators[v].my_latest_bet)
+
         View(betset).plot_view(safe_bets)
