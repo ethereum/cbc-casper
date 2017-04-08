@@ -73,12 +73,7 @@ class View:
     # the "extension" of a view is the union of the bets in a view and the bets in its dependency!
     @profile
     def get_extension(self):
-        if not self.recompute_extension:
-            return self.extension
-        # store the extension in the cache
-        self.extension = (self.dependency()).union(self.bets)
-        self.recompute_extension = False
-        return self.extension
+        return (self.dependency()).union(self.bets)
 
     @profile
     def dependency_from_same_validator(self):
@@ -90,9 +85,7 @@ class View:
 
     @profile
     def get_extension_from_same_validator(self):
-        self.extension = (self.dependency_from_same_validator()).union(self.bets)
-        return self.extension
-
+        return (self.dependency_from_same_validator()).union(self.bets)
 
     @profile
     def get_extension_up_to_sequence_numbers(self, sequence_numbers):
