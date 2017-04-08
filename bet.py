@@ -171,10 +171,10 @@ class Bet:
 
     @profile
     def dependency_from_same_validator(self):
-        depenencies = set()
+        dependencies = set()
 
         def recurr(B):
-            depenencies.add(B)
+            dependencies.add(B)
             if self.sender not in B.justification:
                 return
             else:
@@ -182,7 +182,7 @@ class Bet:
 
         recurr(self)
 
-        return depenencies
+        return dependencies
 
 
 '''
