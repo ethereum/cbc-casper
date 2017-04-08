@@ -12,13 +12,11 @@
 # weight_of_target_estimate
 # attack_delta
 # operation_log
-import copy   # hopefully this does not end up being used
 
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
 from view import View
 from model_validator import Model_Validator
-
 
 class Adversary:
 
@@ -36,7 +34,7 @@ class Adversary:
         self.target_estimate = 1 - victim_estimate  # this will need to change when we go from binary to n-ary
 
         # the attacker keeps a copy of the parameter view, to which she will add attacking bets...
-        self.attack_view = copy.deepcopy(view)
+        self.attack_view = view
 
         # ...and she will keep track of the latest estimates from these validators, if unique
         self.latest_bets = latest_observed_bets
