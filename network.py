@@ -53,4 +53,7 @@ class Network:
             self.get_bet_from_validator(v)
 
     def report(self, safe_bets):
-        View(self.global_view).plot_view(safe_bets)
+        betset = set()
+        for v in VALIDATOR_NAMES:
+            betset.add(self.validators[v].my_latest_bet)
+        View(betset).plot_view(safe_bets)

@@ -81,6 +81,20 @@ class View:
         return self.extension
 
     @profile
+    def dependency_from_same_validator(self):
+        dependencies = set()
+        for bet in self.bets:
+            dependencies = dependencies.union(bet.dependency_from_same_validator())
+
+        return dependencies
+
+    @profile
+    def get_extension_from_same_validator(self):
+        self.extension = (self.dependency_from_same_validator()).union(self.bets)
+        return self.extension
+
+
+    @profile
     def get_extension_up_to_sequence_numbers(self, sequence_numbers):
 
         sieve = set(self.bets)
@@ -108,7 +122,6 @@ class View:
                 sieve.add(b)
 
         return extension
-
 
     #####################################################################################
     # if A is a dependency of B, B is causally dependent on A...
@@ -193,11 +206,12 @@ class View:
         else:
             raise Exception("...expected a non-empty view")
 
+    @profile
     def plot_view(self, coloured_bets, colour='green'):
 
         G = nx.DiGraph()
 
-        nodes = self.get_extension()
+        nodes = self.get_extension_from_same_validator()
 
         for b in nodes:
             G.add_edges_from([(b, b)])
@@ -207,21 +221,10 @@ class View:
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
         # G.add_edges_from([('C','F')])
 
-        def display_height(bet, i=0):
-
-            l = []
-            for b in bet.justification.values():
-                l.append(display_height(b, i+1))
-
-            if len(l) > 0:
-                return max(l) + 1
-            else:
-                return 0
-
         positions = dict()
 
         for b in nodes:
-            positions[b] = (float)(b.sender+1)/(float)(NUM_VALIDATORS+1), (display_height(b)+1)/4.
+            positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), (b.height + 1)/4.
 
         node_color_map = {}
         for b in nodes:

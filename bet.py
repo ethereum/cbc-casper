@@ -33,12 +33,23 @@ class Bet:
         else:
             self.sequence_number = self.justification[self.sender].sequence_number + 1
 
+        if self.justification == dict():
+            self.height = 0
+        else:
+            candidate_max = 0
+            for v in self.justification:
+                if self.justification[v].height > candidate_max:
+                    candidate_max = self.justification[v].height
+
+            self.height = candidate_max + 1
+
         # ...sorting some things out just for debugging please ignore this!
         global bet_number
         self.id_number = bet_number
         bet_number += 1
 
     # equality check
+    @profile
     def __eq__(self, B):
 
         # the empty set is not a bet!
@@ -157,6 +168,22 @@ class Bet:
         assert B.sender == self.sender, "...expected bets to be from the same validator"
 
         return self.recursive_is_dependency_from_same_validator(B)
+
+    @profile
+    def dependency_from_same_validator(self):
+        depenencies = set()
+
+        def recurr(B):
+            depenencies.add(B)
+            if self.sender not in B.justification:
+                return
+            else:
+                recurr(B.justification[self.sender])
+
+        recurr(self)
+
+        return depenencies
+
 
 '''
     @profile
