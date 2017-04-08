@@ -89,7 +89,12 @@ elif sys.argv[1:] == ['blockchain']:
     iterator = 0
 
     while(True):
-        network.report(safe_bets)
+
+        if iterator % REPORT_INTERVAL == 0:
+            network.report(safe_bets)
+            if REPORT_SUBJECTIVE_VIEWS:
+                for i in xrange(NUM_VALIDATORS):
+                    network.validators[i].view.plot_view(safe_bets)
 
         # for i in xrange(NUM_VALIDATORS):
         #    network.validators[i].view.plot_view(safe_bets)
