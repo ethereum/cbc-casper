@@ -19,15 +19,15 @@ class Model_Validator:
     my_latest_bet_value_error = """...expected dictionary latest_observed_bets to only contain values
      of a bet or the empty set"""
 
-    def __init__(self, model_of_validator, my_latest_bet, my_latest_observed_bets, viewable, target_estimate):
+    def __init__(self, validator_name, my_latest_bet, my_latest_observed_bets, viewable, target_estimate):
 
         # be safe, type check!
         assert target_estimate in ESTIMATE_SPACE, "...expected an estimate!"
 
         # lets keep a record of the validator that the model is of...
         # this is useful for adding bets from this validator using class functions other than __init__
-        assert model_of_validator in VALIDATOR_NAMES, "expected validator in __init__ of Model_Validator"
-        self.model_of = model_of_validator
+        assert validator_name in VALIDATOR_NAMES, "expected validator in __init__ of Model_Validator"
+        self.model_of = validator_name
 
         self.my_latest_bet = my_latest_bet
         self.target_estimate = target_estimate
