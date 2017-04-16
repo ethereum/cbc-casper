@@ -11,6 +11,7 @@ from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
 
 class View:
+    @profile
     def __init__(self, bets):
         # be safe, type check!
         for b in bets:
@@ -37,6 +38,7 @@ class View:
             s += str(b) + "\n"
         return s
 
+    @profile
     def add_bet(self, bet):
         self.recompute_extension = True
         self.recompute_latest_bets = True
@@ -47,10 +49,12 @@ class View:
         # ...and finally, add the bet!
         self.bets.add(bet)
 
+    @profile
     def add_view(self, view):
         for b in view.bets:
             self.add_bet(b)
 
+    @profile
     def remove_bets(self, bets_to_remove_from_view):
         self.recompute_extension = True
         self.bets.difference_update(bets_to_remove_from_view)
@@ -126,6 +130,7 @@ class View:
     # this algorithm encodes a map from validators to their lates bets, in a particular view...
     # ...it returns a Python dictionary of the most recent bets, indexed by validator...
     # ...and it stores empty set to handle key exceptions!
+    @profile
     def get_latest_bets(self):
         if not self.recompute_latest_bets:
             return self.latest_bets
@@ -171,6 +176,7 @@ class View:
         return latest_bets
 
     # this computes the maximum weight estimate from the latest bets in the view
+    @profile
     def canonical_estimate(self):
 
         # first, grab the latest bets...

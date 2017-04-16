@@ -36,6 +36,7 @@ class Validator:
         for e in ESTIMATE_SPACE:
             self.lastest_bets_with_estimate[e] = dict()
 
+    @profile
     def get_latest_estimate(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
@@ -116,7 +117,11 @@ class Validator:
 
         self.viewables = self.get_viewables()
 
-        adversary = Adversary(self.my_latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
+        latest_bets_copy = copy.deepcopy(self.latest_observed_bets)
+        vicarious_bets_copy = copy.deepcopy(self.vicarious_latest_bets)
+        viewables_copy = copy.deepcopy(self.viewables)
+
+        adversary = Adversary(self.my_latest_estimate, latest_bets_copy, vicarious_bets_copy, viewables_copy)
 
         print "about to conduct ideal attack"
         unsafe, _, _ = adversary.ideal_network_attack()
@@ -126,6 +131,7 @@ class Validator:
         self.decided = not unsafe
         return not unsafe
 
+    @profile
     def make_bet_with_null_justification(self, estimate):
         assert (len(self.view.bets) == 0 and
                 self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
@@ -134,6 +140,7 @@ class Validator:
         self.latest_observed_bets[self.name] = self.my_latest_bet
         return self.my_latest_bet
 
+    @profile
     def make_new_latest_bet(self):
 
         if len(self.view.bets) == 0 and self.my_latest_bet is None:
@@ -208,6 +215,7 @@ class Validator:
         else:
             print "unable to show bet to decided node"
 
+    @profile
     def receive_bets(self, bets):
         if not self.decided:
             for bet in bets:

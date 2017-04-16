@@ -14,6 +14,7 @@ class Bet:
     # ...these things are not very conceptually important...
 
     # constructor!
+    @profile
     def __init__(self, estimate, justification, sender):
 
         # be safe. type check!...
@@ -72,6 +73,7 @@ class Bet:
 
     # this is not an efficient serialization, because bets are included redundantly
     # but this does serialize bets nicely, like this: "(1, {(1, {}, 0)}, 1)"...!
+    @profile
     def __str__(self):
         string = "("
         string += str(self.estimate) + ", {"
