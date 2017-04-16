@@ -21,10 +21,9 @@ from model_validator import Model_Validator
 class Adversary:
 
     @profile
-    def __init__(self, view, victim_estimate, latest_observed_bets, vicarious_latest_bets, viewables):
+    def __init__(self, victim_estimate, latest_observed_bets, vicarious_latest_bets, viewables):
 
         # be safe! start with type checking.
-        assert isinstance(view, View), "...expected a View!"
         assert victim_estimate in ESTIMATE_SPACE, "...expected an estimate!"
 
         # The adversary has particular estimate that she wants to attack (the victim estimate)...
@@ -33,8 +32,8 @@ class Adversary:
         # ...and a particular estimate she wants to cause to win (the target estimate)...
         self.target_estimate = 1 - victim_estimate  # this will need to change when we go from binary to n-ary
 
-        # the attacker keeps a copy of the parameter view, to which she will add attacking bets...
-        self.attack_view = view
+        # the attacker adds bets the bets they created in the attack to this view...
+        self.attack_view = View(set())
 
         # ...and she will keep track of the latest estimates from these validators, if unique
         self.latest_bets = latest_observed_bets
@@ -163,7 +162,7 @@ class Adversary:
 
                 # if we can end the attack, then lets return our success
                 if self.is_attack_complete():
-                    return True, self.operations_log
+                    return True, self.operations_log, self.attack_view
 
             # updating the set of validators who haven't voted yet...
             # ...to the empty set, because after this loop all validators have voted.
@@ -228,7 +227,7 @@ class Adversary:
                                             hash(new_bet)])
 
                 if self.is_attack_complete():
-                    return True, self.operations_log
+                    return True, self.operations_log, self.attack_view
 
             # now that the attack loop is done, we can remove the
             # validators who made new bets from the "voting_against" set
@@ -241,4 +240,4 @@ class Adversary:
         # if ever we exist the while(progress_made) loop with progress_made == False
         # rather than a return value, then the attack has failed
         assert not progress_made, "...expected to exit loop only when progress is not made"
-        return False, self.operations_log
+        return False, self.operations_log, self.attack_view

@@ -116,10 +116,10 @@ class Validator:
 
         self.viewables = self.get_viewables()
 
-        adversary = Adversary(copy.deepcopy(self.view), self.my_latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
+        adversary = Adversary(self.my_latest_estimate, copy.deepcopy(self.latest_observed_bets), copy.deepcopy(self.vicarious_latest_bets), copy.deepcopy(self.viewables))
 
         print "about to conduct ideal attack"
-        unsafe, _ = adversary.ideal_network_attack()
+        unsafe, _, _ = adversary.ideal_network_attack()
 
         print "are we safe?, ", not unsafe
 
