@@ -201,14 +201,14 @@ class Validator:
             self.vicarious_latest_bets[v] = self.latest_observed_bets[v].justification
 
     @profile
-    def show_single_bet(self, bet):
+    def receive_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
             self.update_view_and_latest_bets(set([bet]))
         else:
             print "unable to show bet to decided node"
 
-    def show_set_of_bets(self, bets):
+    def receive_bets(self, bets):
         if not self.decided:
             for bet in bets:
                 self.view.add_bet(bet)
