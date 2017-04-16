@@ -157,7 +157,7 @@ class Validator:
         return self.my_latest_bet
 
     @profile
-    def update_view_and_latest_bets(self, showed_bets):
+    def update_state(self, showed_bets):
 
         '''
         PART 1 - updating latest bets
@@ -204,7 +204,7 @@ class Validator:
     def receive_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
-            self.update_view_and_latest_bets(set([bet]))
+            self.update_state(set([bet]))
         else:
             print "unable to show bet to decided node"
 
@@ -212,6 +212,6 @@ class Validator:
         if not self.decided:
             for bet in bets:
                 self.view.add_bet(bet)
-            self.update_view_and_latest_bets(bets)
+            self.update_state(bets)
         else:
             print "unable to show bet to decided node"
