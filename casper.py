@@ -19,7 +19,7 @@ from network import Network
 
 @profile
 def main():
-    if sys.argv[1:] == ['rounds']:
+    if sys.argv[1] == 'rounds':
 
         network = Network()
 
@@ -82,7 +82,7 @@ def main():
                 edges.append([last_bets[path[0]], network.validators[path[1]].my_latest_bet])
                 edges.append([last_bets[path[1]], network.validators[path[1]].my_latest_bet])
 
-    elif sys.argv[1:] == ['blockchain']:
+    elif sys.argv[1] == 'blockchain':
 
         network = Network()
 
