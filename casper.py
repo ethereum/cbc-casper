@@ -30,14 +30,15 @@ def main():
 
         network.random_initialization()
 
+        edges = []
         iterator = 0
         while(True):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_bets)
+                network.report(safe_bets,edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_bets)
+                        network.validators[i].view.plot_view(safe_bets, use_edges=edges)
 
             iterator += 1
 
@@ -48,6 +49,7 @@ def main():
                         pairs.append([i, j])
 
             messages = []
+
             for i in xrange(NUM_MESSAGES_PER_ROUND):
                 message_path = r.sample(pairs, 1)
                 messages.append(message_path[0])
@@ -75,6 +77,10 @@ def main():
 
                     if decided[i]:
                         safe_bets.add(new_bet)
+
+            for path in messages:
+                edges.append([last_bets[path[0]], network.validators[path[1]].my_latest_bet])
+                edges.append([last_bets[path[1]], network.validators[path[1]].my_latest_bet])
 
     elif sys.argv[1:] == ['blockchain']:
 

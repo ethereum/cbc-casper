@@ -206,16 +206,24 @@ class View:
             raise Exception("...expected a non-empty view")
 
     @profile
-    def plot_view(self, coloured_bets, colour='green'):
+    def plot_view(self, coloured_bets, colour='green', use_edges=[]):
 
         G = nx.DiGraph()
 
         nodes = self.get_extension_from_same_validator()
 
+
+
         for b in nodes:
             G.add_edges_from([(b, b)])
-            for b2 in b.justification.values():
-                G.add_edges_from([(b2, b)])
+
+        if use_edges == []:
+            for b in nodes:
+                for b2 in b.justification.values():
+                    G.add_edges_from([(b2, b)])
+        else:
+            for e in use_edges:
+                G.add_edges_from([(e[0],e[1])])
 
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
         # G.add_edges_from([('C','F')])
