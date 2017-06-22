@@ -95,14 +95,15 @@ def main():
         initial_view = View(set([random_bet]))
         network.view_initialization(initial_view)
         iterator = 0
+        edges = []
 
         while(True):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_bets)
+                network.report(safe_bets,edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_bets)
+                        network.validators[i].view.plot_view(safe_bets, use_edges=edges)
 
             # for i in xrange(NUM_VALIDATORS):
             #    network.validators[i].view.plot_view(safe_bets)
@@ -118,6 +119,8 @@ def main():
             if not decided[next_validator]:
                 new_bet = network.get_bet_from_validator(next_validator)
                 decided[next_validator] = network.validators[next_validator].decide_if_safe()
+
+                edges.append([bet, new_bet])
 
                 if decided[next_validator]:
                     safe_bets.add(new_bet)
