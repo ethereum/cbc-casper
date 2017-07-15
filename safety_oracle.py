@@ -98,5 +98,4 @@ class Safety_Oracle:
 
         print "are we safe?, ", not unsafe
 
-        self.decided = not unsafe
         return not unsafe

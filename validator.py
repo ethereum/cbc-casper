@@ -43,7 +43,11 @@ class Validator:
     @profile
     def check_estimate_safety(self, estimate):
         oracle = Safety_Oracle(estimate, self.latest_observed_bets, self.vicarious_latest_bets)
-        return oracle.check_estimate_safety()
+        safe = oracle.check_estimate_safety()
+        if safe:
+            self.decided = True
+
+        return safe
 
     @profile
     def make_new_latest_bet(self):
