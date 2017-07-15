@@ -18,6 +18,7 @@ from bet import Bet
 from view import View
 from model_validator import Model_Validator
 
+
 class Adversary:
 
     @profile

@@ -17,6 +17,7 @@ from view import View
 from adversary import Adversary
 from network import Network
 
+
 @profile
 def main():
     if sys.argv[1] == 'rounds':
@@ -100,7 +101,7 @@ def main():
         while(True):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_bets,edges)
+                network.report(safe_bets, edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
                         network.validators[i].view.plot_view(safe_bets, use_edges=edges)

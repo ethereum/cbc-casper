@@ -247,14 +247,13 @@ class View:
 
         nx.draw(G, positions, node_color=color_values, node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
-        ax = plt.gca() # to get the current axis
+        ax = plt.gca()  # to get the current axis
         ax.collections[0].set_edgecolor("black")
 
-
-        ax.text(-0.05,0.1,"Weights: ",fontsize=20)
+        ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
         for v in xrange(NUM_VALIDATORS):
             xpos = (float)(v + 1)/(float)(NUM_VALIDATORS + 1) - 0.01
-            ax.text(xpos,0.1,(str)((int)(WEIGHTS[v])),fontsize=20)
+            ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
 
         pylab.show()
