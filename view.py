@@ -206,8 +206,6 @@ class View:
 
         nodes = self.get_extension_from_same_validator()
 
-
-
         for b in nodes:
             G.add_edges_from([(b, b)])
 
@@ -217,7 +215,7 @@ class View:
                     G.add_edges_from([(b2, b)])
         else:
             for e in use_edges:
-                G.add_edges_from([(e[0],e[1])])
+                G.add_edges_from([(e[0], e[1])])
 
         # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
         # G.add_edges_from([('C','F')])
