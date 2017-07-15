@@ -47,7 +47,7 @@ class Network:
 
         for v in latest:
             self.validators[v].my_latest_bet = latest[v]
-            self.validators[v].update_state([latest[v]])
+            self.validators[v].update_latest_bets([latest[v]])
 
     def random_initialization(self):
         for v in VALIDATOR_NAMES:
