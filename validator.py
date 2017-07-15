@@ -46,6 +46,27 @@ class Validator:
         return oracle.check_estimate_safety()
 
     @profile
+    def make_new_latest_bet(self):
+
+        estimates = self.estimator()
+
+        if len(estimates) == 1:
+            estimate = next(iter(estimates))
+        else:
+            estimate = r.choice(tuple(estimates))
+
+        justification = self.latest_observed_bets
+        sender = self.name
+
+        self.my_latest_bet = Bet(estimate, justification, sender)
+        # self.my_latest_bet.make_redundancy_free()
+        self.my_latest_estimate = estimate
+        self.view.add_bet(self.my_latest_bet)
+        self.latest_observed_bets[self.name] = self.my_latest_bet
+
+        return self.my_latest_bet
+
+    @profile
     def update_latest_bets(self, showed_bets):
 
         '''
@@ -96,24 +117,3 @@ class Validator:
             self.update_latest_bets(bets)
         else:
             print "unable to show bet to decided node"
-
-    @profile
-    def make_new_latest_bet(self):
-
-        estimates = self.estimator()
-
-        if len(estimates) == 1:
-            estimate = next(iter(estimates))
-        else:
-            estimate = r.choice(tuple(estimates))
-
-        justification = self.latest_observed_bets
-        sender = self.name
-
-        self.my_latest_bet = Bet(estimate, justification, sender)
-        # self.my_latest_bet.make_redundancy_free()
-        self.my_latest_estimate = estimate
-        self.view.add_bet(self.my_latest_bet)
-        self.latest_observed_bets[self.name] = self.my_latest_bet
-
-        return self.my_latest_bet
