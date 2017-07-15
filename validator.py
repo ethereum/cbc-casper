@@ -98,31 +98,14 @@ class Validator:
             print "unable to show bet to decided node"
 
     @profile
-    def make_bet_with_null_justification(self, estimate):
-        assert (len(self.view.bets) == 0 and
-                self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
-        self.my_latest_bet = Bet(estimate, dict(), self.name)
-        self.view.add_bet(self.my_latest_bet)
-        self.latest_observed_bets[self.name] = self.my_latest_bet
-        return self.my_latest_bet
-
-    @profile
     def make_new_latest_bet(self):
-
-        if len(self.view.bets) == 0 and self.my_latest_bet is None:
-            estimate = r.choice(tuple(ESTIMATE_SPACE))
-            self.my_latest_bet = self.make_bet_with_null_justification(estimate)
-            self.view.add_bet(self.my_latest_bet)
-
-            self.my_latest_estimate = estimate
-            return self.my_latest_bet
 
         estimates = self.estimator()
 
         if len(estimates) == 1:
             estimate = next(iter(estimates))
         else:
-            Exception("expected only one estimate")
+            estimate = r.choice(tuple(estimates))
 
         justification = self.latest_observed_bets
         sender = self.name
