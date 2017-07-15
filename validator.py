@@ -88,18 +88,13 @@ class Validator:
             print "unable to show bet to decided node"
 
     @profile
-    def get_latest_estimate(self):
+    def estimator(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
             if v in self.latest_observed_bets:
                 scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
 
-        max_weight_estimates = utils.get_max_weight_estimates(scores)
-
-        if len(max_weight_estimates) == 1:
-            return next(iter(max_weight_estimates))
-        else:
-            raise Exception("expected non-empty latest_observed_bets")
+        return utils.get_max_weight_estimates(scores)
 
     @profile
     def make_bet_with_null_justification(self, estimate):
@@ -121,7 +116,13 @@ class Validator:
             self.my_latest_estimate = estimate
             return self.my_latest_bet
 
-        estimate = self.get_latest_estimate()
+        estimates = self.estimator()
+
+        if len(estimates) == 1:
+            estimate = next(iter(estimates))
+        else:
+            Exception("expected only one estimate")
+
         justification = self.latest_observed_bets
         sender = self.name
 
