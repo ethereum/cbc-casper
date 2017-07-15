@@ -8,8 +8,8 @@ REPORT = False
 
 class Safety_Oracle:
 
-    def __init__(self, my_latest_estimate, latest_observed_bets, vicarious_latest_bets):
-        self.my_latest_estimate = my_latest_estimate
+    def __init__(self, candidate_estimate, latest_observed_bets, vicarious_latest_bets):
+        self.candidate_estimate = candidate_estimate
         self.latest_observed_bets = latest_observed_bets
         self.vicarious_latest_bets = vicarious_latest_bets
 
@@ -40,8 +40,8 @@ class Safety_Oracle:
 
                 # for validators without anything in their view, any bets are later bets are viewable bets!
                 # ...so we add them all in!
-                for v in lastest_bets_with_estimate[1 - self.my_latest_estimate].keys():
-                    viewables[w][v] = lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
+                for v in lastest_bets_with_estimate[1 - self.candidate_estimate].keys():
+                    viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
 
             # if we do have a latest bet from this validator, then...
             else:
@@ -49,15 +49,15 @@ class Safety_Oracle:
 
                 # then all bets that are causally after these bets are viewable by this validator
 
-                print self.my_latest_estimate
+                print self.candidate_estimate
 
-                for v in lastest_bets_with_estimate[1 - self.my_latest_estimate].keys():
+                for v in lastest_bets_with_estimate[1 - self.candidate_estimate].keys():
                     if v not in self.vicarious_latest_bets[w].keys():
-                        viewables[w][v] = lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
+                        viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
                         continue
 
-                    if self.vicarious_latest_bets[w][v].sequence_number < lastest_bets_with_estimate[1 - self.my_latest_estimate][v].sequence_number:
-                        viewables[w][v] = lastest_bets_with_estimate[1 - self.my_latest_estimate][v]
+                    if self.vicarious_latest_bets[w][v].sequence_number < lastest_bets_with_estimate[1 - self.candidate_estimate][v].sequence_number:
+                        viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
 
         return viewables
 
@@ -65,8 +65,8 @@ class Safety_Oracle:
     def check_estimate_safety(self):
 
         print "entering decide if safe!"
-        print "self.my_latest_estimate", self.my_latest_estimate
-        if self.my_latest_estimate is None:
+        print "self.candidate_estimate", self.candidate_estimate
+        if self.candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
 
         if REPORT:
@@ -91,7 +91,7 @@ class Safety_Oracle:
         vicarious_bets_copy = copy.deepcopy(self.vicarious_latest_bets)
         viewables_copy = copy.deepcopy(viewables)
 
-        adversary = Adversary(self.my_latest_estimate, latest_bets_copy, vicarious_bets_copy, viewables_copy)
+        adversary = Adversary(self.candidate_estimate, latest_bets_copy, vicarious_bets_copy, viewables_copy)
 
         print "about to conduct ideal attack"
         unsafe, _, _ = adversary.ideal_network_attack()
