@@ -31,12 +31,22 @@ class Validator:
         self.my_latest_bet = None
         self.my_latest_estimate = None
 
+    @profile
+    def estimator(self):
+        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
+        for v in VALIDATOR_NAMES:
+            if v in self.latest_observed_bets:
+                scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
+
+        return utils.get_max_weight_estimates(scores)
+
+    @profile
     def check_estimate_safety(self, estimate):
         oracle = Safety_Oracle(estimate, self.latest_observed_bets, self.vicarious_latest_bets)
         return oracle.check_estimate_safety()
 
     @profile
-    def update_validator_state(self, showed_bets):
+    def update_latest_bets(self, showed_bets):
 
         '''
         PART 1 - updating latest bets
@@ -74,7 +84,7 @@ class Validator:
     def receive_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
-            self.update_validator_state(set([bet]))
+            self.update_latest_bets(set([bet]))
         else:
             print "unable to show bet to decided node"
 
@@ -83,18 +93,9 @@ class Validator:
         if not self.decided:
             for bet in bets:
                 self.view.add_bet(bet)
-            self.update_validator_state(bets)
+            self.update_latest_bets(bets)
         else:
             print "unable to show bet to decided node"
-
-    @profile
-    def estimator(self):
-        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
-        for v in VALIDATOR_NAMES:
-            if v in self.latest_observed_bets:
-                scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
-
-        return utils.get_max_weight_estimates(scores)
 
     @profile
     def make_bet_with_null_justification(self, estimate):
