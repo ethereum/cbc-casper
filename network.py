@@ -46,8 +46,7 @@ class Network:
         latest = view.get_latest_bets()
 
         for v in latest:
-            self.validators[v].my_latest_bet = latest[v]
-            self.validators[v].update_latest_bets([latest[v]])
+            self.validators[v].receive_bets(latest[v])
 
     def random_initialization(self):
         for v in VALIDATOR_NAMES:
@@ -56,7 +55,7 @@ class Network:
     def report(self, safe_bets, edges):
         betset = set()
         for v in VALIDATOR_NAMES:
-            if self.validators[v].my_latest_bet is not None:
-                betset.add(self.validators[v].my_latest_bet)
+            if self.validators[v].my_latest_bet() is not None:
+                betset.add(self.validators[v].my_latest_bet())
 
         View(betset).plot_view(safe_bets, use_edges=edges)

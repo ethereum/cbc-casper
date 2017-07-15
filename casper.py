@@ -59,7 +59,7 @@ def main():
             last_bets = []
             validator_received_bet = set()
             for i in xrange(NUM_VALIDATORS):
-                last_bets.append(network.validators[i].my_latest_bet)
+                last_bets.append(network.validators[i].my_latest_bet())
 
             for sb in list(safe_bets):
                 if sb not in last_bets:
@@ -80,8 +80,8 @@ def main():
                         safe_bets.add(new_bet)
 
             for path in messages:
-                edges.append([last_bets[path[0]], network.validators[path[1]].my_latest_bet])
-                edges.append([last_bets[path[1]], network.validators[path[1]].my_latest_bet])
+                edges.append([last_bets[path[0]], network.validators[path[1]].my_latest_bet()])
+                edges.append([last_bets[path[1]], network.validators[path[1]].my_latest_bet()])
 
     elif sys.argv[1] == 'blockchain':
 
@@ -112,7 +112,7 @@ def main():
             current_validator = iterator % NUM_VALIDATORS
             next_validator = (iterator + 1) % NUM_VALIDATORS
 
-            bet = network.validators[current_validator].my_latest_bet
+            bet = network.validators[current_validator].my_latest_bet()
 
             if isinstance(bet, Bet):
                 network.propagate_bet_to_validator(bet, next_validator)

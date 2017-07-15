@@ -19,8 +19,6 @@ class Validator:
         self.name = name
         self.view = View(set())
         self.decided = False
-        self.my_latest_bet = None
-        self.my_latest_estimate = None
         self.latest_observed_bets = dict()  # This stores the latest bets seen by the validator
         self.vicarious_latest_bets = dict()  # This stores the latest bets committed to have been seen by other validaotrs in their latest bets
         for v in VALIDATOR_NAMES:
@@ -63,15 +61,22 @@ class Validator:
         justification = self.latest_observed_bets
         sender = self.name
 
-        self.my_latest_bet = Bet(estimate, justification, sender)
-        # self.my_latest_bet.make_redundancy_free()
-        self.my_latest_estimate = estimate
-        self.view.add_bet(self.my_latest_bet)
-        self.latest_observed_bets[self.name] = self.my_latest_bet
+        new_latest_bet = Bet(estimate, justification, sender)
+        # new_latest_bet.make_redundancy_free()
+        self.view.add_bet(new_latest_bet)
+        self.latest_observed_bets[self.name] = new_latest_bet
 
-        return self.my_latest_bet
+        return new_latest_bet
 
-    # This method updates a validators latest bets (and vicarious latest bets) in response to seeing new bets
+    # This function returns the validator's latest bet
+    @profile
+    def my_latest_bet(self):
+        if self.name in self.latest_observed_bets:
+            return self.latest_observed_bets[self.name]
+        else:
+            return None
+
+    # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
     @profile
     def update_latest_bets(self, showed_bets):
 
