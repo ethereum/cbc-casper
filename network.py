@@ -15,7 +15,7 @@ class Network:
     @profile
     def propagate_bet_to_validator(self, bet, validator_name):
         assert bet in self.global_view, "...expected only to propagate bets from the global view"
-        self.validators[validator_name].receive_bet(bet)
+        self.validators[validator_name].receive_bets(set([bet]))
 
     def get_bet_from_validator(self, validator_name):
         assert validator_name in VALIDATOR_NAMES, "...expected a known validator"
