@@ -2,35 +2,32 @@ from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
 from view import View
 from safety_oracle import Safety_Oracle
-
 import utils
-
 
 import random as r
 r.seed()
-
-# validators have...
-# views...
-# ability to make new latest bet w esimate in the view
-# ability to make new latest bet w given estimate or throwing
-# ability to "decide" on a value of the consensus
 
 REPORT = False
 
 
 class Validator:
+
+    # The validator's state is a function of its view and name alone (along with global variables)
+    # However, for performance's sake the validator also stores
     @profile
     def __init__(self, name):
         self.name = name
         self.view = View(set())
-        self.latest_observed_bets = dict()
-        self.vicarious_latest_bets = dict()
-        for v in VALIDATOR_NAMES:
-            self.vicarious_latest_bets[v] = dict()
         self.decided = False
         self.my_latest_bet = None
         self.my_latest_estimate = None
+        self.latest_observed_bets = dict()  # This stores the latest bets seen by the validator
+        self.vicarious_latest_bets = dict()  # This stores the latest bets committed to have been seen by other validaotrs in their latest bets
+        for v in VALIDATOR_NAMES:
+            self.vicarious_latest_bets[v] = dict()
 
+    # The estimator function returns the set of max weight estimates
+    # This may not be a single-element set because the validator may have an empty view
     @profile
     def estimator(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
@@ -40,6 +37,8 @@ class Validator:
 
         return utils.get_max_weight_estimates(scores)
 
+    # The validator checks estimate safety by calling the safety oracle
+    # This method also flags the validator as having decided in the case that the estimate is safe
     @profile
     def check_estimate_safety(self, estimate):
         oracle = Safety_Oracle(estimate, self.latest_observed_bets, self.vicarious_latest_bets)
@@ -49,6 +48,8 @@ class Validator:
 
         return safe
 
+    # This function produces a new latest bet for the validator
+    # It updates the validator's latest bet, estimate, view, and latest observed bets
     @profile
     def make_new_latest_bet(self):
 
@@ -70,6 +71,7 @@ class Validator:
 
         return self.my_latest_bet
 
+    # This method updates a validators latest bets (and vicarious latest bets) in response to seeing new bets
     @profile
     def update_latest_bets(self, showed_bets):
 
@@ -105,6 +107,7 @@ class Validator:
         for v in self.latest_observed_bets:
             self.vicarious_latest_bets[v] = self.latest_observed_bets[v].justification
 
+    # This method is the only way that a validator can receive protocol messages
     @profile
     def receive_bets(self, bets):
         if not self.decided:
