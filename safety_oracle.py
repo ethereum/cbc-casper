@@ -62,7 +62,7 @@ class Safety_Oracle:
         return viewables
 
     @profile
-    def decide_if_safe(self):
+    def check_estimate_safety(self):
 
         print "entering decide if safe!"
         print "self.my_latest_estimate", self.my_latest_estimate

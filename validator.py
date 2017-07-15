@@ -31,9 +31,9 @@ class Validator:
         self.my_latest_bet = None
         self.my_latest_estimate = None
 
-    def decide_if_safe(self, estimate):
+    def check_estimate_safety(self, estimate):
         oracle = Safety_Oracle(estimate, self.latest_observed_bets, self.vicarious_latest_bets)
-        return oracle.decide_if_safe()
+        return oracle.check_estimate_safety()
 
     @profile
     def update_validator_state(self, showed_bets):
