@@ -74,7 +74,7 @@ def main():
             for i in xrange(NUM_VALIDATORS):
                 if not decided[i] and i in validator_received_bet:
                     new_bet = network.get_bet_from_validator(i)
-                    decided[i] = network.validators[i].decide_if_safe()
+                    decided[i] = network.validators[i].decide_if_safe(new_bet.estimate)
 
                     if decided[i]:
                         safe_bets.add(new_bet)
@@ -119,7 +119,7 @@ def main():
 
             if not decided[next_validator]:
                 new_bet = network.get_bet_from_validator(next_validator)
-                decided[next_validator] = network.validators[next_validator].decide_if_safe()
+                decided[next_validator] = network.validators[next_validator].decide_if_safe(new_bet.estimate)
 
                 edges.append([bet, new_bet])
 

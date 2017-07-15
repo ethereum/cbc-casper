@@ -31,58 +31,12 @@ class Validator:
         self.my_latest_bet = None
         self.my_latest_estimate = None
 
-    @profile
-    def get_latest_estimate(self):
-        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
-        for v in VALIDATOR_NAMES:
-            if v in self.latest_observed_bets:
-                scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
-
-        max_weight_estimates = utils.get_max_weight_estimates(scores)
-
-        if len(max_weight_estimates) == 1:
-            return next(iter(max_weight_estimates))
-        else:
-            raise Exception("expected non-empty latest_observed_bets")
-
-    def decide_if_safe(self):
-        oracle = Safety_Oracle(self.my_latest_estimate, self.latest_observed_bets, self.vicarious_latest_bets)
+    def decide_if_safe(self, estimate):
+        oracle = Safety_Oracle(estimate, self.latest_observed_bets, self.vicarious_latest_bets)
         return oracle.decide_if_safe()
 
     @profile
-    def make_bet_with_null_justification(self, estimate):
-        assert (len(self.view.bets) == 0 and
-                self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
-        self.my_latest_bet = Bet(estimate, dict(), self.name)
-        self.view.add_bet(self.my_latest_bet)
-        self.latest_observed_bets[self.name] = self.my_latest_bet
-        return self.my_latest_bet
-
-    @profile
-    def make_new_latest_bet(self):
-
-        if len(self.view.bets) == 0 and self.my_latest_bet is None:
-            estimate = r.choice(tuple(ESTIMATE_SPACE))
-            self.my_latest_bet = self.make_bet_with_null_justification(estimate)
-            self.view.add_bet(self.my_latest_bet)
-
-            self.my_latest_estimate = estimate
-            return self.my_latest_bet
-
-        estimate = self.get_latest_estimate()
-        justification = self.latest_observed_bets
-        sender = self.name
-
-        self.my_latest_bet = Bet(estimate, justification, sender)
-        # self.my_latest_bet.make_redundancy_free()
-        self.my_latest_estimate = estimate
-        self.view.add_bet(self.my_latest_bet)
-        self.latest_observed_bets[self.name] = self.my_latest_bet
-
-        return self.my_latest_bet
-
-    @profile
-    def update_state(self, showed_bets):
+    def update_validator_state(self, showed_bets):
 
         '''
         PART 1 - updating latest bets
@@ -120,7 +74,7 @@ class Validator:
     def receive_bet(self, bet):
         if not self.decided:
             self.view.add_bet(bet)
-            self.update_state(set([bet]))
+            self.update_validator_state(set([bet]))
         else:
             print "unable to show bet to decided node"
 
@@ -129,6 +83,52 @@ class Validator:
         if not self.decided:
             for bet in bets:
                 self.view.add_bet(bet)
-            self.update_state(bets)
+            self.update_validator_state(bets)
         else:
             print "unable to show bet to decided node"
+
+    @profile
+    def get_latest_estimate(self):
+        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
+        for v in VALIDATOR_NAMES:
+            if v in self.latest_observed_bets:
+                scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
+
+        max_weight_estimates = utils.get_max_weight_estimates(scores)
+
+        if len(max_weight_estimates) == 1:
+            return next(iter(max_weight_estimates))
+        else:
+            raise Exception("expected non-empty latest_observed_bets")
+
+    @profile
+    def make_bet_with_null_justification(self, estimate):
+        assert (len(self.view.bets) == 0 and
+                self.my_latest_bet is None), "...cannot make null justification on a non-empty view"
+        self.my_latest_bet = Bet(estimate, dict(), self.name)
+        self.view.add_bet(self.my_latest_bet)
+        self.latest_observed_bets[self.name] = self.my_latest_bet
+        return self.my_latest_bet
+
+    @profile
+    def make_new_latest_bet(self):
+
+        if len(self.view.bets) == 0 and self.my_latest_bet is None:
+            estimate = r.choice(tuple(ESTIMATE_SPACE))
+            self.my_latest_bet = self.make_bet_with_null_justification(estimate)
+            self.view.add_bet(self.my_latest_bet)
+
+            self.my_latest_estimate = estimate
+            return self.my_latest_bet
+
+        estimate = self.get_latest_estimate()
+        justification = self.latest_observed_bets
+        sender = self.name
+
+        self.my_latest_bet = Bet(estimate, justification, sender)
+        # self.my_latest_bet.make_redundancy_free()
+        self.my_latest_estimate = estimate
+        self.view.add_bet(self.my_latest_bet)
+        self.latest_observed_bets[self.name] = self.my_latest_bet
+
+        return self.my_latest_bet
