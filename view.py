@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import pylab
+import utils
 
 from math import pi
 from bet import Bet
@@ -191,17 +192,10 @@ class View:
                 assert isinstance(latest_bets[v], Bet), "...expected only bets or the emptyset in the latest bets"
                 scores[latest_bets[v].estimate] += WEIGHTS[v]
 
-        # get the max score
-        max_score = 0
-        for e in ESTIMATE_SPACE:
-            if scores[e] > max_score:
-                max_score = scores[e]
-                max_score_estimate = e
+        max_weight_estimates = get_max_weight_estimates(scores)
 
-        # check that we have a max_score greater than zero:
-        # note that here we are requiring the tie-breaking property.
-        if max_score > 0:
-            return max_score_estimate
+        if len(max_weight_estimates) == 1:
+            return next(iter(max_weight_estimates))
         else:
             raise Exception("...expected a non-empty view")
 

@@ -3,6 +3,9 @@ from bet import Bet
 from view import View
 from safety_oracle import Safety_Oracle
 
+import utils
+
+
 import random as r
 r.seed()
 
@@ -35,21 +38,12 @@ class Validator:
             if v in self.latest_observed_bets:
                 scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
 
-        max_score = 0
-        max_score_estimate = None
-        for e in ESTIMATE_SPACE:
-            if max_score == 0:
-                max_score = scores[e]
-                max_score_estimate = e
-                continue
+        max_weight_estimates = utils.get_max_weight_estimates(scores)
 
-            if scores[e] > max_score:
-                max_score = scores[e]
-                max_score_estimate = e
-
-        if max_score == 0:
+        if len(max_weight_estimates) == 1:
+            return next(iter(max_weight_estimates))
+        else:
             raise Exception("expected non-empty latest_observed_bets")
-        return max_score_estimate
 
     def decide_if_safe(self):
         oracle = Safety_Oracle(self.my_latest_estimate, self.latest_observed_bets, self.vicarious_latest_bets)

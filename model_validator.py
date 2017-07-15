@@ -12,6 +12,8 @@ from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
 from view import View
 
+import utils
+
 
 class Model_Validator:
     latest_observed_bets_value_error = """...expected dictionary latest_observed_bets to only contain values
@@ -49,25 +51,15 @@ class Model_Validator:
         # otherwise we compute the max score byzantine free estimate
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
 
-        for v in VALIDATOR_NAMES:
-            if v not in self.latest_observed_bets:
-                continue
-            else:
-                assert isinstance(self.latest_observed_bets[v], Bet), """...expected dictionary
-                  latest_observed_bets to only contain values of a bet or the empty set"""
-                scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
+        for v in self.latest_observed_bets:
+            assert isinstance(self.latest_observed_bets[v], Bet), """...expected dictionary
+              latest_observed_bets to only contain values of a bet or the empty set"""
+            scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
 
-        # get the max score
-        max_score = 0
-        for e in ESTIMATE_SPACE:
-            if scores[e] > max_score:
-                max_score = scores[e]
-                max_score_estimate = e
+        max_weight_estimates = utils.get_max_weight_estimates(scores)
 
-            # check that we have a max_score greater than zero:
-        # note that here we are requiring the tie-breaking property.
-        if max_score > 0:
-            return max_score_estimate
+        if len(max_weight_estimates) == 1:
+            return next(iter(max_weight_estimates))
         else:
             return self.target_estimate
 
