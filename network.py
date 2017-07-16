@@ -43,7 +43,7 @@ class Network:
         assert isinstance(view, View)
         self.global_view = view.bets
 
-        latest = view.get_latest_bets()
+        latest = view.latest_bets
 
         for v in latest:
             self.validators[v].receive_bets(set([latest[v]]))

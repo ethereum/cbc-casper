@@ -8,10 +8,10 @@ REPORT = False
 
 class Safety_Oracle:
 
-    def __init__(self, candidate_estimate, latest_observed_bets, vicarious_latest_bets):
+    def __init__(self, candidate_estimate, view):
         self.candidate_estimate = candidate_estimate
-        self.latest_observed_bets = latest_observed_bets
-        self.vicarious_latest_bets = vicarious_latest_bets
+        self.latest_observed_bets = view.latest_bets
+        self.vicarious_latest_bets = view.vicarious_latest_bets
 
     @profile
     def get_latest_bets_with_estimate(self):

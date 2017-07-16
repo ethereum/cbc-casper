@@ -20,12 +20,12 @@ class View:
 
         # now for some assignment...
         self.bets = set()
-        for b in bets:
-            self.bets.add(b)
+        self.latest_bets = dict()
+        self.vicarious_latest_bets = dict()
+        for v in VALIDATOR_NAMES:
+            self.vicarious_latest_bets[v] = dict()
 
-        # to avoid recomputing the view's extension, when this is false we return a cached value
-        self.recompute_extension = True
-        self.recompute_latest_bets = True
+        self.add_bets(bets)
 
     # this "serialization" has a new line for every serialization of bets...
     # ...so that it literally looks just like this...!
@@ -39,46 +39,77 @@ class View:
             s += str(b) + "\n"
         return s
 
-    @profile
-    def add_bet(self, bet):
-        self.recompute_extension = True
-        self.recompute_latest_bets = True
+    # The estimator function returns the set of max weight estimates
+    # This may not be a single-element set because the validator may have an empty view
+    def estimator(self):
+        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
+        for v in VALIDATOR_NAMES:
+            if v in self.latest_bets:
+                scores[self.latest_bets[v].estimate] += WEIGHTS[v]
+        return utils.get_max_weight_estimates(scores)
 
-        # be safe, type check!...
-        assert isinstance(bet, Bet), "...expected to add a bet to the view"
+    # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
+    def get_new_bets(self, showed_bets):
+        new_bets = set()
+        # The memo will keep track of bets we've already looked at, so we don't redo work.
+        memo = set()
+        # At the start, our working set will be the "showed bets" parameter
+        current_set = set(showed_bets)
+        while(current_set != set()):
+            next_set = set()
+            # If there's no bet in the current working set
+            for bet in current_set:
+                # Which we haven't seen it in the view or during this loop
+                if bet not in self.bets and bet not in memo:
+                    # But if we do have a new bet, then we add it to our pile..
+                    new_bets.add(bet)
+                    # and add the best in its justification to our next working set
+                    for b in bet.justification.values():
+                        next_set.add(b)
+                # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
+                memo.add(bet)
+            current_set = next_set
+        # After the loop is done, we return a set of new bets
+        return new_bets
 
-        # ...and finally, add the bet!
-        self.bets.add(bet)
+    # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
+    def add_bets(self, showed_bets):
+        '''
+        PART -1 - type check
+        '''
+        for b in showed_bets:
+            assert isinstance(b, Bet), "expected only to add bets"
+        '''
+        PART 0 - finding newly discovered bets
+        '''
+        newly_discovered_bets = self.get_new_bets(showed_bets)
+        '''
+        PART 1 - updating latest bets
+        '''
+        for b in newly_discovered_bets:
+            self.bets.add(b)
+        '''
+        PART 3 - updating vicarious latest bets
+        '''
+        # updating latest bets..
+        for b in newly_discovered_bets:
+            if b.sender not in self.latest_bets:
+                self.latest_bets[b.sender] = b
+                continue
+            if self.latest_bets[b.sender].sequence_number < b.sequence_number:
+                self.latest_bets[b.sender] = b
+                continue
+            assert (b == self.latest_bets[b.sender] or
+                    b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
+        '''
+        PART 4 - updating vicarious latest bets
+        '''
+        # updating vicarious_latest_bets for validator v, for all v..
+        for v in self.latest_bets:
+            self.vicarious_latest_bets[v] = self.latest_bets[v].justification
 
-    @profile
-    def add_view(self, view):
-        for b in view.bets:
-            self.add_bet(b)
-
-    @profile
-    def remove_bets(self, bets_to_remove_from_view):
-        self.recompute_extension = True
-        self.bets.difference_update(bets_to_remove_from_view)
-
-    # the dependency of a view inherits its definition from the dependency of a bet...
-    # ...it is union of the dependencies of the bets in the view!
-
-    # THIS CAN BE OPTIMIZED BY, INSTEAD OF RUNNING THE DEPENDENCY FUNCTION FROM THE BET
-    # CLASS FOR EVERY BET IN THE VIEW,...
-    # ...REWRITING IT SO THAT THE DAG IS NOT REDUNDANTLY TRAVERSED
-
-    @profile
-    def dependency(self):
-        dependencies = set()
-        for bet in self.bets:
-            dependencies = dependencies.union(bet.dependency())
-
-        return dependencies
-
-    # the "extension" of a view is the union of the bets in a view and the bets in its dependency!
-    @profile
-    def get_extension(self):
-        return (self.dependency()).union(self.bets)
+    def get_extension_from_same_validator(self):
+        return (self.dependency_from_same_validator()).union(self.bets)
 
     @profile
     def dependency_from_same_validator(self):
@@ -87,117 +118,6 @@ class View:
             dependencies = dependencies.union(bet.dependency_from_same_validator())
 
         return dependencies
-
-    @profile
-    def get_extension_from_same_validator(self):
-        return (self.dependency_from_same_validator()).union(self.bets)
-
-    @profile
-    def get_extension_up_to_sequence_numbers(self, sequence_numbers):
-
-        sieve = set(self.bets)
-        extension = set()
-
-        while(sieve != set()):
-
-            to_remove_from_sieve = []
-            to_add_to_sieve = []
-
-            for bet in sieve:
-
-                to_remove_from_sieve.append(bet)
-
-                if bet.sender not in sequence_numbers or bet.sequence_number > sequence_numbers[bet.sender]:
-                    extension.add(bet)
-
-                    for b in bet.justification.values():
-                        to_add_to_sieve.append(b)
-
-            for b in to_remove_from_sieve:
-                sieve.remove(b)
-
-            for b in to_add_to_sieve:
-                sieve.add(b)
-
-        return extension
-
-    #####################################################################################
-    # if A is a dependency of B, B is causally dependent on A...
-    # ...which means that B is causally (and therefore chronologically) "later" than A...
-    # ...thus the definition of dependency lets us define and identify the latest bets in a given view...
-    # ...to reason about consensus in a view, we will need to identify the latest bets from each validator...!
-    #####################################################################################
-
-    # this algorithm encodes a map from validators to their lates bets, in a particular view...
-    # ...it returns a Python dictionary of the most recent bets, indexed by validator...
-    # ...and it stores empty set to handle key exceptions!
-    @profile
-    def get_latest_bets(self):
-        if not self.recompute_latest_bets:
-            return self.latest_bets
-
-        # here's the dictionary that we'll populate and return
-        latest_bets = dict()
-
-        # we are going to search every bet in the extension of view to be sure to find all of the latest bets...
-        # ...we'll call the bet we're currently inspecting "candidate"
-        for candidate_bet in (self.get_extension()):
-
-            # we're going to be filtering first by validator
-            sender = candidate_bet.sender
-
-            # if we haven't heard anything from this validator...
-            # ...we can trivially say that the candidate is the latest bet we've seen, from this validator..
-            if sender not in latest_bets:
-                latest_bets[sender] = candidate_bet
-                continue  # ...and then we're totally free to go to the next candidate!
-
-            # if we already have a latest bet from this validator...
-            # ...we need to check if the candidate is "later" or "earlier" than this bet...
-            # ...and then update our record of the latest bet from this validator, if appropriate
-
-            # so if the candidate is in the dependency the latest bet...
-            # ...then the candidate earlier than that "latest bet"...
-            # ...so the candidate definitely is not the latest bet in the view...!
-            if candidate_bet.is_dependency(latest_bets[sender]):
-                continue  # to the next candidate!
-
-            # ...if the latest bet is a dependency of the candidate bet...
-            # ...then this candidate is "later" than our current "latest bet"
-            if latest_bets[sender].is_dependency(candidate_bet):
-                latest_bets[sender] = candidate_bet  # ...so we keep a record of the latest bets
-                continue
-
-            raise Exception("...did not expect any Byzantine (equivocating) validators!")
-
-        # after we filter through all of the bets in the extended view...
-        # ...we have our epic dictionary of latest bets!
-        self.recompute_extension = True
-        self.latest_bets = True
-        return latest_bets
-
-    # this computes the maximum weight estimate from the latest bets in the view
-    @profile
-    def canonical_estimate(self):
-
-        # first, grab the latest bets...
-        latest_bets = self.get_latest_bets()
-
-        # now compute the scores of each estimate
-        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
-        for v in VALIDATOR_NAMES:
-            if v not in latest_bets[v]:
-                continue
-            else:
-                assert isinstance(latest_bets[v], Bet), "...expected only bets or the emptyset in the latest bets"
-                scores[latest_bets[v].estimate] += WEIGHTS[v]
-
-        max_weight_estimates = get_max_weight_estimates(scores)
-
-        if len(max_weight_estimates) == 1:
-            return next(iter(max_weight_estimates))
-        else:
-            raise Exception("...expected a non-empty view")
 
     @profile
     def plot_view(self, coloured_bets, colour='green', use_edges=[]):

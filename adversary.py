@@ -15,7 +15,6 @@
 
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
-from view import View
 from model_validator import Model_Validator
 
 
@@ -34,7 +33,7 @@ class Adversary:
         self.target_estimate = 1 - victim_estimate  # this will need to change when we go from binary to n-ary
 
         # the attacker adds bets the bets they created in the attack to this view...
-        self.attack_view = View(set())
+        self.attack_view = set()
 
         # ...and she will keep track of the latest estimates from these validators, if unique
         self.latest_bets = latest_observed_bets
@@ -156,7 +155,7 @@ class Adversary:
                     self.validator_models[v2].make_viewable(new_bet)
 
                 # ...update the attack view...
-                self.attack_view.add_bet(new_bet)
+                self.attack_view.add(new_bet)
 
                 # ...and update the attack delta!
                 self.update_attack_delta()
@@ -221,7 +220,7 @@ class Adversary:
                     self.validator_models[v2].make_viewable(new_bet)
 
                 # ...updating the attack view
-                self.attack_view.add_bet(new_bet)
+                self.attack_view.add(new_bet)
 
                 # ...add a log of our operations
                 self.operations_log.append(["added valid bet for a validator voting against the attacker",
