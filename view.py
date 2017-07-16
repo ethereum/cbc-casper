@@ -7,9 +7,6 @@ from math import pi
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 
-# Views are sets of bets...
-# ...with corresponding class functions!
-
 
 class View:
     @profile
@@ -27,12 +24,7 @@ class View:
 
         self.add_bets(bets)
 
-    # this "serialization" has a new line for every serialization of bets...
-    # ...so that it literally looks just like this...!
-    # View:
-    # (1, {(1, {}, 0)}, 1)
-    # (0, {}, 0)
-
+    @profile
     def __str__(self):
         s = "View: \n"
         for b in self.bets:
@@ -41,6 +33,7 @@ class View:
 
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
+    @profile
     def estimator(self):
         scores = dict.fromkeys(ESTIMATE_SPACE, 0)
         for v in VALIDATOR_NAMES:
@@ -49,48 +42,66 @@ class View:
         return utils.get_max_weight_estimates(scores)
 
     # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
+    @profile
     def get_new_bets(self, showed_bets):
+
         new_bets = set()
         # The memo will keep track of bets we've already looked at, so we don't redo work.
         memo = set()
+
         # At the start, our working set will be the "showed bets" parameter
         current_set = set(showed_bets)
         while(current_set != set()):
+
             next_set = set()
             # If there's no bet in the current working set
             for bet in current_set:
+
                 # Which we haven't seen it in the view or during this loop
                 if bet not in self.bets and bet not in memo:
+
                     # But if we do have a new bet, then we add it to our pile..
                     new_bets.add(bet)
+
                     # and add the best in its justification to our next working set
                     for b in bet.justification.values():
                         next_set.add(b)
                 # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
                 memo.add(bet)
+
             current_set = next_set
+
         # After the loop is done, we return a set of new bets
         return new_bets
 
     # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
+    @profile
     def add_bets(self, showed_bets):
+
         '''
         PART -1 - type check
         '''
+
         for b in showed_bets:
             assert isinstance(b, Bet), "expected only to add bets"
+
         '''
         PART 0 - finding newly discovered bets
         '''
+
         newly_discovered_bets = self.get_new_bets(showed_bets)
+
         '''
         PART 1 - updating latest bets
         '''
+
         for b in newly_discovered_bets:
             self.bets.add(b)
+
         '''
         PART 3 - updating vicarious latest bets
         '''
+
         # updating latest bets..
         for b in newly_discovered_bets:
             if b.sender not in self.latest_bets:
@@ -101,13 +112,16 @@ class View:
                 continue
             assert (b == self.latest_bets[b.sender] or
                     b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
+
         '''
         PART 4 - updating vicarious latest bets
         '''
+
         # updating vicarious_latest_bets for validator v, for all v..
         for v in self.latest_bets:
             self.vicarious_latest_bets[v] = self.latest_bets[v].justification
 
+    @profile
     def get_extension_from_same_validator(self):
         return (self.dependency_from_same_validator()).union(self.bets)
 
