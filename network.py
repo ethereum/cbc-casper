@@ -46,7 +46,7 @@ class Network:
         latest = view.get_latest_bets()
 
         for v in latest:
-            self.validators[v].receive_bets(latest[v])
+            self.validators[v].receive_bets(set([latest[v]]))
 
     def random_initialization(self):
         for v in VALIDATOR_NAMES:
