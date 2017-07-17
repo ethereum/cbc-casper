@@ -49,11 +49,11 @@ class Safety_Oracle:
                 # then all bets that are causally after these bets are viewable by this validator
 
                 for v in lastest_bets_with_estimate[1 - self.candidate_estimate].keys():
-                    if v not in self.latest_observed_bets[w].justification.keys():
+                    if v not in self.latest_observed_bets[w].justification.latest_bets.keys():
                         viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
                         continue
 
-                    if self.latest_observed_bets[w].justification[v].sequence_number < lastest_bets_with_estimate[1 - self.candidate_estimate][v].sequence_number:
+                    if self.latest_observed_bets[w].justification.latest_bets[v].sequence_number < lastest_bets_with_estimate[1 - self.candidate_estimate][v].sequence_number:
                         viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
 
         return viewables

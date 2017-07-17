@@ -1,6 +1,7 @@
 import utils
 from bet import Bet
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
+import plot_tool
 
 
 class View:
@@ -91,7 +92,7 @@ class View:
                     new_bets.add(bet)
 
                     # and add the best in its justification to our next working set
-                    for b in bet.justification.values():
+                    for b in bet.justification.latest_bets.values():
                         next_set.add(b)
                 # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
                 memo.add(bet)

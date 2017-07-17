@@ -10,6 +10,7 @@
 # PART OF THE VALIDATOR MODEL latest_oberved_bets
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
+from justification import Justification
 from view import View
 
 import utils
@@ -79,7 +80,7 @@ class Model_Validator:
     def make_new_latest_bet(self):
 
         if self.my_latest_bet is None:
-            new_bet = Bet(self.target_estimate, dict(), self.model_of)
+            new_bet = Bet(self.target_estimate, Justification(), self.model_of)
             self.my_latest_bet = new_bet
             return new_bet
 
@@ -102,7 +103,7 @@ class Model_Validator:
         if self.my_estimate() == self.target_estimate:
 
             # make the new bet
-            new_latest_bet = Bet(self.target_estimate, self.latest_observed_bets, self.model_of)
+            new_latest_bet = Bet(self.target_estimate, Justification(self.latest_observed_bets), self.model_of)
 
             # and update the model parameters accordingly:
             self.my_latest_bet = new_latest_bet

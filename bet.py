@@ -3,7 +3,9 @@
 # a set of bets or the empty set)
 
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE
+from justification import Justification
 import copy
+
 
 bet_number = 0
 
@@ -20,27 +22,25 @@ class Bet:
         # be safe. type check!...
         assert sender in VALIDATOR_NAMES, "...expected a validator!"
         assert estimate in ESTIMATE_SPACE, "...expected an estimate!"
-        assert type(justification) is dict, "expected justification to be a dict!"
-        for v in justification.keys():  # anything iterable, containing bets
-            assert isinstance(justification[v], Bet), "...expected there to be only bets in the justification!"
+        # assert isinstance(justification, Justification), "expected justification a Justification!"
 
         # ...then do some assignment
         self.sender = sender
         self.estimate = estimate
         self.justification = copy.copy(justification)
 
-        if self.sender not in self.justification:
+        if self.sender not in self.justification.latest_bets:
             self.sequence_number = 0
         else:
-            self.sequence_number = self.justification[self.sender].sequence_number + 1
+            self.sequence_number = self.justification.latest_bets[self.sender].sequence_number + 1
 
         if self.justification == dict():
             self.height = 0
         else:
             candidate_max = 0
-            for v in self.justification:
-                if self.justification[v].height > candidate_max:
-                    candidate_max = self.justification[v].height
+            for v in self.justification.latest_bets:
+                if self.justification.latest_bets[v].height > candidate_max:
+                    candidate_max = self.justification.latest_bets[v].height
 
             self.height = candidate_max + 1
 
@@ -80,10 +80,10 @@ class Bet:
         i = 0
         # if this following line of code sometimes produces different orders (justification is a set), then
         # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
-        for b in self.justification.values():
+        for b in self.justification.latest_bets.values():
             string += str(b)
             i += 1
-            if i != len(self.justification):  # getting fancy; leaving out commas without successive terms
+            if i != len(self.justification.latest_bets):  # getting fancy; leaving out commas without successive terms
                 string += ", "
         string += "}, " + str(self.sender) + ")"
         return string
@@ -102,13 +102,13 @@ class Bet:
     def recursive_is_dependency_from_same_validator(self, B):
 
         # this is the case where we get to the sender's first Bet before finding this bet
-        if self.sender not in B.justification:
+        if self.sender not in B.justification.latest_bets:
             return False
 
-        if self == B.justification[self.sender]:
+        if self == B.justification.latest_bets[self.sender]:
             return True
 
-        return self.recursive_is_dependency_from_same_validator(B.justification[self.sender])
+        return self.recursive_is_dependency_from_same_validator(B.justification.latest_bets[self.sender])
 
     @profile
     def is_dependency_from_same_validator(self, B):

@@ -1,6 +1,7 @@
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from bet import Bet
 from view import View
+from justification import Justification
 from safety_oracle import Safety_Oracle
 import utils
 
@@ -60,7 +61,7 @@ class Validator:
 
         # randomly sampling a value returned by the estimator (always returns the single element of a single-element set, btw)
         estimate = self.estimator()
-        justification = self.view.latest_bets
+        justification = Justification(self.view.latest_bets)
         sender = self.name
 
         new_latest_bet = Bet(estimate, justification, sender)
