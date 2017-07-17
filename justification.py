@@ -12,6 +12,9 @@ class Justification:
         for v in latest_bets:
             self.latest_bets[v] = latest_bets[v]
 
+    def is_null(self):
+        return self.latest_bets == dict()
+
     def estimate(self, default=None):
         scores = dict()
         for e in ESTIMATE_SPACE:

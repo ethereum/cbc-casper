@@ -28,7 +28,7 @@ class Bet:
             self.sequence_number = self.justification.latest_bets[self.sender].sequence_number + 1
 
         # the "heights" of bets are used for visualization of views
-        if self.justification == dict():
+        if self.justification.is_null():
             self.height = 0
         else:
             candidate_max = 0
