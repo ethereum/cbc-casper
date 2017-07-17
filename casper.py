@@ -13,6 +13,7 @@ import random as r  # to ensure the tie-breaking property
 
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
 from bet import Bet
+from justification import Justification
 from view import View
 from adversary import Adversary
 from network import Network
@@ -92,7 +93,7 @@ def main():
         decided = dict.fromkeys(VALIDATOR_NAMES, 0)
         safe_bets = set()
 
-        random_bet = Bet(r.randint(0, 1), dict(), 0)
+        random_bet = Bet(r.randint(0, 1), Justification(), 0)
         initial_view = View(set([random_bet]))
         network.view_initialization(initial_view)
         iterator = 0
