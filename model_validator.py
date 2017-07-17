@@ -49,7 +49,7 @@ class Model_Validator:
     # model validators use their view at my_latest_bet to calculate an estimate
     @profile
     def my_estimate(self):
-        return utils.get_estimate_from_justification(self.latest_observed_bets, self.target_estimate)
+        return utils.get_estimate_from_latest_bets(self.latest_observed_bets, self.target_estimate)
 
     # this important method makes a bet viewable to the model validator
     # It will only succeed if:

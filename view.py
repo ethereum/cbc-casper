@@ -28,7 +28,7 @@ class View:
     # This may not be a single-element set because the validator may have an empty view
     @profile
     def estimator(self):
-        return utils.get_estimate_from_justification(self.latest_bets)
+        return utils.get_estimate_from_latest_bets(self.latest_bets)
 
     # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
     @profile
