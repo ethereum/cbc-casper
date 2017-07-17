@@ -70,7 +70,7 @@ class Bet:
 
     @profile
     def __hash__(self):
-        return self.id_number
+        return hash(str(self.sequence_number) + str(self.sender))
 
     # this method can be used to check if a bet is valid
     def is_valid(self):
