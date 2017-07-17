@@ -59,14 +59,12 @@ class Validator:
     @profile
     def make_new_latest_bet(self):
 
-        # randomly sampling a value returned by the estimator (always returns the single element of a single-element set, btw)
         estimate = self.estimator()
         justification = self.view.justification()
         sender = self.name
 
         new_latest_bet = Bet(estimate, justification, sender)
 
-        # new_latest_bet.make_redundancy_free()
         self.view.add_bets(set([new_latest_bet]))
 
         return new_latest_bet
