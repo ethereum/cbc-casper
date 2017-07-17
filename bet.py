@@ -98,6 +98,10 @@ class Bet:
     def __hash__(self):
         return self.id_number
 
+    # this method can be used to check if a bet is valid
+    def is_valid(self):
+        return self.estimate == self.justification.estimate()
+
     @profile
     def recursive_is_dependency_from_same_validator(self, B):
 
