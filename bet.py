@@ -98,60 +98,6 @@ class Bet:
     def __hash__(self):
         return self.id_number
 
-    #####################################################################################
-    # a bet A is a dependency of a bet B if either...
-    # ...A is in the justification of B...
-    # ...or A is in the dependency of bets in the justification of B!
-    #####################################################################################
-
-    # this function checks if this bet (self) is a dependency of some bet B...
-
-    @profile
-    def recursive_is_dependency(self, B, is_checked):
-
-        # be safe, type check!
-        # self is definitely a dependency of B if it is in the justification...
-        if self in B.justification.values():
-            return True
-
-        is_checked[B] = True
-
-        # ...or if it is in the dependency of anything in the justification!
-        for b in B.justification.values():
-            if b not in is_checked:
-                if self.recursive_is_dependency(b, is_checked):
-                    return True
-
-        # if neither of these, then "self" is not a dependency of B!
-        return False
-
-    @profile
-    def is_dependency(self, B):
-
-        assert isinstance(B, Bet), "...expected a bet!"
-
-        is_checked = dict()
-
-        return self.recursive_is_dependency(B, is_checked)
-
-    # this one gets all the bets in the dependency of this bet (self)...
-    # ...it puts them into a set, and returns that!
-    @profile
-    def dependency(self):
-        dependencies = set()
-
-        # recurr into the justification to find all dependencies and add them to our set "d"
-        def recurr(B):
-            for b in B.justification.values():  # recursion bottoms on empty iterable
-                dependencies.add(b)  # note that .add in set() checks if __hash__ does not already appear!
-                recurr(b)
-
-        # now we're calling it:
-        recurr(self)
-
-        # we did it!
-        return dependencies
-
     @profile
     def recursive_is_dependency_from_same_validator(self, B):
 
