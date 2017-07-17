@@ -117,22 +117,6 @@ class Bet:
 
         return self.recursive_is_dependency_from_same_validator(B)
 
-    @profile
-    def dependency_from_same_validator(self):
-        dependencies = set()
-
-        def recurr(B):
-            dependencies.add(B)
-            if self.sender not in B.justification:
-                return
-            else:
-                recurr(B.justification[self.sender])
-
-        recurr(self)
-
-        return dependencies
-
-
 '''
     @profile
     def make_redundancy_free(self):
