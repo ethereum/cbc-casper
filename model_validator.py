@@ -13,6 +13,7 @@ from bet import Bet
 from view import View
 
 import utils
+import random as r
 
 
 class Model_Validator:
@@ -44,24 +45,10 @@ class Model_Validator:
         # will track the latest bets observed by this model validator
         self.latest_observed_bets = my_latest_observed_bets
 
-    # model validators use their view at my_latest_bet to calculate an estimate, returns set() on failure
+    # model validators use their view at my_latest_bet to calculate an estimate
     @profile
     def my_estimate(self):
-
-        # otherwise we compute the max score byzantine free estimate
-        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
-
-        for v in self.latest_observed_bets:
-            assert isinstance(self.latest_observed_bets[v], Bet), """...expected dictionary
-              latest_observed_bets to only contain values of a bet or the empty set"""
-            scores[self.latest_observed_bets[v].estimate] += WEIGHTS[v]
-
-        max_weight_estimates = utils.get_max_weight_estimates(scores)
-
-        if len(max_weight_estimates) == 1:
-            return next(iter(max_weight_estimates))
-        else:
-            return self.target_estimate
+        return utils.get_estimate_from_justification(self.latest_observed_bets, self.target_estimate)
 
     # this important method makes a bet viewable to the model validator
     # It will only succeed if:
