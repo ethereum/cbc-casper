@@ -29,39 +29,6 @@ class View:
     def estimator(self):
         return utils.get_estimate_from_justification(self.latest_bets)
 
-    # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
-    @profile
-    def get_new_bets(self, showed_bets):
-
-        new_bets = set()
-        # The memo will keep track of bets we've already looked at, so we don't redo work.
-        memo = set()
-
-        # At the start, our working set will be the "showed bets" parameter
-        current_set = set(showed_bets)
-        while(current_set != set()):
-
-            next_set = set()
-            # If there's no bet in the current working set
-            for bet in current_set:
-
-                # Which we haven't seen it in the view or during this loop
-                if bet not in self.bets and bet not in memo:
-
-                    # But if we do have a new bet, then we add it to our pile..
-                    new_bets.add(bet)
-
-                    # and add the best in its justification to our next working set
-                    for b in bet.justification.values():
-                        next_set.add(b)
-                # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
-                memo.add(bet)
-
-            current_set = next_set
-
-        # After the loop is done, we return a set of new bets
-        return new_bets
-
     # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
     @profile
     def add_bets(self, showed_bets):
@@ -100,6 +67,39 @@ class View:
                 continue
             assert (b == self.latest_bets[b.sender] or
                     b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
+
+    # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
+    @profile
+    def get_new_bets(self, showed_bets):
+
+        new_bets = set()
+        # The memo will keep track of bets we've already looked at, so we don't redo work.
+        memo = set()
+
+        # At the start, our working set will be the "showed bets" parameter
+        current_set = set(showed_bets)
+        while(current_set != set()):
+
+            next_set = set()
+            # If there's no bet in the current working set
+            for bet in current_set:
+
+                # Which we haven't seen it in the view or during this loop
+                if bet not in self.bets and bet not in memo:
+
+                    # But if we do have a new bet, then we add it to our pile..
+                    new_bets.add(bet)
+
+                    # and add the best in its justification to our next working set
+                    for b in bet.justification.values():
+                        next_set.add(b)
+                # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
+                memo.add(bet)
+
+            current_set = next_set
+
+        # After the loop is done, we return a set of new bets
+        return new_bets
 
     @profile
     def plot_view(self, coloured_bets, colour='green', use_edges=[]):
