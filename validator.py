@@ -17,6 +17,7 @@ class Validator:
     # However, for performance's sake the validator also stores
     @profile
     def __init__(self, name):
+        assert name in VALIDATOR_NAMES, "expected a validator name"
         self.name = name
         self.view = View(set())
         self.decided = False
@@ -47,6 +48,7 @@ class Validator:
     # This method also flags the validator as having decided in the case that the estimate is safe
     @profile
     def check_estimate_safety(self, estimate):
+        assert estimate in ESTIMATE_SPACE, "expected an estimate"
         oracle = Safety_Oracle(estimate, self.view)
         is_safe = oracle.check_estimate_safety()
         if is_safe:
