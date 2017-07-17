@@ -61,8 +61,8 @@ class Validator:
     @profile
     def make_new_latest_bet(self):
 
-        estimate = self.estimator()
         justification = self.view.justification()
+        estimate = justification.estimate()
         sender = self.name
 
         new_latest_bet = Bet(estimate, justification, sender)
