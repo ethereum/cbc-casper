@@ -3,7 +3,6 @@ from bet import Bet
 from adversary import Adversary
 
 import copy
-REPORT = False
 
 
 class Safety_Oracle:
@@ -13,6 +12,7 @@ class Safety_Oracle:
         self.latest_observed_bets = view.latest_bets
         self.vicarious_latest_bets = view.vicarious_latest_bets
 
+    # This method returns a map estimates -> validator -> bet with estimate
     @profile
     def get_latest_bets_with_estimate(self):
 
@@ -49,8 +49,6 @@ class Safety_Oracle:
 
                 # then all bets that are causally after these bets are viewable by this validator
 
-                print self.candidate_estimate
-
                 for v in lastest_bets_with_estimate[1 - self.candidate_estimate].keys():
                     if v not in self.vicarious_latest_bets[w].keys():
                         viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
@@ -64,26 +62,8 @@ class Safety_Oracle:
     @profile
     def check_estimate_safety(self):
 
-        print "entering decide if safe!"
-        print "self.candidate_estimate", self.candidate_estimate
         if self.candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
-
-        if REPORT:
-            lb = View([])
-            for v in VALIDATOR_NAMES:
-                if v in self.latest_observed_bets:
-                    lb.add_bet(self.latest_observed_bets[v])
-            print "ADVERSARY IS BEING FED THIS AS LATEST BETS:"
-            lb.plot_view(lb.bets, 'yellow')
-
-            vic_lb = View([])
-            for v in VALIDATOR_NAMES:
-                for w in VALIDATOR_NAMES:
-                    if w in self.vicarious_latest_bets[v]:
-                        vic_lb.add_bet(self.vicarious_latest_bets[v][w])
-            print "ADVERSARY IS BEING FED THIS AS VICARIOUS LATEST BETS:"
-            vic_lb.plot_view(vic_lb.bets, 'yellow')
 
         viewables = self.get_viewables()
 
@@ -93,9 +73,6 @@ class Safety_Oracle:
 
         adversary = Adversary(self.candidate_estimate, latest_bets_copy, vicarious_bets_copy, viewables_copy)
 
-        print "about to conduct ideal attack"
         unsafe, _, _ = adversary.ideal_network_attack()
-
-        print "are we safe?, ", not unsafe
 
         return not unsafe
