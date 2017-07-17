@@ -10,7 +10,6 @@ class Safety_Oracle:
     def __init__(self, candidate_estimate, view):
         self.candidate_estimate = candidate_estimate
         self.latest_observed_bets = view.latest_bets
-        self.vicarious_latest_bets = view.vicarious_latest_bets
 
     # This method returns a map estimates -> validator -> bet with estimate
     @profile
@@ -50,11 +49,11 @@ class Safety_Oracle:
                 # then all bets that are causally after these bets are viewable by this validator
 
                 for v in lastest_bets_with_estimate[1 - self.candidate_estimate].keys():
-                    if v not in self.vicarious_latest_bets[w].keys():
+                    if v not in self.latest_observed_bets[w].justification.keys():
                         viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
                         continue
 
-                    if self.vicarious_latest_bets[w][v].sequence_number < lastest_bets_with_estimate[1 - self.candidate_estimate][v].sequence_number:
+                    if self.latest_observed_bets[w].justification[v].sequence_number < lastest_bets_with_estimate[1 - self.candidate_estimate][v].sequence_number:
                         viewables[w][v] = lastest_bets_with_estimate[1 - self.candidate_estimate][v]
 
         return viewables
@@ -68,10 +67,9 @@ class Safety_Oracle:
         viewables = self.get_viewables()
 
         latest_bets_copy = copy.deepcopy(self.latest_observed_bets)
-        vicarious_bets_copy = copy.deepcopy(self.vicarious_latest_bets)
         viewables_copy = copy.deepcopy(viewables)
 
-        adversary = Adversary(self.candidate_estimate, latest_bets_copy, vicarious_bets_copy, viewables_copy)
+        adversary = Adversary(self.candidate_estimate, latest_bets_copy, viewables_copy)
 
         unsafe, _, _ = adversary.ideal_network_attack()
 

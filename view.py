@@ -18,9 +18,6 @@ class View:
         # now for some assignment...
         self.bets = set()
         self.latest_bets = dict()
-        self.vicarious_latest_bets = dict()
-        for v in VALIDATOR_NAMES:
-            self.vicarious_latest_bets[v] = dict()
 
         self.add_bets(bets)
 
@@ -108,14 +105,6 @@ class View:
                 continue
             assert (b == self.latest_bets[b.sender] or
                     b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
-
-        '''
-        PART 3 - updating vicarious latest bets
-        '''
-
-        # updating vicarious_latest_bets for validator v, for all v..
-        for v in self.latest_bets:
-            self.vicarious_latest_bets[v] = self.latest_bets[v].justification
 
     @profile
     def get_extension_from_same_validator(self):
