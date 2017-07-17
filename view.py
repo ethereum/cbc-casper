@@ -88,14 +88,14 @@ class View:
         newly_discovered_bets = self.get_new_bets(showed_bets)
 
         '''
-        PART 1 - updating latest bets
+        PART 1 - updating the set of viewed bets
         '''
 
         for b in newly_discovered_bets:
             self.bets.add(b)
 
         '''
-        PART 3 - updating vicarious latest bets
+        PART 2 - updating latest bets
         '''
 
         # updating latest bets..
@@ -110,7 +110,7 @@ class View:
                     b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
 
         '''
-        PART 4 - updating vicarious latest bets
+        PART 3 - updating vicarious latest bets
         '''
 
         # updating vicarious_latest_bets for validator v, for all v..
