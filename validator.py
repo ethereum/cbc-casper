@@ -59,7 +59,7 @@ class Validator:
     def make_new_latest_bet(self):
 
         # randomly sampling a value returned by the estimator (always returns the single element of a single-element set, btw)
-        estimate = r.choice(tuple(self.estimator()))
+        estimate = self.estimator()
         justification = self.view.latest_bets
         sender = self.name
 

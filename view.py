@@ -35,11 +35,7 @@ class View:
     # This may not be a single-element set because the validator may have an empty view
     @profile
     def estimator(self):
-        scores = dict.fromkeys(ESTIMATE_SPACE, 0)
-        for v in VALIDATOR_NAMES:
-            if v in self.latest_bets:
-                scores[self.latest_bets[v].estimate] += WEIGHTS[v]
-        return utils.get_max_weight_estimates(scores)
+        return utils.get_estimate_from_justification(self.latest_bets)
 
     # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
     @profile
