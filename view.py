@@ -1,5 +1,6 @@
 import utils
 from bet import Bet
+from justification import Justification
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 import plot_tool
 
@@ -29,6 +30,10 @@ class View:
     @profile
     def estimator(self):
         return utils.get_estimate_from_latest_bets(self.latest_bets)
+
+    @profile
+    def justification(self):
+        return Justification(self.latest_bets)
 
     # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
     @profile

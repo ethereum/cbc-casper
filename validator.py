@@ -61,7 +61,7 @@ class Validator:
 
         # randomly sampling a value returned by the estimator (always returns the single element of a single-element set, btw)
         estimate = self.estimator()
-        justification = Justification(self.view.latest_bets)
+        justification = self.view.justification()
         sender = self.name
 
         new_latest_bet = Bet(estimate, justification, sender)
