@@ -33,8 +33,8 @@ class Validator:
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
     @profile
-    def estimator(self):
-        return self.view.estimator()
+    def estimate(self):
+        return self.view.estimate()
 
     # This function returns the validator's latest bet
     @profile
