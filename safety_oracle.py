@@ -9,7 +9,7 @@ class Safety_Oracle:
 
     def __init__(self, candidate_estimate, view):
         self.candidate_estimate = candidate_estimate
-        self.latest_observed_messages = view.latest_messages
+        self.view = view
 
     # This method returns a map estimates -> validator -> message with estimate
     @profile
@@ -19,8 +19,8 @@ class Safety_Oracle:
         for e in ESTIMATE_SPACE:
             lastest_messages_with_estimate[e] = dict()
 
-        for v in self.latest_observed_messages:
-            lastest_messages_with_estimate[self.latest_observed_messages[v].estimate][v] = self.latest_observed_messages[v]
+        for v in self.view.latest_messages:
+            lastest_messages_with_estimate[self.view.latest_messages[v].estimate][v] = self.view.latest_messages[v]
 
         return lastest_messages_with_estimate
 
@@ -35,7 +35,7 @@ class Safety_Oracle:
             viewables[v] = dict()
 
         for w in VALIDATOR_NAMES:
-            if w not in self.latest_observed_messages:
+            if w not in self.view.latest_messages:
 
                 # for validators without anything in their view, any messages are later messages are viewable messages!
                 # ...so we add them all in!
@@ -44,16 +44,16 @@ class Safety_Oracle:
 
             # if we do have a latest message from this validator, then...
             else:
-                assert isinstance(self.latest_observed_messages[w], Bet), "...expected my_latest_message to be a bet or the empty set"
+                assert isinstance(self.view.latest_messages[w], Bet), "...expected my_latest_message to be a bet or the empty set"
 
                 # then all messages that are causally after these messages are viewable by this validator
 
                 for v in lastest_messages_with_estimate[1 - self.candidate_estimate].keys():
-                    if v not in self.latest_observed_messages[w].justification.latest_messages.keys():
+                    if v not in self.view.latest_messages[w].justification.latest_messages.keys():
                         viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
                         continue
 
-                    if self.latest_observed_messages[w].justification.latest_messages[v].sequence_number < lastest_messages_with_estimate[1 - self.candidate_estimate][v].sequence_number:
+                    if self.view.latest_messages[w].justification.latest_messages[v].sequence_number < lastest_messages_with_estimate[1 - self.candidate_estimate][v].sequence_number:
                         viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
 
         return viewables
@@ -66,7 +66,7 @@ class Safety_Oracle:
 
         viewables = self.get_viewables()
 
-        latest_messages_copy = copy.deepcopy(self.latest_observed_messages)
+        latest_messages_copy = copy.deepcopy(self.view.latest_messages)
         viewables_copy = copy.deepcopy(viewables)
 
         adversary = Adversary(self.candidate_estimate, latest_messages_copy, viewables_copy)
