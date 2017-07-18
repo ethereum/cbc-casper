@@ -13,10 +13,10 @@ def dependency_from_same_validator_from_bet(b):
 
     def recurr(B):
         dependencies.add(B)
-        if b.sender not in B.justification.latest_bets:
+        if b.sender not in B.justification.latest_messages:
             return
         else:
-            recurr(B.justification.latest_bets[b.sender])
+            recurr(B.justification.latest_messages[b.sender])
 
     recurr(b)
 
@@ -26,7 +26,7 @@ def dependency_from_same_validator_from_bet(b):
 @profile
 def dependency_from_same_validator(view):
     dependencies = set()
-    for bet in view.bets:
+    for bet in view.messages:
         dependencies = dependencies.union(dependency_from_same_validator_from_bet(bet))
 
     return dependencies
@@ -34,7 +34,7 @@ def dependency_from_same_validator(view):
 
 @profile
 def get_extension_from_same_validator(view):
-    return (dependency_from_same_validator(view)).union(view.bets)
+    return (dependency_from_same_validator(view)).union(view.messages)
 
 
 @profile
@@ -49,7 +49,7 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
 
     if use_edges == []:
         for b in nodes:
-            for b2 in b.justification.latest_bets.values():
+            for b2 in b.justification.latest_messages.values():
                 G.add_edges_from([(b2, b)])
     else:
         for e in use_edges:

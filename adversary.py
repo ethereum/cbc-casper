@@ -40,7 +40,7 @@ class Adversary:
 
         self.vicarious_latest_bets = dict()
         for v in latest_observed_bets:
-            self.vicarious_latest_bets[v] = self.latest_bets[v].justification.latest_bets
+            self.vicarious_latest_bets[v] = self.latest_bets[v].justification.latest_messages
 
         # ...and she also keeps models of every validator!
         self.validator_models = dict()

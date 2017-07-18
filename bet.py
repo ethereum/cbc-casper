@@ -22,19 +22,19 @@ class Bet:
         self.justification = copy.copy(justification)
 
         # the sequence number makes certain operations more efficient (like checking if bets are later)
-        if self.sender not in self.justification.latest_bets:
+        if self.sender not in self.justification.latest_messages:
             self.sequence_number = 0
         else:
-            self.sequence_number = self.justification.latest_bets[self.sender].sequence_number + 1
+            self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
         # the "heights" of bets are used for visualization of views
         if self.justification.is_null():
             self.height = 0
         else:
             candidate_max = 0
-            for v in self.justification.latest_bets:
-                if self.justification.latest_bets[v].height > candidate_max:
-                    candidate_max = self.justification.latest_bets[v].height
+            for v in self.justification.latest_messages:
+                if self.justification.latest_messages[v].height > candidate_max:
+                    candidate_max = self.justification.latest_messages[v].height
 
             self.height = candidate_max + 1
 
@@ -60,10 +60,10 @@ class Bet:
         i = 0
         # if this following line of code sometimes produces different orders (justification is a set), then
         # we have an issue. It would be good practice to give a standard for ordering bets in justifications.
-        for b in self.justification.latest_bets.values():
+        for b in self.justification.latest_messages.values():
             string += str(b)
             i += 1
-            if i != len(self.justification.latest_bets):  # getting fancy; leaving out commas without successive terms
+            if i != len(self.justification.latest_messages):  # getting fancy; leaving out commas without successive terms
                 string += ", "
         string += "}, " + str(self.sender) + ")"
         return string
@@ -80,13 +80,13 @@ class Bet:
     def recursive_is_dependency_from_same_validator(self, B):
 
         # this is the case where we get to the sender's first Bet before finding this bet
-        if self.sender not in B.justification.latest_bets:
+        if self.sender not in B.justification.latest_messages:
             return False
 
-        if self == B.justification.latest_bets[self.sender]:
+        if self == B.justification.latest_messages[self.sender]:
             return True
 
-        return self.recursive_is_dependency_from_same_validator(B.justification.latest_bets[self.sender])
+        return self.recursive_is_dependency_from_same_validator(B.justification.latest_messages[self.sender])
 
     @profile
     def is_dependency_from_same_validator(self, B):

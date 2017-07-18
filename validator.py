@@ -24,9 +24,9 @@ class Validator:
 
     # This method is the only way that a validator can receive protocol messages
     @profile
-    def receive_bets(self, bets):
+    def receive_messages(self, messages):
         if not self.decided:
-            self.view.add_bets(bets)
+            self.view.add_messages(messages)
         else:
             print "unable to show bet to decided node"
 
@@ -38,9 +38,9 @@ class Validator:
 
     # This function returns the validator's latest bet
     @profile
-    def my_latest_bet(self):
-        if self.name in self.view.latest_bets:
-            return self.view.latest_bets[self.name]
+    def my_latest_message(self):
+        if self.name in self.view.latest_messages:
+            return self.view.latest_messages[self.name]
         else:
             return None
 
@@ -59,14 +59,14 @@ class Validator:
     # This function produces a new latest bet for the validator
     # It updates the validator's latest bet, estimate, view, and latest observed bets
     @profile
-    def make_new_latest_bet(self):
+    def make_new_message(self):
 
         justification = self.view.justification()
         estimate = justification.estimate()
         sender = self.name
 
-        new_latest_bet = Bet(estimate, justification, sender)
+        new_message = Bet(estimate, justification, sender)
 
-        self.view.add_bets(set([new_latest_bet]))
+        self.view.add_messages(set([new_message]))
 
-        return new_latest_bet
+        return new_message

@@ -28,7 +28,7 @@ def main():
         print "WEIGHTS", WEIGHTS
 
         decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-        safe_bets = set()
+        safe_messages = set()
 
         network.random_initialization()
 
@@ -37,10 +37,10 @@ def main():
         while(True):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_bets,edges)
+                network.report(safe_messages, edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_bets, use_edges=edges)
+                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
 
             iterator += 1
 
@@ -57,32 +57,32 @@ def main():
                 messages.append(message_path[0])
                 pairs.remove(message_path[0])
 
-            last_bets = []
-            validator_received_bet = set()
+            last_messages = []
+            validator_received_messages = set()
             for i in xrange(NUM_VALIDATORS):
-                last_bets.append(network.validators[i].my_latest_bet())
+                last_messages.append(network.validators[i].my_latest_message())
 
-            for sb in list(safe_bets):
-                if sb not in last_bets:
+            for sb in list(safe_messages):
+                if sb not in last_messages:
                     raise Exception("safe bets should be in last bets")  # sanity check
 
             for path in messages:
                 i = path[0]
                 j = path[1]
-                network.propagate_bet_to_validator(last_bets[i], j)
-                validator_received_bet.add(j)
+                network.propagate_message_to_validator(last_messages[i], j)
+                validator_received_messages.add(j)
 
             for i in xrange(NUM_VALIDATORS):
-                if not decided[i] and i in validator_received_bet:
-                    new_bet = network.get_bet_from_validator(i)
-                    decided[i] = network.validators[i].check_estimate_safety(new_bet.estimate)
+                if not decided[i] and i in validator_received_messages:
+                    new_message = network.get_message_from_validator(i)
+                    decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
 
                     if decided[i]:
-                        safe_bets.add(new_bet)
+                        safe_messages.add(new_message)
 
             for path in messages:
-                edges.append([last_bets[path[0]], network.validators[path[1]].my_latest_bet()])
-                edges.append([last_bets[path[1]], network.validators[path[1]].my_latest_bet()])
+                edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
+                edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
 
     elif sys.argv[1] == 'blockchain':
 
@@ -91,10 +91,10 @@ def main():
         print "WEIGHTS", WEIGHTS
 
         decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-        safe_bets = set()
+        safe_messages = set()
 
-        random_bet = Bet(r.randint(0, 1), Justification(), 0)
-        initial_view = View(set([random_bet]))
+        random_message = Bet(r.randint(0, 1), Justification(), 0)
+        initial_view = View(set([random_message]))
         network.view_initialization(initial_view)
         iterator = 0
         edges = []
@@ -102,10 +102,10 @@ def main():
         while(True):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_bets, edges)
+                network.report(safe_messages, edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_bets, use_edges=edges)
+                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
 
             # for i in xrange(NUM_VALIDATORS):
             #    network.validators[i].view.plot_view(safe_bets)
@@ -113,19 +113,19 @@ def main():
             current_validator = iterator % NUM_VALIDATORS
             next_validator = (iterator + 1) % NUM_VALIDATORS
 
-            bet = network.validators[current_validator].my_latest_bet()
+            message = network.validators[current_validator].my_latest_message()
 
-            if isinstance(bet, Bet):
-                network.propagate_bet_to_validator(bet, next_validator)
+            if isinstance(message, Bet):
+                network.propagate_message_to_validator(message, next_validator)
 
             if not decided[next_validator]:
-                new_bet = network.get_bet_from_validator(next_validator)
-                decided[next_validator] = network.validators[next_validator].check_estimate_safety(new_bet.estimate)
+                new_message = network.get_message_from_validator(next_validator)
+                decided[next_validator] = network.validators[next_validator].check_estimate_safety(new_message.estimate)
 
-                edges.append([bet, new_bet])
+                edges.append([message, new_message])
 
                 if decided[next_validator]:
-                    safe_bets.add(new_bet)
+                    safe_messages.add(new_message)
 
             iterator += 1
     else:

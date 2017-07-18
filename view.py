@@ -7,21 +7,18 @@ import plot_tool
 
 class View:
     @profile
-    def __init__(self, bets):
-        # be safe, type check!
-        for b in bets:
-            assert isinstance(b, Bet), "...expected only bets in view"
+    def __init__(self, messages):
 
         # now for some assignment...
-        self.bets = set()
-        self.latest_bets = dict()
+        self.messages = set()
+        self.latest_messages = dict()
 
-        self.add_bets(bets)
+        self.add_messages(messages)
 
     @profile
     def __str__(self):
         s = "View: \n"
-        for b in self.bets:
+        for b in self.messages:
             s += str(b) + "\n"
         return s
 
@@ -29,84 +26,84 @@ class View:
     # This may not be a single-element set because the validator may have an empty view
     @profile
     def estimate(self):
-        return utils.get_estimate_from_latest_bets(self.latest_bets)
+        return utils.get_estimate_from_latest_messages(self.latest_messages)
 
     @profile
     def justification(self):
-        return Justification(self.latest_bets)
+        return Justification(self.latest_messages)
 
     # This method updates a validator's observed latest bets (and vicarious latest bets) in response to seeing new bets
     @profile
-    def add_bets(self, showed_bets):
+    def add_messages(self, showed_messages):
 
         '''
         PART -1 - type check
         '''
 
-        for b in showed_bets:
+        for b in showed_messages:
             assert isinstance(b, Bet), "expected only to add bets"
 
         '''
         PART 0 - finding newly discovered bets
         '''
 
-        newly_discovered_bets = self.get_new_bets(showed_bets)
+        newly_discovered_messages = self.get_new_messages(showed_messages)
 
         '''
         PART 1 - updating the set of viewed bets
         '''
 
-        for b in newly_discovered_bets:
-            self.bets.add(b)
+        for b in newly_discovered_messages:
+            self.messages.add(b)
 
         '''
         PART 2 - updating latest bets
         '''
 
         # updating latest bets..
-        for b in newly_discovered_bets:
-            if b.sender not in self.latest_bets:
-                self.latest_bets[b.sender] = b
+        for b in newly_discovered_messages:
+            if b.sender not in self.latest_messages:
+                self.latest_messages[b.sender] = b
                 continue
-            if self.latest_bets[b.sender].sequence_number < b.sequence_number:
-                self.latest_bets[b.sender] = b
+            if self.latest_messages[b.sender].sequence_number < b.sequence_number:
+                self.latest_messages[b.sender] = b
                 continue
-            assert (b == self.latest_bets[b.sender] or
-                    b.is_dependency_from_same_validator(self.latest_bets[b.sender])), "...did not expect any equivocating nodes!"
+            assert (b == self.latest_messages[b.sender] or
+                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "...did not expect any equivocating nodes!"
 
     # This method returns the set of bets out of showed_bets and their dependency that isn't part of the view
     @profile
-    def get_new_bets(self, showed_bets):
+    def get_new_messages(self, showed_messages):
 
-        new_bets = set()
+        new_messages = set()
         # The memo will keep track of bets we've already looked at, so we don't redo work.
         memo = set()
 
         # At the start, our working set will be the "showed bets" parameter
-        current_set = set(showed_bets)
+        current_set = set(showed_messages)
         while(current_set != set()):
 
             next_set = set()
             # If there's no bet in the current working set
-            for bet in current_set:
+            for message in current_set:
 
                 # Which we haven't seen it in the view or during this loop
-                if bet not in self.bets and bet not in memo:
+                if message not in self.messages and message not in memo:
 
                     # But if we do have a new bet, then we add it to our pile..
-                    new_bets.add(bet)
+                    new_messages.add(message)
 
                     # and add the best in its justification to our next working set
-                    for b in bet.justification.latest_bets.values():
+                    for b in message.justification.latest_messages.values():
                         next_set.add(b)
                 # Keeping a record of very bet we inspect, being sure not to do any extra (exponential complexity) work
-                memo.add(bet)
+                memo.add(message)
 
             current_set = next_set
 
         # After the loop is done, we return a set of new bets
-        return new_bets
+        return new_messages
 
     @profile
-    def plot_view(self, coloured_bets, colour='green', use_edges=[]):
-        plot_tool.plot_view(self, coloured_bets, colour, use_edges)
+    def plot_view(self, coloured_messages, colour='green', use_edges=[]):
+        plot_tool.plot_view(self, coloured_messages, colour, use_edges)

@@ -4,24 +4,24 @@ import random as r
 
 
 class Justification:
-    def __init__(self, latest_bets=dict()):
-        self.latest_bets = dict()
-        if latest_bets == dict():
+    def __init__(self, latest_messages=dict()):
+        self.latest_messages = dict()
+        if latest_messages == dict():
             return
 
-        for v in latest_bets:
-            self.latest_bets[v] = latest_bets[v]
+        for v in latest_messages:
+            self.latest_messages[v] = latest_messages[v]
 
     def is_null(self):
-        return self.latest_bets == dict()
+        return self.latest_messages == dict()
 
     def estimate(self, default=None):
         scores = dict()
         for e in ESTIMATE_SPACE:
             scores[e] = 0
 
-        for v in self.latest_bets:
-            scores[self.latest_bets[v].estimate] += WEIGHTS[v]
+        for v in self.latest_messages:
+            scores[self.latest_messages[v].estimate] += WEIGHTS[v]
 
         mwe = utils.get_max_weight_estimates(scores)
 
