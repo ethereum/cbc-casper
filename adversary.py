@@ -21,7 +21,7 @@ from model_validator import Model_Validator
 class Adversary:
 
     @profile
-    def __init__(self, victim_estimate, latest_observed_bets, viewables):
+    def __init__(self, victim_estimate, view, viewables):
 
         # be safe! start with type checking.
         assert victim_estimate in ESTIMATE_SPACE, "...expected an estimate!"
@@ -36,10 +36,10 @@ class Adversary:
         self.attack_view = set()
 
         # ...and she will keep track of the latest estimates from these validators, if unique
-        self.latest_bets = latest_observed_bets
+        self.latest_bets = view.latest_messages
 
         self.vicarious_latest_bets = dict()
-        for v in latest_observed_bets:
+        for v in self.latest_bets:
             self.vicarious_latest_bets[v] = self.latest_bets[v].justification.latest_messages
 
         # ...and she also keeps models of every validator!

@@ -66,10 +66,10 @@ class Safety_Oracle:
 
         viewables = self.get_viewables()
 
-        latest_messages_copy = copy.deepcopy(self.view.latest_messages)
+        view_copy = copy.deepcopy(self.view)
         viewables_copy = copy.deepcopy(viewables)
 
-        adversary = Adversary(self.candidate_estimate, latest_messages_copy, viewables_copy)
+        adversary = Adversary(self.candidate_estimate, view_copy, viewables_copy)
 
         unsafe, _, _ = adversary.ideal_network_attack()
 
