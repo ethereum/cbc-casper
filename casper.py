@@ -64,7 +64,7 @@ def main():
 
             for sb in list(safe_messages):
                 if sb not in last_messages:
-                    raise Exception("safe bets should be in last bets")  # sanity check
+                    raise Exception("safe estimates should be in last messages")  # sanity check
 
             for path in messages:
                 i = path[0]
@@ -106,9 +106,6 @@ def main():
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
                         network.validators[i].view.plot_view(safe_messages, use_edges=edges)
-
-            # for i in xrange(NUM_VALIDATORS):
-            #    network.validators[i].view.plot_view(safe_bets)
 
             current_validator = iterator % NUM_VALIDATORS
             next_validator = (iterator + 1) % NUM_VALIDATORS

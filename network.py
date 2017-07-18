@@ -13,9 +13,9 @@ class Network:
         self.global_view = set()
 
     @profile
-    def propagate_message_to_validator(self, bet, validator_name):
-        assert bet in self.global_view, "...expected only to propagate bets from the global view"
-        self.validators[validator_name].receive_messages(set([bet]))
+    def propagate_message_to_validator(self, message, validator_name):
+        assert message in self.global_view, "...expected only to propagate messages from the global view"
+        self.validators[validator_name].receive_messages(set([message]))
 
     def get_message_from_validator(self, validator_name):
         assert validator_name in VALIDATOR_NAMES, "...expected a known validator"
@@ -23,18 +23,18 @@ class Network:
         if self.validators[validator_name].decided:
             return True
 
-        new_bet = self.validators[validator_name].make_new_message()
-        self.global_view.add(new_bet)
-        return new_bet
+        new_message = self.validators[validator_name].make_new_message()
+        self.global_view.add(new_message)
+        return new_message
 
-    def random_propagation_and_bet(self):
+    def random_propagation_and_message(self):
 
         destination = r.choice(tuple(VALIDATOR_NAMES))
         if len(self.global_view) == 0:
             self.get_message_from_validator(destination)
         else:
-            bet = r.choice(tuple(self.global_view))
-            self.propagate_message_to_validator(bet, destination)
+            message = r.choice(tuple(self.global_view))
+            self.propagate_message_to_validator(message, destination)
             self.get_message_from_validator(destination)
 
     # def let_validator_push

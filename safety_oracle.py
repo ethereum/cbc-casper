@@ -11,7 +11,7 @@ class Safety_Oracle:
         self.candidate_estimate = candidate_estimate
         self.latest_observed_messages = view.latest_messages
 
-    # This method returns a map estimates -> validator -> bet with estimate
+    # This method returns a map estimates -> validator -> message with estimate
     @profile
     def get_latest_messages_with_estimate(self):
 
@@ -26,7 +26,7 @@ class Safety_Oracle:
 
     @profile
     def get_viewables(self):
-        # if this validator has no latest bets in the view, then we store...
+        # if this validator has no latest messages in the view, then we store...
 
         lastest_messages_with_estimate = self.get_latest_messages_with_estimate()
 
@@ -37,16 +37,16 @@ class Safety_Oracle:
         for w in VALIDATOR_NAMES:
             if w not in self.latest_observed_messages:
 
-                # for validators without anything in their view, any bets are later bets are viewable bets!
+                # for validators without anything in their view, any messages are later messages are viewable messages!
                 # ...so we add them all in!
                 for v in lastest_messages_with_estimate[1 - self.candidate_estimate].keys():
                     viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
 
-            # if we do have a latest bet from this validator, then...
+            # if we do have a latest message from this validator, then...
             else:
-                assert isinstance(self.latest_observed_messages[w], Bet), "...expected my_latest_bet to be a bet or the empty set"
+                assert isinstance(self.latest_observed_messages[w], Bet), "...expected my_latest_message to be a bet or the empty set"
 
-                # then all bets that are causally after these bets are viewable by this validator
+                # then all messages that are causally after these messages are viewable by this validator
 
                 for v in lastest_messages_with_estimate[1 - self.candidate_estimate].keys():
                     if v not in self.latest_observed_messages[w].justification.latest_messages.keys():

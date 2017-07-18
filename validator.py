@@ -28,7 +28,7 @@ class Validator:
         if not self.decided:
             self.view.add_messages(messages)
         else:
-            print "unable to show bet to decided node"
+            print "unable to show message to decided node"
 
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
@@ -36,7 +36,7 @@ class Validator:
     def estimate(self):
         return self.view.estimate()
 
-    # This function returns the validator's latest bet
+    # This function returns the validator's latest message
     @profile
     def my_latest_message(self):
         if self.name in self.view.latest_messages:
@@ -56,8 +56,8 @@ class Validator:
 
         return is_safe
 
-    # This function produces a new latest bet for the validator
-    # It updates the validator's latest bet, estimate, view, and latest observed bets
+    # This function produces a new latest message for the validator
+    # It updates the validator's latest message, estimate, view, and latest observed messages
     @profile
     def make_new_message(self):
 
