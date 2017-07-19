@@ -55,7 +55,7 @@ class Validator:
     def make_new_message(self):
 
         justification = self.view.justification()
-        estimate = justification.estimate()
+        estimate = self.view.estimate()
         sender = self.name
 
         new_message = Block(estimate, justification, sender)

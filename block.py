@@ -44,7 +44,12 @@ class Block:
         if self.justification.is_null():
             self.height = 1
         else:
-            self.height = max(self.justification.latest_messages.values()) + 1
+            candidate_max = 1
+            for v in self.justification.latest_messages:
+                if self.justification.latest_messages[v].height > candidate_max:
+                    candidate_max = self.justification.latest_messages[v].height
+
+            self.height = candidate_max + 1
 
     def __hash__(self):
         return hash(str(self.sequence_number)+str(self.sender))

@@ -12,7 +12,6 @@ class Network:
             self.validators[v] = Validator(v)
         self.global_view = set()
 
-    @profile
     def propagate_message_to_validator(self, message, validator_name):
         assert message in self.global_view, "...expected only to propagate messages from the global view"
         self.validators[validator_name].receive_messages(set([message]))
@@ -52,7 +51,7 @@ class Network:
         for v in VALIDATOR_NAMES:
             self.get_message_from_validator(v)
 
-    def report(self, safe_messages, edges):
+    def report(self, safe_messages, edges=[]):
         messageset = set()
         for v in VALIDATOR_NAMES:
             if self.validators[v].my_latest_message() is not None:

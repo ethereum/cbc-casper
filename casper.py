@@ -14,14 +14,12 @@ import random as r  # to ensure the tie-breaking property
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
 from justification import Justification
 from view import View
-from adversary import Adversary
 from network import Network
 
 
-@profile
 def main():
 
-    print( sys.argv[0] )
+    print(sys.argv[0])
 
     if len(sys.argv) == 1 or sys.argv[1] == 'rounds':
 
@@ -34,6 +32,10 @@ def main():
 
         network.random_initialization()
 
+        network.report(safe_messages)
+        
+        return
+        
         edges = []
         iterator = 0
         while(True):

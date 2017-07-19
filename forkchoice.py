@@ -44,7 +44,7 @@ def get_favorite_child_of_block(block, children, latest_messages):
 def get_fork_choice(last_finalized_block, children, latest_messages):
 
     best_block = last_finalized_block
-    while(best_block in children):
+    while(best_block in children.keys()):
         best_block = get_favorite_child_of_block(best_block, children, latest_messages)
 
     return best_block
