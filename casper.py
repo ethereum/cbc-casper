@@ -19,9 +19,7 @@ from network import Network
 
 def main():
 
-    print(sys.argv[0])
-
-    if len(sys.argv) == 1 or sys.argv[1] == 'rounds':
+    if sys.argv[1] == 'rounds':
 
         network = Network()
 
