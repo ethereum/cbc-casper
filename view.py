@@ -75,6 +75,8 @@ class View:
         PART 3 - updating children
         '''
         for b in newly_discovered_messages:
+            if b.estimate is None:
+                continue
             if b.estimate not in self.children:
                 self.children[b.estimate] = set()
             self.children[b.estimate].add(b)
