@@ -1,10 +1,7 @@
 '''
 Casper PoC: Correct-by-construction asynchronous binary consensus.
 
-Note that comments marked with "#########....#########"" barriers are probably
-conceptually important Other comments may be conceptually important but are
-mostly for code comprehension Note that not all comments have been marked up in
-this manner, yet... :)
+Important comments are marked with "#########....#########"" barriers.
 '''
 
 import sys

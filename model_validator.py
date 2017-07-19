@@ -13,7 +13,6 @@ from bet import Bet
 from justification import Justification
 from view import View
 
-import utils
 import random as r
 
 

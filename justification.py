@@ -1,5 +1,4 @@
 from settings import ESTIMATE_SPACE, WEIGHTS
-import utils
 import random as r
 from block import Block
 

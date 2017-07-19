@@ -3,7 +3,6 @@ from bet import Bet
 from view import View
 from justification import Justification
 from safety_oracle import Safety_Oracle
-import utils
 
 import random as r
 r.seed()
