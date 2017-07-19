@@ -25,21 +25,20 @@ def get_max_weight_indexes(scores):
 def get_favorite_child_of_block(block, children, latest_messages):
 
     scores = dict()
-    for b in children[block]:
-        scores[b] = 0
+    for child in children[block]:
+        scores[child] = 0
 
     memo = set()
-    for b in children[block]:
+    for child in children[block]:
         for v in latest_messages.keys():
             if v in memo:
                 continue
-            if latest_messages[v].is_decendant(latest_messages[v]):
-                scores[b] += WEIGHTS[v]
+            if child.is_in_blockchain_of_block(latest_messages[v]):
+                scores[child] += WEIGHTS[v]
 
     max_weight_children = get_max_weight_indexes(scores)
 
     c = r.choice(tuple(max_weight_children))
-    print "c:", c
     return c
 
 
