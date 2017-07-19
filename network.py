@@ -12,7 +12,7 @@ class Network:
         self.validators = dict()
         for v in VALIDATOR_NAMES:
             self.validators[v] = Validator(v)
-        self.global_view = set()
+        self.global_view = View()
 
     def propagate_message_to_validator(self, message, validator_name):
         assert message in self.global_view, "...expected only to propagate messages from the global view"
@@ -25,7 +25,7 @@ class Network:
             return True
 
         new_message = self.validators[validator_name].make_new_message()
-        self.global_view.add(new_message)
+        self.global_view.add_messages(set([new_message]))
         return new_message
 
     def random_propagation_and_message(self):
@@ -51,9 +51,11 @@ class Network:
 
     def random_initialization(self):
         Genesis = Block()
+        self.global_view.add_messages(set([Genesis]))
         for v in VALIDATOR_NAMES:
             self.validators[v].receive_messages(set([Genesis]))
-            self.get_message_from_validator(v)
+            new_bet = self.get_message_from_validator(v)
+            self.global_view.add_messages(set([new_bet]))
 
     def report(self, safe_messages, edges=[]):
         messageset = set()

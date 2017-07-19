@@ -16,10 +16,17 @@ from justification import Justification
 from view import View
 from network import Network
 
+from validator import Validator
 
 def main():
 
-    if sys.argv[1] == 'rounds':
+    if sys.argv[1] == 'test':
+        
+        network = Network()
+        network.random_initialization()
+        print network.global_view
+
+    elif sys.argv[1] == 'rounds':
 
         network = Network()
 
