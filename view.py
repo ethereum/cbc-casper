@@ -1,7 +1,7 @@
 from block import Block
 from justification import Justification
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-# import plot_tool
+import forkchoice
 
 
 class View:
@@ -11,7 +11,7 @@ class View:
         self.messages = set()
         self.latest_messages = dict()
         self.children = dict()
-        self.last_finalized_block = dict()
+        self.last_finalized_block = Block()
 
         self.add_messages(messages)
 
@@ -24,10 +24,10 @@ class View:
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
     def estimate(self):
-        return utils.get_estimate_from_latest_messages(self.latest_messages)
+        return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
 
     def justification(self):
-        return Justification(self.latest_messages)
+        return Justification(self.latest_messages, self.last_finalized_block)
 
     # This method updates a validator's observed latest messages (and vicarious latest messages) in response to seeing new messages
     def add_messages(self, showed_messages):
