@@ -72,9 +72,6 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
     color_values = [node_color_map.get(node) for node in G.nodes()]
 
     labels = {}
-    for b in nodes:
-        labels[b] = b.estimate
-    # labels['B']=r'$b$'
 
     node_sizes = []
     for node in G.nodes():
