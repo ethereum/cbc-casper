@@ -59,11 +59,11 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
 
     # nx.draw(G, positions, , node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
-    nx.draw_networkx_nodes(G, positions, alpha=0.3, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black')
+    nx.draw_networkx_nodes(G, positions, alpha=0.5, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black')
     if colored_edges != []:
         nx.draw_networkx_edges(G, positions, edgelist=colored_edges, width=10, edge_color='r')
     if thick_edges != []:
-        nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=1, style='solid')
+        nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=5, edge_color='grey', style='solid')
 
     nx.draw_networkx_edges(G, positions, edgelist=edges, style='dashed', edge_color='grey')
     nx.draw_networkx_labels(G, positions, labels=labels)
