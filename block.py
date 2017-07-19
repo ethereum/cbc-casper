@@ -52,7 +52,9 @@ class Block:
             self.height = candidate_max + 1
 
     def __hash__(self):
-        return hash(str(self.sequence_number)+str(self.sender))
+        if self.sender is None:
+            return hash(0)
+        return hash(self.sequence_number + self.sender)
 
     def is_decendant(self, block):
         assert isinstance(block, Block), "...expected a block"
