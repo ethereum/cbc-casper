@@ -7,7 +7,6 @@ import pylab
 import plot_tool
 
 
-@profile
 def dependency_from_same_validator_from_bet(b):
     dependencies = set()
 
@@ -23,7 +22,6 @@ def dependency_from_same_validator_from_bet(b):
     return dependencies
 
 
-@profile
 def dependency_from_same_validator(view):
     dependencies = set()
     for bet in view.messages:
@@ -32,12 +30,10 @@ def dependency_from_same_validator(view):
     return dependencies
 
 
-@profile
 def get_extension_from_same_validator(view):
     return (dependency_from_same_validator(view)).union(view.messages)
 
 
-@profile
 def plot_view(view, coloured_bets, colour='green', use_edges=[]):
 
     G = nx.DiGraph()
