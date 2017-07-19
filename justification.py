@@ -1,11 +1,10 @@
 from settings import ESTIMATE_SPACE, WEIGHTS
 import random as r
-from block import Block
 import forkchoice
 
 
 class Justification:
-    def __init__(self, latest_messages=dict(), last_finalized_block=Block(), children=dict()):
+    def __init__(self, last_finalized_block, latest_messages=dict(), children=dict()):
         self.last_finalized_block = last_finalized_block
         self.latest_messages = latest_messages
         self.children = children
