@@ -99,9 +99,9 @@ def main():
 
             print "BEST CHAIN----------------------", best_chain
 
-            coloured_blocks = network.global_view.latest_messages.values()
+            #coloured_blocks = network.global_view.latest_messages.values()
 
-            network.report(colored_messages=coloured_blocks, edges=communications, thick_edges=blockchain, colored_edges=best_chain)
+            network.report(edges=communications, thick_edges=blockchain, colored_edges=best_chain)
 
             #for i in xrange(NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
