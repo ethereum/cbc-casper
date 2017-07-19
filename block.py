@@ -44,22 +44,16 @@ class Block:
     def __hash__(self):
         return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
 
-    def is_decendant(self, block):
+    def is_in_blockchain_of_block(self, block):
         assert isinstance(block, Block), "...expected a block"
 
         if self == block:
             return True
 
-        if block.sequence_number <= self.sequence_number:
+        if block.estimate is None:
             return False
 
-        candidate = block.justification.latest_messages[block.sender]
+        if block.estimate == self:
+            return True
 
-        while(candidate.sequence_number > self.sequence_number):
-
-            if candidate == self:
-                return True
-
-            candidate = candidate.estimate
-
-        return False
+        return self.is_in_blockchain_of_block(block.estimate)

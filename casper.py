@@ -54,24 +54,33 @@ def main():
             if network.validators[i].my_latest_message() is not None:
                 old_blocks.append(network.validators[i].my_latest_message())
 
+        affected_validators = set()
         for path in messages:
             i = path[0]
             j = path[1]
             old_block = old_blocks[i]
-            network.propagate_message_to_validator(old_block, j)
+
+            if old_block not in network.validators[j].view.messages:
+                network.propagate_message_to_validator(old_block, j)
+                affected_validators.add(j)
 
         new_blocks = []
         for j in xrange(NUM_VALIDATORS):
-            new_block = network.get_message_from_validator(j)
-            new_blocks.append(new_block)
+            if j in affected_validators:
+                new_block = network.get_message_from_validator(j)
+                new_blocks.append(new_block)
 
-            if new_block.estimate is not None:
-                blockchain.append([new_block, new_block.estimate])
+                if new_block.estimate is not None:
+                    blockchain.append([new_block, new_block.estimate])
 
         for path in messages:
             i = path[0]
             j = path[1]
-            communications.append([old_blocks[i], new_blocks[j]])
+            if i in old_blocks:
+                for b in new_blocks:
+                    if b.sender == j:
+                        if old_blocks[i] not in network.validators[j].view.messages:
+                            communications.append([old_blocks[i], b])
 
         network.global_view.add_messages(new_blocks)
 
