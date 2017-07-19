@@ -27,7 +27,7 @@ class View:
         return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
 
     def justification(self):
-        return Justification(self.latest_messages, self.last_finalized_block)
+        return Justification(self.latest_messages, self.last_finalized_block, self.children)
 
     # This method updates a validator's observed latest messages (and vicarious latest messages) in response to seeing new messages
     def add_messages(self, showed_messages):
