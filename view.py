@@ -9,10 +9,10 @@ class View:
     def __init__(self, messages=set()):
 
         # now for some assignment...
-        self.messages = set([Block()])
+        self.messages = set()
         self.latest_messages = dict()
         self.children = dict()
-        self.last_finalized_block = Block()
+        self.last_finalized_block = None
 
         self.add_messages(messages)
 
@@ -75,8 +75,6 @@ class View:
         PART 3 - updating children
         '''
         for b in newly_discovered_messages:
-            if b.estimate is None:
-                continue
             if b.estimate not in self.children:
                 self.children[b.estimate] = set()
             self.children[b.estimate].add(b)

@@ -5,6 +5,8 @@ from justification import Justification
 
 class Block:
     def __eq__(self, block):
+        if block is None:
+            return False
         if self.sender != block.sender:
             return False
         if self.estimate is None and block.estimate is not None:

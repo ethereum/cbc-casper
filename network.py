@@ -53,7 +53,7 @@ class Network:
         for v in VALIDATOR_NAMES:
             new_bet = self.get_message_from_validator(v)
 
-    def report(self, safe_messages, edges=[]):
+    def report(self, safe_messages=set(), edges=[]):
         messageset = set()
         for v in VALIDATOR_NAMES:
             if self.validators[v].my_latest_message() is not None:

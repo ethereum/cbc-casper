@@ -57,10 +57,7 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
     positions = dict()
 
     for b in nodes:
-        if b.sender is None:
-            positions[b] = 0.5, 0.0
-        else:
-            positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
+        positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
 
     node_color_map = {}
     for b in nodes:
@@ -81,6 +78,11 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
             node_sizes.append(700*pow(100/pi, 0.5))
 
     nx.draw_networkx_labels(G, positions, labels, font_size=20)
+
+    print nodes
+    print positions
+    print len(nodes)
+    print len(positions)
 
     nx.draw(G, positions, node_color=color_values, node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 

@@ -18,10 +18,11 @@ from network import Network
 
 from validator import Validator
 
+
 def main():
 
     if sys.argv[1] == 'test':
-        
+
         network = Network()
         network.random_initialization()
         print network.global_view
@@ -37,19 +38,16 @@ def main():
 
         network.random_initialization()
 
-        network.report(safe_messages)
-        
-        return
-        
         edges = []
         iterator = 0
-        while(True):
+        while(iterator < 50):
 
             if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_messages, edges)
+                # network.report(safe_messages, edges)
                 if REPORT_SUBJECTIVE_VIEWS:
                     for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
+                        # network.validators[i].view.plot_view(safe_messages, use_edges=edges)
+                        continue
 
             iterator += 1
 
@@ -66,33 +64,43 @@ def main():
                 messages.append(message_path[0])
                 pairs.remove(message_path[0])
 
-            last_messages = []
-            validator_received_messages = set()
-            for i in xrange(NUM_VALIDATORS):
-                last_messages.append(network.validators[i].my_latest_message())
-
-            for sb in list(safe_messages):
-                if sb not in last_messages:
-                    raise Exception("safe estimates should be in last messages")  # sanity check
-
             for path in messages:
                 i = path[0]
                 j = path[1]
-                network.propagate_message_to_validator(last_messages[i], j)
-                validator_received_messages.add(j)
+                network.propagate_message_to_validator(network.validators[i].my_latest_message(), j)
+                network.get_message_from_validator(j)
 
-            for i in xrange(NUM_VALIDATORS):
-                if not decided[i] and i in validator_received_messages:
-                    new_message = network.get_message_from_validator(i)
-                    decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
+        print network.global_view.messages
+        network.report()
+        '''
+        last_messages = []
+        validator_received_messages = set()
+        for i in xrange(NUM_VALIDATORS):
+            last_messages.append(network.validators[i].my_latest_message())
 
-                    if decided[i]:
-                        safe_messages.add(new_message)
+        for sb in list(safe_messages):
+            if sb not in last_messages:
+                raise Exception("safe estimates should be in last messages")  # sanity check
 
-            for path in messages:
-                edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
-                edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
+        for path in messages:
+            i = path[0]
+            j = path[1]
+            network.propagate_message_to_validator(last_messages[i], j)
+            validator_received_messages.add(j)
 
+        for i in xrange(NUM_VALIDATORS):
+            if not decided[i] and i in validator_received_messages:
+                new_message = network.get_message_from_validator(i)
+                decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
+
+                if decided[i]:
+                    safe_messages.add(new_message)
+
+        for path in messages:
+            edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
+            edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
+
+        '''
     else:
         print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
