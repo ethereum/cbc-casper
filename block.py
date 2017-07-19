@@ -36,15 +36,37 @@ class Block:
 
         # the sequence number makes certain operations more efficient (like checking if bets are later)
         if self.sender not in self.justification.latest_messages:
-            self.sequence_number = 0
+            self.sequence_number = 1
         else:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
         # the "heights" of bets are used for visualization of views
         if self.justification.is_null():
-            self.height = 0
+            self.height = 1
         else:
             self.height = max(self.justification.latest_messages.values()) + 1
 
     def __hash__(self):
         return hash(str(self.sequence_number)+str(self.sender))
+
+    def is_decendant(self, block):
+        assert isinstance(block, Block), "...expected a block"
+
+        if self == block:
+            return True
+
+        if block.sequence_number <= self.sequence_number:
+            return False
+
+        sequence_number = block.sequence_number
+        candidate = block.justification.latest_messages[block.sender]
+
+        while(sequence_number > self.sequence_number):
+
+            if candidate == self:
+                return True
+
+            candidate = candidate.justification.latest_messages[block.sender]
+            sequence_number -= 1
+
+        return False
