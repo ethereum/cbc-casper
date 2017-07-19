@@ -11,14 +11,14 @@ def dependency_from_same_validator_from_bet(b):
     dependencies = set()
 
     def recurr(B):
-        print b.sender not in B.justification.latest_messages
+        if b == B:
+            return
         if b.sender not in B.justification.latest_messages or B.sequence_number == 1:
             return
         else:
             recurr(B.justification.latest_messages[b.sender])
 
     recurr(b)
-
     return dependencies
 
 
