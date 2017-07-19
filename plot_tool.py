@@ -14,6 +14,11 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
 
     nodes = view.messages
 
+    fig_size = plt.rcParams["figure.figsize"]
+    fig_size[0] = 20
+    fig_size[1] = 20
+    plt.rcParams["figure.figsize"] = fig_size
+
     for b in nodes:
         G.add_edges_from([(b, b)])
 
@@ -67,10 +72,6 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
     #ax = fig.add_subplot()
     ax = plt.gca()  # to get the current axis
     ax.collections[0].set_edgecolor("black")
-    fig_size = plt.rcParams["figure.figsize"]
-    fig_size[0] = 20
-    fig_size[1] = 20
-    plt.rcParams["figure.figsize"] = fig_size
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
     for v in xrange(NUM_VALIDATORS):
