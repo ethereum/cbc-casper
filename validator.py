@@ -1,5 +1,5 @@
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-from bet import Bet
+from block import Block
 from view import View
 from justification import Justification
 from safety_oracle import Safety_Oracle
@@ -48,7 +48,7 @@ class Validator:
     @profile
     def check_estimate_safety(self, estimate):
         return False
-#        assert estimate in ESTIMATE_SPACE, "expected an estimate"
+        assert isinstance(estimate, Block), "..expected estimate to be a Block"
         oracle = Safety_Oracle(estimate, self.view)
         is_safe = oracle.check_estimate_safety()
         if is_safe:
@@ -65,7 +65,7 @@ class Validator:
         estimate = justification.estimate()
         sender = self.name
 
-        new_message = Bet(estimate, justification, sender)
+        new_message = Block(estimate, justification, sender)
 
         self.view.add_messages(set([new_message]))
 
