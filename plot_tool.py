@@ -34,7 +34,7 @@ def get_extension_from_same_validator(view):
     return (dependency_from_same_validator(view)).union(view.messages)
 
 
-def plot_view(view, coloured_bets, colour='green', use_edges=[]):
+def plot_view(view, coloured_bets=[], colour='green', use_edges=[]):
 
     G = nx.DiGraph()
 
@@ -49,7 +49,8 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
                 G.add_edges_from([(b2, b)])
     else:
         for e in use_edges:
-            G.add_edges_from([(e[0], e[1])])
+            if e[0] in nodes and e[1] in nodes:
+                G.add_edges_from([(e[0], e[1])])
 
     # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
     # G.add_edges_from([('C','F')])

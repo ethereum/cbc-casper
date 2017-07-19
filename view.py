@@ -2,7 +2,6 @@ from block import Block
 from justification import Justification
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 import forkchoice
-import plot_tool
 
 
 class View:
@@ -110,6 +109,3 @@ class View:
 
         # After the loop is done, we return a set of new messages
         return new_messages
-
-    def plot_view(self, coloured_messages, colour='green', use_edges=[]):
-        plot_tool.plot_view(self, coloured_messages, colour, use_edges)

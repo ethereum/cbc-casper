@@ -40,15 +40,7 @@ def main():
 
         edges = []
         iterator = 0
-        while(iterator < 50):
-
-            if iterator % REPORT_INTERVAL == 0:
-                # network.report(safe_messages, edges)
-                if REPORT_SUBJECTIVE_VIEWS:
-                    for i in xrange(NUM_VALIDATORS):
-                        # network.validators[i].view.plot_view(safe_messages, use_edges=edges)
-                        continue
-
+        while(iterator < 10):
             iterator += 1
 
             pairs = []
@@ -67,11 +59,14 @@ def main():
             for path in messages:
                 i = path[0]
                 j = path[1]
-                network.propagate_message_to_validator(network.validators[i].my_latest_message(), j)
-                network.get_message_from_validator(j)
+                old_block = network.validators[i].my_latest_message()
+                network.propagate_message_to_validator(old_block, j)
+                new_block = network.get_message_from_validator(j)
+                edges.append([old_block, new_block])
 
-        print network.global_view.messages
-        network.report()
+        print "len(edges)", len(edges)
+        print "len(network.global_view.messages)", len(network.global_view.messages)
+        network.report(safe_messages=set(), edges=edges)
         '''
         last_messages = []
         validator_received_messages = set()
@@ -93,7 +88,7 @@ def main():
                 new_message = network.get_message_from_validator(i)
                 decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
 
-                if decided[i]:
+                if decided[i]:d
                     safe_messages.add(new_message)
 
         for path in messages:

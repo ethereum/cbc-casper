@@ -54,9 +54,4 @@ class Network:
             new_bet = self.get_message_from_validator(v)
 
     def report(self, safe_messages=set(), edges=[]):
-        messageset = set()
-        for v in VALIDATOR_NAMES:
-            if self.validators[v].my_latest_message() is not None:
-                messageset.add(self.validators[v].my_latest_message())
-
-        View(messageset).plot_view(safe_messages, use_edges=edges)
+        plot_tool.plot_view(self.global_view, coloured_bets=safe_messages, use_edges=edges)
