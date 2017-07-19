@@ -1,5 +1,5 @@
 import networkx as nx
-from bet import Bet
+from block import Block
 from settings import WEIGHTS, NUM_VALIDATORS, ESTIMATE_SPACE
 from math import pi
 import matplotlib.pyplot as plt

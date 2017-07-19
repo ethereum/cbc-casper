@@ -3,6 +3,7 @@ import random as r  # to ensure the tie-breaking property
 from settings import VALIDATOR_NAMES
 from view import View
 from validator import Validator
+import plot_tool
 
 
 class Network:
@@ -57,4 +58,4 @@ class Network:
             if self.validators[v].my_latest_message() is not None:
                 messageset.add(self.validators[v].my_latest_message())
 
-#        View(messageset).plot_view(safe_messages, use_edges=edges)
+        View(messageset).plot_view(safe_messages, use_edges=edges)
