@@ -14,7 +14,6 @@
 # operation_log
 
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-from bet import Bet
 from model_validator import Model_Validator
 
 

@@ -9,7 +9,6 @@
 # viewable   #MAYBE QUESTIONABLE DESIGN CHOICE - PERHAPS THE SET OF VIEWABLE BETS FOR A VALIDATOR SHOULD NOT BE A
 # PART OF THE VALIDATOR MODEL latest_oberved_bets
 from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-from bet import Bet
 from justification import Justification
 from view import View
 
