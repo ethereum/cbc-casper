@@ -44,7 +44,7 @@ class Block:
     def __hash__(self):
         return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
 
-    def is_in_blockchain_of_block(self, block):
+    def is_in_blockchain(self, block):
         assert isinstance(block, Block), "...expected a block"
 
         if self == block:
@@ -53,4 +53,4 @@ class Block:
         if block.estimate is None:
             return False
 
-        return self.is_in_blockchain_of_block(block.estimate)
+        return self.is_in_blockchain(block.estimate)
