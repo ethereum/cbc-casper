@@ -1,5 +1,6 @@
 from settings import ESTIMATE_SPACE, WEIGHTS, VALIDATOR_NAMES
 import random as r
+import copy
 
 
 def get_max_weight_indexes(scores):
@@ -33,12 +34,13 @@ def get_favorite_child_of_block(block, children, latest_messages):
         for v in latest_messages.keys():
             if v in memo:
                 continue
-            if child.is_in_blockchain_of_block(latest_messages[v]):
+            if child.is_in_blockchain(latest_messages[v]):
                 scores[child] += WEIGHTS[v]
 
     max_weight_children = get_max_weight_indexes(scores)
 
     c = r.choice(tuple(max_weight_children))
+    print "c:--------", len(max_weight_children)
     return c
 
 
