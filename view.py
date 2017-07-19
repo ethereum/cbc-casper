@@ -9,7 +9,7 @@ class View:
     def __init__(self, messages=set()):
 
         # now for some assignment...
-        self.messages = set()
+        self.messages = set([Block()])
         self.latest_messages = dict()
         self.children = dict()
         self.last_finalized_block = Block()
