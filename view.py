@@ -105,5 +105,5 @@ class View:
         return new_messages
 
     @profile
-    def plot_view(self, coloured_messages, colour='green', use_edges=[]):
+    def plot_view(self, coloured_messages=set(), colour='green', use_edges=[]):
         plot_tool.plot_view(self, coloured_messages, colour, use_edges)

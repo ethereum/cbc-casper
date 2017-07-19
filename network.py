@@ -10,21 +10,21 @@ class Network:
         self.validators = dict()
         for v in VALIDATOR_NAMES:
             self.validators[v] = Validator(v)
-        self.global_view = set()
+        self.global_view = View(set())
 
     @profile
     def propagate_message_to_validator(self, message, validator_name):
-        assert message in self.global_view, "...expected only to propagate messages from the global view"
+        assert message in self.global_view.messages, "...expected only to propagate messages from the global view"
         self.validators[validator_name].receive_messages(set([message]))
 
     def get_message_from_validator(self, validator_name):
         assert validator_name in VALIDATOR_NAMES, "...expected a known validator"
 
         if self.validators[validator_name].decided:
-            return True
+            return self.validators[validator_name].my_latest_message()
 
         new_message = self.validators[validator_name].make_new_message()
-        self.global_view.add(new_message)
+        self.global_view.add_messages(set([new_message]))
         return new_message
 
     def random_propagation_and_message(self):
@@ -52,7 +52,7 @@ class Network:
         for v in VALIDATOR_NAMES:
             self.get_message_from_validator(v)
 
-    def report(self, safe_messages, edges):
+    def report(self, safe_messages=set(), edges=[]):
         messageset = set()
         for v in VALIDATOR_NAMES:
             if self.validators[v].my_latest_message() is not None:

@@ -21,110 +21,82 @@ from network import Network
 
 @profile
 def main():
-    if sys.argv[1] == 'rounds':
+    network = Network()
 
-        network = Network()
+    print "WEIGHTS", WEIGHTS
 
-        print "WEIGHTS", WEIGHTS
+    decided = dict.fromkeys(VALIDATOR_NAMES, 0)
+    safe_messages = set()
 
-        decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-        safe_messages = set()
+    network.random_initialization()
+    network.report()
+    blockchain = []
+    communications = []
 
-        network.random_initialization()
+    iterator = 0
+    decided = {}
+    safe_bets = set()
+    while(True):
+        iterator += 1
 
-        edges = []
-        iterator = 0
-        while(True):
+        pairs = []
+        for i in xrange(NUM_VALIDATORS):
+            for j in xrange(NUM_VALIDATORS):
+                if i != j:
+                    pairs.append([i, j])
 
-            if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_messages, edges)
-                if REPORT_SUBJECTIVE_VIEWS:
-                    for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
+        messages = []
 
-            iterator += 1
+        for i in xrange(NUM_MESSAGES_PER_ROUND):
+            message_path = r.sample(pairs, 1)
+            messages.append(message_path[0])
+            pairs.remove(message_path[0])
 
-            pairs = []
-            for i in xrange(NUM_VALIDATORS):
-                for j in xrange(NUM_VALIDATORS):
-                    if i != j:
-                        pairs.append([i, j])
+        old_blocks = []
+        for i in xrange(NUM_VALIDATORS):
+            if network.validators[i].my_latest_message() is not None:
+                old_blocks.append(network.validators[i].my_latest_message())
 
-            messages = []
+        sending_validators = set()
+        affected_validators = set()
+        successful_paths = []
+        for path in messages:
+            i = path[0]
+            j = path[1]
+            old_block = old_blocks[i]
 
-            for i in xrange(NUM_MESSAGES_PER_ROUND):
-                message_path = r.sample(pairs, 1)
-                messages.append(message_path[0])
-                pairs.remove(message_path[0])
+            if old_block not in network.validators[j].view.messages:
+                network.propagate_message_to_validator(old_block, j)
+                sending_validators.add(i)
+                affected_validators.add(j)
+                successful_paths.append([i, j])
 
-            last_messages = []
-            validator_received_messages = set()
-            for i in xrange(NUM_VALIDATORS):
-                last_messages.append(network.validators[i].my_latest_message())
+        new_blocks = []
+        for j in xrange(NUM_VALIDATORS):
+            if j in affected_validators:
+                new_block = network.get_message_from_validator(j)
+                new_blocks.append(new_block)
 
-            for sb in list(safe_messages):
-                if sb not in last_messages:
-                    raise Exception("safe estimates should be in last messages")  # sanity check
+                decided[i] = network.validators[i].check_estimate_safety(new_block.estimate)
+                if decided[i]:
+                    safe_bets.add(new_block)
 
-            for path in messages:
-                i = path[0]
-                j = path[1]
-                network.propagate_message_to_validator(last_messages[i], j)
-                validator_received_messages.add(j)
+                successful_paths.append([j, j])
 
-            for i in xrange(NUM_VALIDATORS):
-                if not decided[i] and i in validator_received_messages:
-                    new_message = network.get_message_from_validator(i)
-                    decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
+        for ij in successful_paths:
+            for b in new_blocks:
+                if b.sender == ij[1]:
+                    communications.append([old_blocks[ij[0]], b])
 
-                    if decided[i]:
-                        safe_messages.add(new_message)
+        network.global_view.add_messages(new_blocks)
 
-            for path in messages:
-                edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
-                edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
+        if iterator % REPORT_INTERVAL == 0:
 
-    elif sys.argv[1] == 'blockchain':
+            network.report(safe_bets, edges=communications)
 
-        network = Network()
+            #for i in xrange(NUM_VALIDATORS):
+            #    plot_tool.plot_view(network.validators[i].view)
 
-        print "WEIGHTS", WEIGHTS
-
-        decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-        safe_messages = set()
-
-        random_message = Bet(r.randint(0, 1), Justification(), 0)
-        initial_view = View(set([random_message]))
-        network.view_initialization(initial_view)
-        iterator = 0
-        edges = []
-
-        while(True):
-
-            if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_messages, edges)
-                if REPORT_SUBJECTIVE_VIEWS:
-                    for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
-
-            current_validator = iterator % NUM_VALIDATORS
-            next_validator = (iterator + 1) % NUM_VALIDATORS
-
-            message = network.validators[current_validator].my_latest_message()
-
-            if isinstance(message, Bet):
-                network.propagate_message_to_validator(message, next_validator)
-
-            if not decided[next_validator]:
-                new_message = network.get_message_from_validator(next_validator)
-                decided[next_validator] = network.validators[next_validator].check_estimate_safety(new_message.estimate)
-
-                edges.append([message, new_message])
-
-                if decided[next_validator]:
-                    safe_messages.add(new_message)
-
-            iterator += 1
     else:
         print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
