@@ -18,14 +18,6 @@ class Block:
     def __init__(self, estimate=0, justification=0, sender=0):
         # genesis block! 0
 
-        if isinstance(estimate, int):
-            self.sender = None
-            self.estimate = None
-            self.justification = Justification(self)
-            self.sequence_number = 0
-            self.height = 0
-            return
-
         assert sender in VALIDATOR_NAMES, "...expected a validator!"
         assert isinstance(estimate, Block), "...expected a prevblock!"
         # assert isinstance(justification, Justification), "expected justification a Justification!"
@@ -38,15 +30,15 @@ class Block:
 
         # the sequence number makes certain operations more efficient (like checking if bets are later)
         if self.sender not in self.justification.latest_messages:
-            self.sequence_number = 1
+            self.sequence_number = 0
         else:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
         # the "heights" of bets are used for visualization of views
         if self.justification.is_null():
-            self.height = 1
+            self.height = 0
         else:
-            candidate_max = 1
+            candidate_max = 0
             for v in self.justification.latest_messages:
                 if self.justification.latest_messages[v].height > candidate_max:
                     candidate_max = self.justification.latest_messages[v].height
@@ -56,7 +48,7 @@ class Block:
     def __hash__(self):
         if self.sender is None:
             return hash(0)
-        return hash(self.sequence_number + self.sender)
+        return hash(self.sequence_number) + hash(self.sender)
 
     def is_decendant(self, block):
         assert isinstance(block, Block), "...expected a block"
