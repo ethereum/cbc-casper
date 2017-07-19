@@ -53,7 +53,4 @@ class Block:
         if block.estimate is None:
             return False
 
-        if block.estimate == self:
-            return True
-
         return self.is_in_blockchain_of_block(block.estimate)
