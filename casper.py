@@ -1,7 +1,10 @@
 '''
 Casper PoC: Correct-by-construction asynchronous binary consensus.
 
-Important comments are marked with "#########....#########"" barriers.
+Note that comments marked with "#########....#########"" barriers are probably
+conceptually important Other comments may be conceptually important but are
+mostly for code comprehension Note that not all comments have been marked up in
+this manner, yet... :)
 '''
 
 import sys
@@ -9,7 +12,6 @@ import sys
 import random as r  # to ensure the tie-breaking property
 
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
-from bet import Bet
 from justification import Justification
 from view import View
 from adversary import Adversary
@@ -18,7 +20,10 @@ from network import Network
 
 @profile
 def main():
-    if sys.argv[1] == 'rounds':
+
+    print( sys.argv[0] )
+
+    if len(sys.argv) == 1 or sys.argv[1] == 'rounds':
 
         network = Network()
 
@@ -81,47 +86,6 @@ def main():
                 edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
                 edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
 
-    elif sys.argv[1] == 'blockchain':
-
-        network = Network()
-
-        print "WEIGHTS", WEIGHTS
-
-        decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-        safe_messages = set()
-
-        random_message = Bet(r.randint(0, 1), Justification(), 0)
-        initial_view = View(set([random_message]))
-        network.view_initialization(initial_view)
-        iterator = 0
-        edges = []
-
-        while(True):
-
-            if iterator % REPORT_INTERVAL == 0:
-                network.report(safe_messages, edges)
-                if REPORT_SUBJECTIVE_VIEWS:
-                    for i in xrange(NUM_VALIDATORS):
-                        network.validators[i].view.plot_view(safe_messages, use_edges=edges)
-
-            current_validator = iterator % NUM_VALIDATORS
-            next_validator = (iterator + 1) % NUM_VALIDATORS
-
-            message = network.validators[current_validator].my_latest_message()
-
-            if isinstance(message, Bet):
-                network.propagate_message_to_validator(message, next_validator)
-
-            if not decided[next_validator]:
-                new_message = network.get_message_from_validator(next_validator)
-                decided[next_validator] = network.validators[next_validator].check_estimate_safety(new_message.estimate)
-
-                edges.append([message, new_message])
-
-                if decided[next_validator]:
-                    safe_messages.add(new_message)
-
-            iterator += 1
     else:
         print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
