@@ -36,8 +36,8 @@ class View:
         PART -1 - type check
         '''
 
-        for b in showed_messages:
-            assert isinstance(b, Block), "expected only to add messages"
+#        for b in showed_messages:
+#            assert isinstance(b, Block), "expected only to add messages"
 
         '''
         PART 0 - finding newly discovered messages
@@ -64,8 +64,8 @@ class View:
             if self.latest_messages[b.sender].sequence_number < b.sequence_number:
                 self.latest_messages[b.sender] = b
                 continue
-            assert (b == self.latest_messages[b.sender] or
-                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "...did not expect any equivocating nodes!"
+#            assert (b == self.latest_messages[b.sender] or
+#                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "...did not expect any equivocating nodes!"
 
         '''
         PART 3 - updating children

@@ -47,7 +47,8 @@ class Validator:
     # This method also flags the validator as having decided in the case that the estimate is safe
     @profile
     def check_estimate_safety(self, estimate):
-        assert estimate in ESTIMATE_SPACE, "expected an estimate"
+        return False
+#        assert estimate in ESTIMATE_SPACE, "expected an estimate"
         oracle = Safety_Oracle(estimate, self.view)
         is_safe = oracle.check_estimate_safety()
         if is_safe:

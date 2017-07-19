@@ -58,4 +58,4 @@ class Network:
             if self.validators[v].my_latest_message() is not None:
                 messageset.add(self.validators[v].my_latest_message())
 
-        View(messageset).plot_view(safe_messages, use_edges=edges)
+#        View(messageset).plot_view(safe_messages, use_edges=edges)

@@ -13,7 +13,7 @@ class Bet:
 
         # be safe. type check!...
         assert sender in VALIDATOR_NAMES, "...expected a validator!"
-        assert estimate in ESTIMATE_SPACE, "...expected an estimate!"
+        # assert estimate in ESTIMATE_SPACE, "...expected an estimate!"
         assert isinstance(justification, Justification), "expected justification a Justification!"
 
         # these are the key elements of a bet

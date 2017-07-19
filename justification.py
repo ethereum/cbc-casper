@@ -11,6 +11,9 @@ class Justification:
     def is_null(self):
         return self.latest_messages == dict()
 
+    def estimate(self, default=None):
+        return self.last_finalized_block
+
     '''
     def estimate(self, default=None):
         return last_finalized_block

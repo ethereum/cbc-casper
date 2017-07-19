@@ -3,7 +3,7 @@ import random as r  # to ensure the tie-breaking property
 r.seed()
 
 # the size of the validator set is assumed to be known in advance
-NUM_VALIDATORS = 25
+NUM_VALIDATORS = 5
 
 # we will refer to them by names in this set
 VALIDATOR_NAMES = set(range(NUM_VALIDATORS))
@@ -30,6 +30,6 @@ ESTIMATE_SPACE = set([0, 1])
 
 # experiment variables:
 
-NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)/20
+NUM_MESSAGES_PER_ROUND = (NUM_VALIDATORS*NUM_VALIDATORS - NUM_VALIDATORS)/2
 REPORT_INTERVAL = 20
 REPORT_SUBJECTIVE_VIEWS = False

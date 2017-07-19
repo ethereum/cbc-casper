@@ -60,6 +60,7 @@ class Safety_Oracle:
 
     @profile
     def check_estimate_safety(self):
+        return False
 
         if self.candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
