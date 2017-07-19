@@ -21,7 +21,8 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
     if use_edges == []:
         for b in nodes:
             for b2 in b.justification.latest_messages.values():
-                edges.append((b2, b))
+                if b2 is not None:
+                    edges.append((b2, b))
     else:
         for e in use_edges:
             if e[0] in nodes and e[1] in nodes:
@@ -54,8 +55,11 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
     # nx.draw(G, positions, , node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
     nx.draw_networkx_nodes(G, positions, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black',alpha=0.8)
-    nx.draw_networkx_edges(G, positions, edgelist=colored_edges, width=7, edge_color='r')
-    nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=3, style='solid')
+    if colored_edges != []:
+        nx.draw_networkx_edges(G, positions, edgelist=colored_edges, width=7, edge_color='r')
+    if thick_edges != []:
+        nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=3, style='solid')
+
     nx.draw_networkx_edges(G, positions, edgelist=edges, style='dashed')
     nx.draw_networkx_labels(G, positions, labels=labels)
 
