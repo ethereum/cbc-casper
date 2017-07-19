@@ -63,15 +63,20 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
     nx.draw_networkx_edges(G, positions, edgelist=edges, style='dashed')
     nx.draw_networkx_labels(G, positions, labels=labels)
 
-
+    #fig = plt.figure(figsize=(10, 10))
+    #ax = fig.add_subplot()
     ax = plt.gca()  # to get the current axis
     ax.collections[0].set_edgecolor("black")
-
+    fig_size = plt.rcParams["figure.figsize"]
+    fig_size[0] = 20
+    fig_size[1] = 20
+    plt.rcParams["figure.figsize"] = fig_size
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
     for v in xrange(NUM_VALIDATORS):
         xpos = (float)(v + 1)/(float)(NUM_VALIDATORS + 1) - 0.01
         ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
+
 
     pylab.show()
     plt.close('all')
