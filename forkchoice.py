@@ -1,4 +1,4 @@
-from settings import ESTIMATE_SPACE, WEIGHTS
+from settings import ESTIMATE_SPACE, WEIGHTS, VALIDATOR_NAMES
 import random as r
 
 
@@ -30,7 +30,7 @@ def get_favorite_child_of_block(block, children, latest_messages):
 
     memo = set()
     for b in children[block]:
-        for v in latest_messages:
+        for v in latest_messages.keys():
             if v in memo:
                 continue
             if latest_messages[v].is_decendant(latest_messages[v]):

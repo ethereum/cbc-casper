@@ -7,18 +7,9 @@ class Block:
     def __eq__(self, block):
         if block is None:
             return False
-        if self.sender != block.sender:
+        if isinstance(block, int):
             return False
-        if self.estimate is None and block.estimate is not None:
-            return False
-        if block.estimate is None and self.estimate is not None:
-            return False
-        if self.estimate != block.estimate:
-            return False
-        if self.sequence_number != block.sequence_number:
-            return False
-
-        return True
+        return self.sender == block.sender and self.estimate == block.estimate
 
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
@@ -31,7 +22,7 @@ class Block:
         # ...then do some assignment
         self.sender = sender
         self.estimate = estimate
-        self.justification = copy.copy(justification)
+        self.justification = justification
 
         # the sequence number makes certain operations more efficient (like checking if bets are later)
         if self.sender not in self.justification.latest_messages:
@@ -51,9 +42,7 @@ class Block:
             self.height = candidate_max + 1
 
     def __hash__(self):
-        if self.sender is None:
-            return hash(0)
-        return hash(self.sequence_number) + hash(self.sender)
+        return hash(str(self.sequence_number + 10000*self.sender))
 
     def is_decendant(self, block):
         assert isinstance(block, Block), "...expected a block"
@@ -64,15 +53,13 @@ class Block:
         if block.sequence_number <= self.sequence_number:
             return False
 
-        sequence_number = block.sequence_number
         candidate = block.justification.latest_messages[block.sender]
 
-        while(sequence_number > self.sequence_number):
+        while(candidate.sequence_number > self.sequence_number):
 
             if candidate == self:
                 return True
 
-            candidate = candidate.justification.latest_messages[block.sender]
-            sequence_number -= 1
+            candidate = candidate.estimate
 
         return False

@@ -2,6 +2,7 @@ from block import Block
 from justification import Justification
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 import forkchoice
+import copy
 
 
 class View:

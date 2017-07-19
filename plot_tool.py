@@ -7,50 +7,24 @@ import pylab
 import plot_tool
 
 
-def dependency_from_same_validator_from_bet(b):
-    dependencies = set()
+def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=[], colored_edges=[]):
 
-    def recurr(B):
-        if b == B:
-            return
-        if b.sender not in B.justification.latest_messages or B.sequence_number == 1:
-            return
-        else:
-            recurr(B.justification.latest_messages[b.sender])
+    G = nx.Graph()
 
-    recurr(b)
-    return dependencies
-
-
-def dependency_from_same_validator(view):
-    dependencies = set()
-    for bet in view.messages:
-        dependencies = dependencies.union(dependency_from_same_validator_from_bet(bet))
-
-    return dependencies
-
-
-def get_extension_from_same_validator(view):
-    return (dependency_from_same_validator(view)).union(view.messages)
-
-
-def plot_view(view, coloured_bets=[], colour='green', use_edges=[]):
-
-    G = nx.DiGraph()
-
-    nodes = get_extension_from_same_validator(view)
+    nodes = view.messages
 
     for b in nodes:
         G.add_edges_from([(b, b)])
 
+    edges = []
     if use_edges == []:
         for b in nodes:
             for b2 in b.justification.latest_messages.values():
-                G.add_edges_from([(b2, b)])
+                edges.append((b2, b))
     else:
         for e in use_edges:
             if e[0] in nodes and e[1] in nodes:
-                G.add_edges_from([(e[0], e[1])])
+                edges.append((e[0], e[1]))
 
     # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
     # G.add_edges_from([('C','F')])
@@ -67,25 +41,23 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[]):
         else:
             node_color_map[b] = 'white'
 
-    color_values = [node_color_map.get(node) for node in G.nodes()]
+    color_values = [node_color_map.get(node) for node in nodes]
 
     labels = {}
 
     node_sizes = []
-    for node in G.nodes():
-        if node.sender is not None:
-            node_sizes.append(700*pow(WEIGHTS[node.sender]/pi, 0.5))
-        else:
-            node_sizes.append(700*pow(100/pi, 0.5))
+    for b in nodes:
+        node_sizes.append(700*pow(WEIGHTS[b.sender]/pi, 0.5))
+        labels[b] = b.sequence_number
 
-    nx.draw_networkx_labels(G, positions, labels, font_size=20)
+    # nx.draw(G, positions, , node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
-    print nodes
-    print positions
-    print len(nodes)
-    print len(positions)
+    nx.draw_networkx_nodes(G, positions, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black',alpha=0.8)
+    nx.draw_networkx_edges(G, positions, edgelist=colored_edges, width=7, edge_color='r')
+    nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=3, style='solid')
+    nx.draw_networkx_edges(G, positions, edgelist=edges, style='dashed')
+    nx.draw_networkx_labels(G, positions, labels=labels)
 
-    nx.draw(G, positions, node_color=color_values, node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
     ax = plt.gca()  # to get the current axis
     ax.collections[0].set_edgecolor("black")
@@ -97,3 +69,4 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[]):
         ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
 
     pylab.show()
+    plt.close('all')

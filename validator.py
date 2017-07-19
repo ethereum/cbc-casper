@@ -2,6 +2,7 @@ from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
 from block import Block
 from view import View
 from justification import Justification
+import copy
 
 import random as r
 r.seed()
@@ -36,6 +37,7 @@ class Validator:
         if self.name in self.view.latest_messages:
             return self.view.latest_messages[self.name]
         else:
+            assert False
             return None
 
     # The validator checks estimate safety by calling the safety oracle

@@ -38,9 +38,10 @@ def main():
 
         network.random_initialization()
 
-        edges = []
+        blockchain = []
+        communications = []
         iterator = 0
-        while(iterator < 10):
+        while(True):
             iterator += 1
 
             pairs = []
@@ -60,42 +61,32 @@ def main():
                 i = path[0]
                 j = path[1]
                 old_block = network.validators[i].my_latest_message()
+                if old_block in network.validators[j].view.messages:
+                    continue
                 network.propagate_message_to_validator(old_block, j)
                 new_block = network.get_message_from_validator(j)
-                edges.append([old_block, new_block])
+                communications.append([old_block, new_block])
 
-        print "len(edges)", len(edges)
-        print "len(network.global_view.messages)", len(network.global_view.messages)
-        network.report(safe_messages=set(), edges=edges)
-        '''
-        last_messages = []
-        validator_received_messages = set()
-        for i in xrange(NUM_VALIDATORS):
-            last_messages.append(network.validators[i].my_latest_message())
+                if new_block.estimate is not None:
+                    blockchain.append([new_block, new_block.estimate])
 
-        for sb in list(safe_messages):
-            if sb not in last_messages:
-                raise Exception("safe estimates should be in last messages")  # sanity check
 
-        for path in messages:
-            i = path[0]
-            j = path[1]
-            network.propagate_message_to_validator(last_messages[i], j)
-            validator_received_messages.add(j)
+            if iterator % REPORT_INTERVAL == 0:
 
-        for i in xrange(NUM_VALIDATORS):
-            if not decided[i] and i in validator_received_messages:
-                new_message = network.get_message_from_validator(i)
-                decided[i] = network.validators[i].check_estimate_safety(new_message.estimate)
+                best_block = network.global_view.estimate()
+                best_chain = []
+                next_block = best_block
+                while next_block is not None:
+                    if next_block.estimate is not None:
+                        best_chain.append((next_block, next_block.estimate))
+                    next_block = next_block.estimate
 
-                if decided[i]:d
-                    safe_messages.add(new_message)
+                print "BEST CHAIN----------------------", best_chain
 
-        for path in messages:
-            edges.append([last_messages[path[0]], network.validators[path[1]].my_latest_message()])
-            edges.append([last_messages[path[1]], network.validators[path[1]].my_latest_message()])
+                coloured_blocks = network.global_view.latest_messages.values()
 
-        '''
+                network.report(colored_messages=coloured_blocks, edges=communications, thick_edges=blockchain, colored_edges=best_chain)
+
     else:
         print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
