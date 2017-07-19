@@ -1,9 +1,11 @@
 import copy
 from settings import VALIDATOR_NAMES
-
+from justification import Justification
 
 class Block:
     def __eq__(self, block):
+        if block is None:
+            return False
         if self.sender != block.sender:
             return False
         if self.estimate != block.estimate:
@@ -19,7 +21,7 @@ class Block:
         if isinstance(estimate, int):
             self.sender = None
             self.estimate = None
-            self.justification = None
+            self.justification = Justification(self)
             self.sequence_number = 0
             self.height = 0
             return

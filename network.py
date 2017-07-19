@@ -3,6 +3,7 @@ import random as r  # to ensure the tie-breaking property
 from settings import VALIDATOR_NAMES
 from view import View
 from validator import Validator
+from block import Block
 import plot_tool
 
 
@@ -49,7 +50,9 @@ class Network:
             self.validators[v].receive_messages(set([latest[v]]))
 
     def random_initialization(self):
+        Genesis = Block()
         for v in VALIDATOR_NAMES:
+            self.validators[v].receive_messages(set([Genesis]))
             self.get_message_from_validator(v)
 
     def report(self, safe_messages, edges=[]):
