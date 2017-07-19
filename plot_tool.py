@@ -57,7 +57,10 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
     positions = dict()
 
     for b in nodes:
-        positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
+        if b.sender is None:
+            positions[b] = 0.5, 0.0
+        else:
+            positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
 
     node_color_map = {}
     for b in nodes:
@@ -73,7 +76,12 @@ def plot_view(view, coloured_bets, colour='green', use_edges=[]):
         labels[b] = b.estimate
     # labels['B']=r'$b$'
 
-    node_sizes = [700*pow(WEIGHTS[node.sender]/pi, 0.5) for node in G.nodes()]
+    node_sizes = []
+    for node in G.nodes():
+        if node.sender is not None:
+            node_sizes.append(700*pow(WEIGHTS[node.sender]/pi, 0.5))
+        else:
+            node_sizes.append(700*pow(100/pi, 0.5))
 
     nx.draw_networkx_labels(G, positions, labels, font_size=20)
 
