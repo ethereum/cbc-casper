@@ -25,20 +25,7 @@ class Network:
             return True
 
         new_message = self.validators[validator_name].make_new_message()
-        self.global_view.add_messages(set([new_message]))
         return new_message
-
-    def random_propagation_and_message(self):
-
-        destination = r.choice(tuple(VALIDATOR_NAMES))
-        if len(self.global_view) == 0:
-            self.get_message_from_validator(destination)
-        else:
-            message = r.choice(tuple(self.global_view))
-            self.propagate_message_to_validator(message, destination)
-            new_message = self.get_message_from_validator(destination)
-            self.global_view.add_messages(set([new_message]))
-
 
     # def let_validator_push
 

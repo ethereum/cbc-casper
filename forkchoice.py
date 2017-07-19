@@ -38,7 +38,9 @@ def get_favorite_child_of_block(block, children, latest_messages):
 
     max_weight_children = get_max_weight_indexes(scores)
 
-    return r.choice(tuple(max_weight_children))
+    c = r.choice(tuple(max_weight_children))
+    print "c:", c
+    return c
 
 
 def get_fork_choice(last_finalized_block, children, latest_messages):

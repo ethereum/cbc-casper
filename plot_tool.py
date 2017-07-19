@@ -5,6 +5,7 @@ from math import pi
 import matplotlib.pyplot as plt
 import pylab
 import plot_tool
+import copy
 
 
 def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=[], colored_edges=[]):

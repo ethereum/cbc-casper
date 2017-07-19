@@ -25,7 +25,7 @@ class View:
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
     def estimate(self):
-        return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
+        return forkchoice.get_fork_choice(self.last_finalized_block, copy.copy(self.children), copy.copy(self.latest_messages))
 
     def justification(self):
         return Justification(self.last_finalized_block, self.latest_messages, self.children)

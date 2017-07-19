@@ -16,7 +16,7 @@ class Block:
 
         assert sender in VALIDATOR_NAMES, "...expected a validator!"
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
-        # assert isinstance(justification, Justification), "expected justification a Justification!"
+        assert isinstance(justification, Justification), "expected justification a Justification!"
 
         # All other blocks!
         # ...then do some assignment
@@ -42,7 +42,7 @@ class Block:
             self.height = candidate_max + 1
 
     def __hash__(self):
-        return hash(str(self.sequence_number + 10000*self.sender))
+        return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
 
     def is_decendant(self, block):
         assert isinstance(block, Block), "...expected a block"
