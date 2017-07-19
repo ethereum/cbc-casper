@@ -56,8 +56,8 @@ class Validator:
     # It updates the validator's latest message, estimate, view, and latest observed messages
     def make_new_message(self):
 
-        justification = self.view.justification()
-        estimate = self.view.estimate()
+        justification = copy.deepcopy(self.view.justification())
+        estimate = copy.deepcopy(self.view.estimate())
         sender = self.name
 
         new_message = Block(estimate, justification, sender)
