@@ -1,21 +1,21 @@
 import utils
-from bet import Bet
+from block import Block
 from justification import Justification
 from settings import NUM_VALIDATORS, VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-import plot_tool
+# import plot_tool
 
 
 class View:
-    @profile
     def __init__(self, messages):
 
         # now for some assignment...
         self.messages = set()
         self.latest_messages = dict()
+        self.children = dict()
+        self.last_finalized_block = dict()
 
         self.add_messages(messages)
 
-    @profile
     def __str__(self):
         s = "View: \n"
         for b in self.messages:
@@ -24,16 +24,13 @@ class View:
 
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
-    @profile
     def estimate(self):
         return utils.get_estimate_from_latest_messages(self.latest_messages)
 
-    @profile
     def justification(self):
         return Justification(self.latest_messages)
 
     # This method updates a validator's observed latest messages (and vicarious latest messages) in response to seeing new messages
-    @profile
     def add_messages(self, showed_messages):
 
         '''
@@ -41,7 +38,7 @@ class View:
         '''
 
         for b in showed_messages:
-            assert isinstance(b, Bet), "expected only to add messages"
+            assert isinstance(b, Block), "expected only to add messages"
 
         '''
         PART 0 - finding newly discovered messages
@@ -71,8 +68,15 @@ class View:
             assert (b == self.latest_messages[b.sender] or
                     b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "...did not expect any equivocating nodes!"
 
+        '''
+        PART 3 - updating children
+        '''
+        for b in newly_discovered_messages:
+            if b.estimate not in self.children:
+                self.children[b.estimate] = set()
+            self.children[b.estimate].add(b)
+
     # This method returns the set of messages out of showed_messages and their dependency that isn't part of the view
-    @profile
     def get_new_messages(self, showed_messages):
 
         new_messages = set()
@@ -104,6 +108,5 @@ class View:
         # After the loop is done, we return a set of new messages
         return new_messages
 
-    @profile
-    def plot_view(self, coloured_messages, colour='green', use_edges=[]):
-        plot_tool.plot_view(self, coloured_messages, colour, use_edges)
+#    def plot_view(self, coloured_messages, colour='green', use_edges=[]):
+#        plot_tool.plot_view(self, coloured_messages, colour, use_edges)
