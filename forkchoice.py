@@ -40,7 +40,6 @@ def get_favorite_child_of_block(block, children, latest_messages):
     max_weight_children = get_max_weight_indexes(scores)
 
     c = r.choice(tuple(max_weight_children))
-    print "c:--------", len(max_weight_children)
     return c
 
 
