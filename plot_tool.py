@@ -29,7 +29,7 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
                 if b2 is not None:
                     e.append((b2, b))
 
-        edges = [{'edges':e,'width':3,'edge_color':'black','style':'normal'}]
+        edges = [{'edges':e,'width':3,'edge_color':'black','style':'solid'}]
     # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
     # G.add_edges_from([('C','F')])
 
@@ -60,7 +60,7 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
 
     for e in edges:
         if isinstance(e,dict):
-            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'], edge_color=e['edge_color'],style=e['style'])
+            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'], edge_color=e['edge_color'],style=e['style'], alpha=0.5)
         else:
             assert False, e
     nx.draw_networkx_labels(G, positions, labels=labels)

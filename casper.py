@@ -97,14 +97,30 @@ def main():
                     best_chain.append((next_block, next_block.estimate))
                 next_block = next_block.estimate
 
+            latest_blocks = []
+            for i in xrange(NUM_VALIDATORS):
+                latest_blocks.append(network.validators[i].my_latest_message())
+
+            vs_chain = []
+            for i in xrange(NUM_VALIDATORS):
+                vs_chain.append([])
+                next_block = latest_blocks[i]
+                while next_block is not None:
+                    if next_block.estimate is not None:
+                        vs_chain[i].append((next_block, next_block.estimate))
+                    next_block = next_block.estimate
+
             print "BEST CHAIN----------------------", best_chain
 
 
             edgelist = []
 
-            edgelist.append({'edges':blockchain, 'width':3,'edge_color':'grey','style':'dashed'})
-            edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':''})
-            edgelist.append({'edges':best_chain, 'width':10,'edge_color':'red','style':''})
+            edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
+            edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
+            edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
+            for i in xrange(NUM_VALIDATORS):
+                edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
+
             #coloured_blocks = network.global_view.latest_messages.values()
             network.report(edges=edgelist)
 
