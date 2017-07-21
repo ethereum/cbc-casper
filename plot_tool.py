@@ -76,5 +76,6 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
         ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
 
 
-    pylab.show()
+    #pylab.show()
+    pylab.savefig("graphs/graph" +str(NUM_VALIDATORS)+ str(len(nodes)) + ".png")
     plt.close('all')
