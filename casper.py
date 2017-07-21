@@ -99,9 +99,14 @@ def main():
 
             print "BEST CHAIN----------------------", best_chain
 
-            #coloured_blocks = network.global_view.latest_messages.values()
 
-            network.report(edges=communications, thick_edges=blockchain, colored_edges=best_chain)
+            edgelist = []
+
+            edgelist.append({'edges':blockchain, 'width':3,'edge_color':'grey','style':'dashed'})
+            edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':''})
+            edgelist.append({'edges':best_chain, 'width':10,'edge_color':'red','style':''})
+            #coloured_blocks = network.global_view.latest_messages.values()
+            network.report(edges=edgelist)
 
             #for i in xrange(NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)

@@ -8,7 +8,7 @@ import plot_tool
 import copy
 
 
-def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=[], colored_edges=[]):
+def plot_view(view, coloured_bets=[], colour='green', edges=[]):
 
     G = nx.Graph()
 
@@ -22,17 +22,14 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
     for b in nodes:
         G.add_edges_from([(b, b)])
 
-    edges = []
-    if use_edges == []:
+    e = []
+    if edges == []:
         for b in nodes:
             for b2 in b.justification.latest_messages.values():
                 if b2 is not None:
-                    edges.append((b2, b))
-    else:
-        for e in use_edges:
-            if e[0] in nodes and e[1] in nodes:
-                edges.append((e[0], e[1]))
+                    e.append((b2, b))
 
+        edges = [{'edges':e,'width':3,'edge_color':'black','style':'normal'}]
     # G.add_edges_from([('A', 'B'),('C','D'),('G','D')])
     # G.add_edges_from([('C','F')])
 
@@ -54,18 +51,18 @@ def plot_view(view, coloured_bets=[], colour='green', use_edges=[], thick_edges=
 
     node_sizes = []
     for b in nodes:
-        node_sizes.append(700*pow(WEIGHTS[b.sender]/pi, 0.5))
+        node_sizes.append(350*pow(WEIGHTS[b.sender]/pi, 0.5))
         labels[b] = b.sequence_number
 
     # nx.draw(G, positions, , node_size=node_sizes, edge_color='black', edge_cmap=plt.cm.Reds)
 
-    nx.draw_networkx_nodes(G, positions, alpha=0.5, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black')
-    if colored_edges != []:
-        nx.draw_networkx_edges(G, positions, edgelist=colored_edges, width=10, edge_color='r')
-    if thick_edges != []:
-        nx.draw_networkx_edges(G, positions, edgelist=thick_edges, width=5, edge_color='grey', style='solid')
+    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes, node_size=node_sizes,edge_color='black')
 
-    nx.draw_networkx_edges(G, positions, edgelist=edges, style='dashed', edge_color='grey')
+    for e in edges:
+        if isinstance(e,dict):
+            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'], edge_color=e['edge_color'],style=e['style'])
+        else:
+            assert False, e
     nx.draw_networkx_labels(G, positions, labels=labels)
 
     #fig = plt.figure(figsize=(10, 10))
