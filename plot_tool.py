@@ -2,10 +2,20 @@ import networkx as nx
 from block import Block
 from settings import WEIGHTS, NUM_VALIDATORS, ESTIMATE_SPACE
 from math import pi
+
 import matplotlib.pyplot as plt
 import pylab
 import plot_tool
 import copy
+import imageio as io
+
+from PIL import Image
+import os
+
+base = 10000000
+IMAGE_LIMIT = 75
+FRAMES = "graphs/"
+THUMBNAILS = "thumbs/"
 
 
 def plot_view(view, coloured_bets=[], colour='green', edges=[]):
@@ -75,7 +85,48 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
         xpos = (float)(v + 1)/(float)(NUM_VALIDATORS + 1) - 0.01
         ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
 
-
-    #pylab.show()
-    pylab.savefig("graphs/graph" +str(NUM_VALIDATORS)+ str(len(nodes)) + ".png")
+    # pylab.show()
+    pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")
     plt.close('all')
+
+
+def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
+
+    file_names = sorted([fn for fn in os.listdir(FRAMES) if fn.endswith('.png')])
+
+    images = []
+    for fn in file_names:
+        images.append(Image.open(FRAMES+fn))
+        if len(images) == frame_count_limit:
+            break
+
+    size = (1000, 1000)
+    iterator = 0
+    for im in images:
+        im.thumbnail(size, Image.ANTIALIAS)
+        im.save("thumbs/" + str(base + iterator) + "thumbnail.png", "PNG")
+        iterator += 1
+        if iterator == frame_count_limit:
+            break
+
+
+def make_gif(frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
+
+    file_names = sorted([fn for fn in os.listdir(THUMBNAILS) if fn.endswith('thumbnail.png')])
+
+    images = []
+    for fn in file_names:
+        images.append(Image.open(THUMBNAILS + fn))
+        if len(images) == frame_count_limit:
+            break
+
+    iterator = 0
+    with io.get_writer(destination_filename, mode='I', duration=frame_duration) as writer:
+        for filename in file_names:
+            image = io.imread(THUMBNAILS + filename)
+            writer.append_data(image)
+            iterator += 1
+            if iterator == frame_count_limit:
+                break
+
+    writer.close()
