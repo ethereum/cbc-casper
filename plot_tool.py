@@ -79,9 +79,9 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
         xpos = (float)(v + 1)/(float)(NUM_VALIDATORS + 1) - 0.01
         ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
 
-    # pylab.show()
-    pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")
-    plt.close('all')
+    pylab.show()
+    # pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")
+    # plt.close('all')
 
 
 def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
