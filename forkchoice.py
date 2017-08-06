@@ -75,3 +75,15 @@ def get_estimate_from_latest_bets(latest_bets, default=None):
         mwe = ESTIMATE_SPACE
 
     return r.choice(tuple(mwe))
+
+def build_chain(tip, base):
+    #assert base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
+
+    chain = []
+    next_block = tip
+    while next_block is not base:
+        if next_block.estimate is not None:
+            chain.append((next_block, next_block.estimate))
+        next_block = next_block.estimate
+
+    return chain
