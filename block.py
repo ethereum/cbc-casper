@@ -9,7 +9,7 @@ class Block:
             return False
         if isinstance(block, int):
             return False
-        return self.sender == block.sender and self.estimate == block.estimate
+        return self.sender == block.sender and self.estimate is block.estimate
 
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
