@@ -25,26 +25,21 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
         current_block = latest_messages[v]
 
         while current_block is not last_finalized_block:
-            if current_block not in scores:
-                scores[current_block] = 0
-
-            scores[current_block] += WEIGHTS[v]
+            scores[current_block] = scores.get(current_block, 0) + WEIGHTS[v]
             current_block = current_block.estimate
 
     best_block = last_finalized_block
     while best_block in children.keys():
         curr_scores = dict()
         for child in children[best_block]:
-            if child not in scores:
-                curr_scores[child] = 0
-            else:
-                curr_scores[child] = scores[child]
+            curr_scores[child] = scores.get(child, 0)
 
         max_weight_children = get_max_weight_indexes(curr_scores)
 
         best_block = r.choice(tuple(max_weight_children))
 
     return best_block
+
 
 
 def get_estimate_from_latest_bets(latest_bets, default=None):
