@@ -77,8 +77,8 @@ def main():
                 new_block = network.get_message_from_validator(j)
                 new_blocks.append(new_block)
 
-                decided[i] = network.validators[i].check_estimate_safety(new_block.estimate)
-                if decided[i]:
+                decided[j] = network.validators[j].check_estimate_safety(new_block.estimate)
+                if decided[j]:
                     safe_bets.add(new_block)
 
                 successful_paths.append([j, j])
