@@ -45,6 +45,8 @@ class Model_Validator:
 
         # will track the latest bets observed by this model validator
         self.latest_observed_bets = my_latest_observed_bets
+        if self.my_latest_bet is not None:
+            self.latest_observed_bets[self.model_of] = self.my_latest_bet # don't forget to keep track of own most recent bet
 
     # model validators use their view at my_latest_bet to calculate an estimate
     @profile
