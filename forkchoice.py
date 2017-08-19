@@ -5,51 +5,41 @@ import copy
 
 def get_max_weight_indexes(scores):
 
-    max_score = 0
-    max_score_estimate = None
-    for e in scores.keys():
-        if max_score == 0:
-            max_score = scores[e]
+    max_score = max(scores.values())
 
-        if scores[e] > max_score:
-            max_score = scores[e]
-
-    max_weight_estimates = set()
-
-    for e in scores.keys():
-        if scores[e] == max_score:
-            max_weight_estimates.add(e)
+    max_weight_estimates = {e for e in scores.keys() if scores[e] == max_score}
 
     return max_weight_estimates
 
 
-def get_favorite_child_of_block(block, children, latest_messages):
+def get_fork_choice(last_finalized_block, children, latest_messages):
+    v_curr_chain = dict()
+
+    for v in latest_messages.keys():
+        if last_finalized_block is None or last_finalized_block.is_in_blockchain(latest_messages[v]):
+            v_curr_chain[v] = build_chain(latest_messages[v], last_finalized_block)
 
     scores = dict()
-    for child in children[block]:
-        scores[child] = 0
 
-    memo = set()
-    for child in children[block]:
-        for v in latest_messages.keys():
-            if v in memo:
-                continue
-            if child.is_in_blockchain(latest_messages[v]):
-                scores[child] += WEIGHTS[v]
+    for v in v_curr_chain.keys():
+        current_block = latest_messages[v]
 
-    max_weight_children = get_max_weight_indexes(scores)
-
-    c = r.choice(tuple(max_weight_children))
-    return c
-
-
-def get_fork_choice(last_finalized_block, children, latest_messages):
+        while current_block is not last_finalized_block:
+            scores[current_block] = scores.get(current_block, 0) + WEIGHTS[v]
+            current_block = current_block.estimate
 
     best_block = last_finalized_block
-    while(best_block in children.keys()):
-        best_block = get_favorite_child_of_block(best_block, children, latest_messages)
+    while best_block in children.keys():
+        curr_scores = dict()
+        for child in children[best_block]:
+            curr_scores[child] = scores.get(child, 0)
+
+        max_weight_children = get_max_weight_indexes(curr_scores)
+
+        best_block = r.choice(tuple(max_weight_children))
 
     return best_block
+
 
 
 def get_estimate_from_latest_bets(latest_bets, default=None):
@@ -75,3 +65,15 @@ def get_estimate_from_latest_bets(latest_bets, default=None):
         mwe = ESTIMATE_SPACE
 
     return r.choice(tuple(mwe))
+
+def build_chain(tip, base):
+    #assert base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
+
+    chain = []
+    next_block = tip
+    while next_block is not base:
+        if next_block.estimate is not None:
+            chain.append((next_block, next_block.estimate))
+        next_block = next_block.estimate
+
+    return chain

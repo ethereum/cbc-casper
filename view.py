@@ -53,8 +53,7 @@ class View:
         PART 1 - updating the set of viewed messages
         '''
 
-        for b in newly_discovered_messages:
-            self.messages.add(b)
+        self.messages.update(newly_discovered_messages)
 
         '''
         PART 2 - updating latest messages
@@ -103,8 +102,8 @@ class View:
                     # and add the best in its justification to our next working set
                     for b in message.justification.latest_messages.values():
                         next_set.add(b)
-                # Keeping a record of very message we inspect, being sure not to do any extra (exponential complexity) work
-                memo.add(message)
+                    # Keeping a record of very message we inspect, being sure not to do any extra (exponential complexity) work
+                    memo.add(message)
 
             current_set = next_set
 

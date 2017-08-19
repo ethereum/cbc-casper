@@ -16,6 +16,7 @@ from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
+import forkchoice
 import plot_tool
 
 
@@ -33,22 +34,13 @@ def main():
     blockchain = []
     communications = []
 
+    pairs = [[i, j] for i in xrange(NUM_VALIDATORS) for j in xrange(NUM_VALIDATORS) if not i == j]
+
     iterator = 0
     while(True):
         iterator += 1
 
-        pairs = []
-        for i in xrange(NUM_VALIDATORS):
-            for j in xrange(NUM_VALIDATORS):
-                if i != j:
-                    pairs.append([i, j])
-
-        messages = []
-
-        for i in xrange(NUM_MESSAGES_PER_ROUND):
-            message_path = r.sample(pairs, 1)
-            messages.append(message_path[0])
-            pairs.remove(message_path[0])
+        messages = r.sample(pairs, NUM_MESSAGES_PER_ROUND)
 
         old_blocks = []
         for i in xrange(NUM_VALIDATORS):
@@ -90,25 +82,11 @@ def main():
         if iterator % REPORT_INTERVAL == 0:
 
             best_block = network.global_view.estimate()
-            best_chain = []
-            next_block = best_block
-            while next_block is not None:
-                if next_block.estimate is not None:
-                    best_chain.append((next_block, next_block.estimate))
-                next_block = next_block.estimate
-
-            latest_blocks = []
-            for i in xrange(NUM_VALIDATORS):
-                latest_blocks.append(network.validators[i].my_latest_message())
+            best_chain = forkchoice.build_chain(best_block, None)
 
             vs_chain = []
             for i in xrange(NUM_VALIDATORS):
-                vs_chain.append([])
-                next_block = latest_blocks[i]
-                while next_block is not None:
-                    if next_block.estimate is not None:
-                        vs_chain[i].append((next_block, next_block.estimate))
-                    next_block = next_block.estimate
+                vs_chain.append(forkchoice.build_chain(network.validators[i].my_latest_message(), None))
 
             print "BEST CHAIN----------------------", best_chain
 

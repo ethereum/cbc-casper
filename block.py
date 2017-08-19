@@ -9,7 +9,8 @@ class Block:
             return False
         if isinstance(block, int):
             return False
-        return self.sender == block.sender and self.estimate == block.estimate
+        return self.hash == block.hash
+
 
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
@@ -41,8 +42,13 @@ class Block:
 
             self.height = candidate_max + 1
 
+        self.hash = self.__hash__()
+
     def __hash__(self):
-        return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
+        if self.estimate is None:
+            return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
+        else:
+            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(10000*self.sender))
 
     def is_in_blockchain(self, block):
         assert isinstance(block, Block), "...expected a block"
