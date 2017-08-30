@@ -18,6 +18,7 @@ from network import Network
 from validator import Validator
 import forkchoice
 import plot_tool
+import presets
 
 
 def main():
@@ -34,13 +35,21 @@ def main():
     blockchain = []
     communications = []
 
-    pairs = [[i, j] for i in xrange(NUM_VALIDATORS) for j in xrange(NUM_VALIDATORS) if not i == j]
 
     iterator = 0
     while(True):
         iterator += 1
 
-        messages = r.sample(pairs, NUM_MESSAGES_PER_ROUND)
+        mode = sys.argv[1]
+        if mode == "rand":
+            messages = presets.random()
+        elif mode == "rrob":
+            messages = presets.round_robin()
+        elif mode == "full":
+            messages = presets.full_propagation()
+        else:
+            print "\nusage: 'kernprof -l casper.py (rand | rrob | full)'\n"
+            return
 
         old_blocks = []
         for i in xrange(NUM_VALIDATORS):
@@ -104,8 +113,5 @@ def main():
 
             #for i in xrange(NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
-
-    else:
-        print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
 main()
