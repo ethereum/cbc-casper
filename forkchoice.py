@@ -24,7 +24,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
     for v in v_curr_chain.keys():
         current_block = latest_messages[v]
 
-        while current_block is not last_finalized_block:
+        while current_block != last_finalized_block:
             scores[current_block] = scores.get(current_block, 0) + WEIGHTS[v]
             current_block = current_block.estimate
 
@@ -66,14 +66,14 @@ def get_estimate_from_latest_bets(latest_bets, default=None):
 
     return r.choice(tuple(mwe))
 
+
 def build_chain(tip, base):
     #assert base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
 
     chain = []
     next_block = tip
-    while next_block is not base:
-        if next_block.estimate is not None:
-            chain.append((next_block, next_block.estimate))
+    while next_block != base and next_block.estimate is not None :
+        chain.append((next_block, next_block.estimate))
         next_block = next_block.estimate
 
     return chain

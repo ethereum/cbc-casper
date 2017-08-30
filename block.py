@@ -11,6 +11,8 @@ class Block:
             return False
         return self.hash == block.hash
 
+    def __ne__(self, block):
+        return not self.__eq__(block)
 
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
