@@ -29,3 +29,17 @@ def message_maker(mode):
             return pairs
 
         return full_propagation
+
+    if mode == "nofinal":
+        # depending on val weights, this message prop order could never finalize a block
+        msg=[0, 1]
+        def round_robin():
+            to_return = [[msg[0], msg[1]]]
+            msg[0] = (msg[0] + 1) % s.NUM_VALIDATORS
+            msg[1] = (msg[1] + 1) % s.NUM_VALIDATORS
+            to_return.append([msg[0], msg[1]])
+            return to_return
+
+        return round_robin
+
+    return None

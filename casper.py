@@ -36,8 +36,8 @@ def main():
     communications = []
 
     mode = sys.argv[1]
-    if mode != "rand" and mode != "rrob" and mode != "full":
-        print "\nusage: 'kernprof -l casper.py (rand | rrob | full)'\n"
+    if mode != "rand" and mode != "rrob" and mode != "full" and mode != "nofinal":
+        print "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
         return
     msg_gen = presets.message_maker(mode)
 
