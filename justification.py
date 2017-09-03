@@ -1,4 +1,3 @@
-from settings import ESTIMATE_SPACE, WEIGHTS
 import random as r
 import forkchoice
 

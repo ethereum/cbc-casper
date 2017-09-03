@@ -10,8 +10,8 @@ this manner, yet... :)
 import sys
 
 import random as r  # to ensure the tie-breaking property
+import settings as s
 
-from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
 from justification import Justification
 from view import View
 from network import Network
@@ -22,12 +22,12 @@ import presets
 
 
 def main():
-
+    
     network = Network()
 
-    print "WEIGHTS", WEIGHTS
+    print "WEIGHTS", s.WEIGHTS
 
-    decided = dict.fromkeys(VALIDATOR_NAMES, 0)
+    decided = dict.fromkeys(s.VALIDATOR_NAMES, 0)
     safe_messages = set()
 
     network.random_initialization()
@@ -35,24 +35,20 @@ def main():
     blockchain = []
     communications = []
 
+    mode = sys.argv[1]
+    if mode != "rand" and mode != "rrob" and mode != "full":
+        print "\nusage: 'kernprof -l casper.py (rand | rrob | full)'\n"
+        return
+    msg_gen = presets.message_maker(mode)
 
     iterator = 0
     while(True):
         iterator += 1
 
-        mode = sys.argv[1]
-        if mode == "rand":
-            messages = presets.random()
-        elif mode == "rrob":
-            messages = presets.round_robin()
-        elif mode == "full":
-            messages = presets.full_propagation()
-        else:
-            print "\nusage: 'kernprof -l casper.py (rand | rrob | full)'\n"
-            return
+        messages = msg_gen()
 
         old_blocks = []
-        for i in xrange(NUM_VALIDATORS):
+        for i in xrange(s.NUM_VALIDATORS):
             if network.validators[i].my_latest_message() is not None:
                 old_blocks.append(network.validators[i].my_latest_message())
 
@@ -71,7 +67,7 @@ def main():
                 successful_paths.append([i, j])
 
         new_blocks = []
-        for j in xrange(NUM_VALIDATORS):
+        for j in xrange(s.NUM_VALIDATORS):
             if j in affected_validators:
                 new_block = network.get_message_from_validator(j)
                 new_blocks.append(new_block)
@@ -88,13 +84,13 @@ def main():
 
         network.global_view.add_messages(new_blocks)
 
-        if iterator % REPORT_INTERVAL == 0:
+        if iterator % s.REPORT_INTERVAL == 0:
 
             best_block = network.global_view.estimate()
             best_chain = forkchoice.build_chain(best_block, None)
 
             vs_chain = []
-            for i in xrange(NUM_VALIDATORS):
+            for i in xrange(s.NUM_VALIDATORS):
                 vs_chain.append(forkchoice.build_chain(network.validators[i].my_latest_message(), None))
 
             print "BEST CHAIN----------------------", best_chain
@@ -105,13 +101,13 @@ def main():
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for i in xrange(NUM_VALIDATORS):
+            for i in xrange(s.NUM_VALIDATORS):
                 edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
 
             #coloured_blocks = network.global_view.latest_messages.values()
             network.report(edges=edgelist)
 
-            #for i in xrange(NUM_VALIDATORS):
+            #for i in xrange(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
 
 main()

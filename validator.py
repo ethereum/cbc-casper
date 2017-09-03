@@ -1,4 +1,4 @@
-from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
+import settings as s
 from block import Block
 from view import View
 from justification import Justification
@@ -15,7 +15,7 @@ class Validator:
     # The validator's state is a function of its view and name alone (along with global variables)
     # However, for performance's sake the validator also stores
     def __init__(self, name):
-        assert name in VALIDATOR_NAMES, "expected a validator name"
+        assert name in s.VALIDATOR_NAMES, "expected a validator name"
         self.name = name
         self.view = View(set())
         self.decided = False

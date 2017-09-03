@@ -1,4 +1,4 @@
-from settings import ESTIMATE_SPACE, WEIGHTS, VALIDATOR_NAMES
+import settings as s
 import random as r
 import copy
 
@@ -25,7 +25,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
         current_block = latest_messages[v]
 
         while current_block != last_finalized_block:
-            scores[current_block] = scores.get(current_block, 0) + WEIGHTS[v]
+            scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
             current_block = current_block.estimate
 
     best_block = last_finalized_block
@@ -53,7 +53,7 @@ def get_estimate_from_latest_bets(latest_bets, default=None):
         scores[e] = 0
 
     for v in latest_bets:
-        scores[latest_bets[v].estimate] += WEIGHTS[v]
+        scores[latest_bets[v].estimate] += s.WEIGHTS[v]
 
     mwe = get_max_weight_estimates(scores)
 
@@ -62,7 +62,7 @@ def get_estimate_from_latest_bets(latest_bets, default=None):
             return default
 
     if mwe == set():
-        mwe = ESTIMATE_SPACE
+        mwe = s.ESTIMATE_SPACE
 
     return r.choice(tuple(mwe))
 
