@@ -36,7 +36,9 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
 
         max_weight_children = get_max_weight_indexes(curr_scores)
 
-        best_block = r.choice(tuple(max_weight_children))
+        assert len(max_weight_children) == 1, "... there should be no ties!"
+
+        best_block = max_weight_children.pop()
 
     return best_block
 
