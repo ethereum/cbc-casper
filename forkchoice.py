@@ -44,7 +44,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
 
 
 def build_chain(tip, base):
-    #assert base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
+    assert base is None or base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
 
     chain = []
     next_block = tip
