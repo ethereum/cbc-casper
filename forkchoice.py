@@ -43,32 +43,6 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
     return best_block
 
 
-
-def get_estimate_from_latest_bets(latest_bets, default=None):
-    estimates = []
-    for v in latest_bets:
-        if latest_bets[v].estimate not in estimates:
-            estimates.append(latest_bets[v].estimate)
-
-    scores = dict()
-    for e in estimates:
-        scores[e] = 0
-
-    for v in latest_bets:
-        scores[latest_bets[v].estimate] += s.WEIGHTS[v]
-
-    mwe = get_max_weight_estimates(scores)
-
-    if default is not None:
-        if default in mwe:
-            return default
-
-    if mwe == set():
-        mwe = s.ESTIMATE_SPACE
-
-    return r.choice(tuple(mwe))
-
-
 def build_chain(tip, base):
     #assert base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
 
