@@ -27,18 +27,18 @@ def main():
 
     print "WEIGHTS", s.WEIGHTS
 
-    safe_messages = set()
-
-    network.random_initialization()
-    network.report()
-    blockchain = []
-    communications = []
-
     mode = sys.argv[1]
     if mode != "rand" and mode != "rrob" and mode != "full" and mode != "nofinal":
         print "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
         return
     msg_gen = presets.message_maker(mode)
+
+    network.random_initialization()
+    network.report()
+
+    blockchain = []
+    communications = []
+    safe_blocks = set()
 
     iterator = 0
     while(True):
