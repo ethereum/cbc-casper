@@ -16,13 +16,13 @@ from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
-import forkchoice
+import utils
 import plot_tool
 import presets
 
 
 def main():
-    
+
     network = Network()
 
     print "WEIGHTS", s.WEIGHTS
@@ -87,11 +87,11 @@ def main():
         if iterator % s.REPORT_INTERVAL == 0:
 
             best_block = network.global_view.estimate()
-            best_chain = forkchoice.build_chain(best_block, None)
+            best_chain = utils.build_chain(best_block, None)
 
             vs_chain = []
             for i in xrange(s.NUM_VALIDATORS):
-                vs_chain.append(forkchoice.build_chain(network.validators[i].my_latest_message(), None))
+                vs_chain.append(utils.build_chain(network.validators[i].my_latest_message(), None))
 
             print "BEST CHAIN----------------------", best_chain
 
