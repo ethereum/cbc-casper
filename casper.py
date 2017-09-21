@@ -128,7 +128,7 @@ def main():
                 edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
 
             #coloured_blocks = network.global_view.latest_messages.values()
-            network.report(edges=edgelist, colored_messages=safe_blocks)
+            network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 
             #for i in xrange(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)

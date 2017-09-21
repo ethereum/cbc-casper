@@ -40,5 +40,5 @@ class Network:
             new_bet = self.get_message_from_validator(v)
             self.global_view.add_messages(set([new_bet]))
 
-    def report(self, colored_messages=set(), edges=[]):
-        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages, edges=edges)
+    def report(self, colored_messages=set(), color_mag=dict(), edges=[]):
+        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages, colour_mag=color_mag, edges=edges)
