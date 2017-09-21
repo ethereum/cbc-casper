@@ -1,77 +1,111 @@
-from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
-from bet import Bet
+import settings as s
+from block import Block
 from adversary import Adversary
+import utils
 
 import copy
+import networkx as nx
 
 
 class Safety_Oracle:
 
     def __init__(self, candidate_estimate, view):
+        if candidate_estimate is None:
+            raise Exception("cannot decide if safe without an estimate")
+
         self.candidate_estimate = candidate_estimate
         self.view = view
 
-    # This method returns a map estimates -> validator -> message with estimate
+    # find biggest set of validators that
+    # a) each of their latest blocks in on the candidate_estimate
+    # b) each of them have seen from eachother a latest block on the candidate_estimate
+    # c) none of them can see a new block from another not on the candidate_estimate
+    # code is quite verbose for first version readability :)
     @profile
-    def get_latest_messages_with_estimate(self):
+    def find_biggest_clique(self):
 
-        lastest_messages_with_estimate = dict()
-        for e in ESTIMATE_SPACE:
-            lastest_messages_with_estimate[e] = dict()
+        # only consider validators building on candidate_estimate
+        building_on_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
+                                self.candidate_estimate.is_in_blockchain(self.view.latest_messages[v])}
 
-        for v in self.view.latest_messages:
-            lastest_messages_with_estimate[self.view.latest_messages[v].estimate][v] = self.view.latest_messages[v]
+        # do not have safety if less than half are building on the candidate_estimate
+        if utils.get_weight(building_on_candidate) < s.TOTAL_WEIGHT / 2:
+            return set()
 
-        return lastest_messages_with_estimate
+        edges = []
+        #for each pair of validators, v, w, add an edge if...
+        pairs = [[v, w] for v in building_on_candidate for w in building_on_candidate if v < w]
+        for [v, w] in pairs:
+            # the latest block v has seen from w is on the candidate estimate
+            v_msg = self.view.latest_messages[v]
+            if w not in v_msg.justification.latest_messages:
+                continue
 
-    @profile
-    def get_viewables(self):
-        # if this validator has no latest messages in the view, then we store...
+            w_msg_in_v_view = v_msg.justification.latest_messages[w]
+            if not self.candidate_estimate.is_in_blockchain(w_msg_in_v_view):
+                continue
 
-        lastest_messages_with_estimate = self.get_latest_messages_with_estimate()
+            # the latest block w has seen from v is on the candidate estimate
+            w_msg = self.view.latest_messages[w]
+            if v not in w_msg.justification.latest_messages:
+                continue
 
-        viewables = dict()
-        for v in VALIDATOR_NAMES:
-            viewables[v] = dict()
+            v_msg_in_w_view = w_msg.justification.latest_messages[v]
+            if not self.candidate_estimate.is_in_blockchain(v_msg_in_w_view):
+                continue
 
-        for w in VALIDATOR_NAMES:
-            if w not in self.view.latest_messages:
+            dont_add = False
+            # there are no blocks from w, that v has not seen, that might change v's estimate
+            w_later_blocks = utils.get_later_messages_from_val(w, w_msg_in_v_view.sequence_number, w_msg)
+            for b in w_later_blocks:
+                if not self.candidate_estimate.is_in_blockchain(b):
+                    dont_add = True
 
-                # for validators without anything in their view, any messages are later messages are viewable messages!
-                # ...so we add them all in!
-                for v in lastest_messages_with_estimate[1 - self.candidate_estimate].keys():
-                    viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
+            # there are no blocks from v, that w has not seen, that might change w's estimate
+            v_later_blocks = utils.get_later_messages_from_val(v, v_msg_in_w_view.sequence_number, v_msg)
+            for b in v_later_blocks:
+                if not self.candidate_estimate.is_in_blockchain(b):
+                    dont_add = True
 
-            # if we do have a latest message from this validator, then...
-            else:
-                assert isinstance(self.view.latest_messages[w], Bet), "...expected my_latest_message to be a bet or the empty set"
+            if not dont_add:
+                edges.append((v, w))
 
-                # then all messages that are causally after these messages are viewable by this validator
+        G = nx.Graph()
 
-                for v in lastest_messages_with_estimate[1 - self.candidate_estimate].keys():
-                    if v not in self.view.latest_messages[w].justification.latest_messages.keys():
-                        viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
-                        continue
+        G.add_edges_from(edges)
 
-                    if self.view.latest_messages[w].justification.latest_messages[v].sequence_number < lastest_messages_with_estimate[1 - self.candidate_estimate][v].sequence_number:
-                        viewables[w][v] = lastest_messages_with_estimate[1 - self.candidate_estimate][v]
+        cliques = nx.find_cliques(G)
 
-        return viewables
+        max_clique = []
+
+        for c in cliques:
+            if utils.get_weight(c) > utils.get_weight(max_clique):
+                max_clique = c
+
+        return set(max_clique)
+
 
     @profile
     def check_estimate_safety(self):
-        return False
 
-        if self.candidate_estimate is None:
-            raise Exception("cannot decide if safe without an estimate")
+        for v in s.VALIDATOR_NAMES:
+            if v not in self.view.latest_messages:
+                return 0, 0
 
-        viewables = self.get_viewables()
+        biggest_clique = self.find_biggest_clique()
 
-        view_copy = copy.deepcopy(self.view)
-        viewables_copy = copy.deepcopy(viewables)
+        # minumum amount of weight that has to equivocate
+        fault_tolerance = 2 * utils.get_weight(biggest_clique) - s.TOTAL_WEIGHT
 
-        adversary = Adversary(self.candidate_estimate, view_copy, viewables_copy)
+        if fault_tolerance > 0:
+            clique_weights = {s.WEIGHTS[v] for v in biggest_clique}
 
-        unsafe, _, _ = adversary.ideal_network_attack()
+            # minimum number of validators that need to equivocate
+            equivocating = set()
+            while round(sum(equivocating), 2) < round(fault_tolerance, 2): # round to stop issues w/ floating point rounding
+                equivocating.add(max(clique_weights.difference(equivocating)))
 
-        return not unsafe
+            # return the number of faults we can tolerate, which is one less than the number that need to equivocate.
+            return fault_tolerance, len(equivocating) - 1
+        else:
+            return 0, 0
