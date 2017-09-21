@@ -16,6 +16,7 @@ from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
+from safety_oracle import Safety_Oracle
 import utils
 import plot_tool
 import presets
@@ -39,6 +40,8 @@ def main():
     blockchain = []
     communications = []
     safe_blocks = set()
+    node_ft = dict()
+
 
     iterator = 0
     while(True):
@@ -73,6 +76,13 @@ def main():
 
                 successful_paths.append([j, j])
 
+                curr = new_block
+                last_finalized_block = network.validators[j].view.last_finalized_block
+                while curr != last_finalized_block:
+                    if network.validators[i].check_estimate_safety(curr):
+                        break
+                    curr = curr.estimate
+
                 if new_block.estimate is not None:
                     blockchain.append([new_block, new_block.estimate])
 
@@ -82,6 +92,20 @@ def main():
                     communications.append([old_blocks[ij[0]], b])
 
         network.global_view.add_messages(new_blocks)
+
+        tip = network.global_view.estimate()
+        while tip is not None:
+            if node_ft.get(tip, 0) == s.NUM_VALIDATORS - 1:
+                break
+
+            oracle = Safety_Oracle(tip, network.global_view)
+            fault_tolerance, num_node_ft = oracle.check_estimate_safety()
+
+            if fault_tolerance > 0:
+                safe_blocks.add(tip)
+                node_ft[tip] = num_node_ft
+
+            tip = tip.estimate
 
         if iterator % s.REPORT_INTERVAL == 0:
 
@@ -104,7 +128,7 @@ def main():
                 edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
 
             #coloured_blocks = network.global_view.latest_messages.values()
-            network.report(edges=edgelist)
+            network.report(edges=edgelist, colored_messages=safe_blocks)
 
             #for i in xrange(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
