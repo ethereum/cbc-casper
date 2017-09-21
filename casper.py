@@ -27,7 +27,6 @@ def main():
 
     print "WEIGHTS", s.WEIGHTS
 
-    decided = dict.fromkeys(s.VALIDATOR_NAMES, 0)
     safe_messages = set()
 
     network.random_initialization()

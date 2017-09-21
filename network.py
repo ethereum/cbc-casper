@@ -21,9 +21,6 @@ class Network:
     def get_message_from_validator(self, validator_name):
         assert validator_name in s.VALIDATOR_NAMES, "...expected a known validator"
 
-        if self.validators[validator_name].decided:
-            return True
-
         new_message = self.validators[validator_name].make_new_message()
         return new_message
 
