@@ -15,15 +15,10 @@ def get_later_messages_from_val(val, sequence_num, most_recent_message):
 
 
 def get_weight(val_set):
-    total_weight = 0
-
     if val_set is None:
         return 0
 
-    for v in val_set:
-        total_weight += s.WEIGHTS[v]
-
-    return total_weight
+    return sum(s.WEIGHTS[v] for v in val_set)
 
 
 def build_chain(tip, base):
