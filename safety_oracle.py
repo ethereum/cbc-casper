@@ -88,10 +88,6 @@ class Safety_Oracle:
     @profile
     def check_estimate_safety(self):
 
-        for v in s.VALIDATOR_NAMES:
-            if v not in self.view.latest_messages:
-                return 0, 0
-
         biggest_clique = self.find_biggest_clique()
 
         # minumum amount of weight that has to equivocate
