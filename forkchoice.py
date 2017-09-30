@@ -15,18 +15,13 @@ def get_max_weight_indexes(scores):
 
 
 def get_fork_choice(last_finalized_block, children, latest_messages):
-    v_curr_chain = dict()
-
-    for v in latest_messages.keys():
-        if last_finalized_block is None or last_finalized_block.is_in_blockchain(latest_messages[v]):
-            v_curr_chain[v] = build_chain(latest_messages[v], last_finalized_block)
 
     scores = dict()
 
-    for v in v_curr_chain.keys():
+    for v in latest_messages:
         current_block = latest_messages[v]
 
-        while current_block != last_finalized_block:
+        while current_block != last_finalized_block and current_block is not None:
             scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
             current_block = current_block.estimate
 
