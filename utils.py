@@ -1,17 +1,18 @@
 import settings as s
 
-def get_later_messages_from_val(val, sequence_num, most_recent_message):
-    later_messages = set()
+def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
+    return not estimate.is_in_blockchain(possibly_conflicting_estimate)
 
-    assert most_recent_message.sender == val, "...expected validator to be the same!"
 
-    curr = most_recent_message
+def exists_free_message(estimate, val, sequence_num, view):
+    curr_message = view.latest_messages[val]
 
-    while curr.sequence_number > sequence_num:
-        later_messages.add(curr)
-        curr = curr.justification.latest_messages[val]
+    while curr_message.sequence_number > sequence_num:
+        if are_conflicting_estimates(estimate, curr_message):
+            return True
+        curr_message = curr_message.justification.latest_messages[val]
 
-    return later_messages
+    return False
 
 
 def get_weight(val_set):

@@ -17,32 +17,32 @@ class Safety_Oracle:
         self.view = view
 
     # find biggest set of validators that
-    # a) each of their latest blocks in on the candidate_estimate
-    # b) each of them have seen from eachother a latest block on the candidate_estimate
-    # c) none of them can see a new block from another not on the candidate_estimate
+    # a) each of their latest messages is on the candidate_estimate
+    # b) each of them have seen from eachother a latest message on the candidate_estimate
+    # c) none of them can see a new message from another not on the candidate_estimate
     # code is quite verbose for first version readability :)
     @profile
     def find_biggest_clique(self):
 
-        # only consider validators building on candidate_estimate
-        building_on_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
-                                self.candidate_estimate.is_in_blockchain(self.view.latest_messages[v])}
+        # only consider validators whose messages are compatable w/ candidate_estimate
+        with_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
+                                 not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
 
-        # do not have safety if less than half are building on the candidate_estimate
-        if utils.get_weight(building_on_candidate) < s.TOTAL_WEIGHT / 2:
+        # do not have safety if less than half have candidate_estimate
+        if utils.get_weight(with_candidate) < s.TOTAL_WEIGHT / 2:
             return set()
 
         edges = []
         #for each pair of validators, v, w, add an edge if...
-        pairs = [[v, w] for v in building_on_candidate for w in building_on_candidate if v < w]
+        pairs = [[v, w] for v in with_candidate for w in with_candidate if v < w]
         for [v, w] in pairs:
-            # the latest block v has seen from w is on the candidate estimate
+            # the latest message v has seen from w is on the candidate estimate
             v_msg = self.view.latest_messages[v]
             if w not in v_msg.justification.latest_messages:
                 continue
 
             w_msg_in_v_view = v_msg.justification.latest_messages[w]
-            if not self.candidate_estimate.is_in_blockchain(w_msg_in_v_view):
+            if utils.are_conflicting_estimates(self.candidate_estimate, w_msg_in_v_view):
                 continue
 
             # the latest block w has seen from v is on the candidate estimate
@@ -51,24 +51,18 @@ class Safety_Oracle:
                 continue
 
             v_msg_in_w_view = w_msg.justification.latest_messages[v]
-            if not self.candidate_estimate.is_in_blockchain(v_msg_in_w_view):
+            if utils.are_conflicting_estimates(self.candidate_estimate, v_msg_in_w_view):
                 continue
 
-            dont_add = False
             # there are no blocks from w, that v has not seen, that might change v's estimate
-            w_later_blocks = utils.get_later_messages_from_val(w, w_msg_in_v_view.sequence_number, w_msg)
-            for b in w_later_blocks:
-                if not self.candidate_estimate.is_in_blockchain(b):
-                    dont_add = True
+            if utils.exists_free_message(self.candidate_estimate, w, w_msg_in_v_view.sequence_number, self.view):
+                continue
 
             # there are no blocks from v, that w has not seen, that might change w's estimate
-            v_later_blocks = utils.get_later_messages_from_val(v, v_msg_in_w_view.sequence_number, v_msg)
-            for b in v_later_blocks:
-                if not self.candidate_estimate.is_in_blockchain(b):
-                    dont_add = True
+            if utils.exists_free_message(self.candidate_estimate, v, v_msg_in_w_view.sequence_number, self.view):
+                continue
 
-            if not dont_add:
-                edges.append((v, w))
+            edges.append((v, w))
 
         G = nx.Graph()
 
