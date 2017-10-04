@@ -7,9 +7,13 @@ def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
 def exists_free_message(estimate, val, sequence_num, view):
     curr_message = view.latest_messages[val]
 
-    while curr_message.sequence_number > sequence_num:
+    while curr_message.sequence_number >= sequence_num:
         if are_conflicting_estimates(estimate, curr_message):
             return True
+
+        if curr_message.sequence_number == 0:
+            break
+
         curr_message = curr_message.justification.latest_messages[val]
 
     return False
