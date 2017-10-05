@@ -17,7 +17,7 @@ class Model_Validator:
 
         self.latest_observed_bets = latest_bets
 
-    # model validators use their view at my_latest_bet to calculate an estimate
+    # model validators use their latest_observed_bets to calculate an estimate
     def my_estimate(self):
         return model_utils.get_estimate_from_latest_messages(self.latest_observed_bets, self.target_estimate)
 

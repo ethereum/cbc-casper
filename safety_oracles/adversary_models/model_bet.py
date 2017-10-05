@@ -2,6 +2,8 @@ import settings as s
 
 class Model_Bet:
 
+    # for now, this simplies the bet structure to work with the adversary
+    # with no side-effects - so, no justifications necessary!
     def __init__(self, estimate, sender):
 
         # be safe. type check!...
