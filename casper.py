@@ -16,7 +16,7 @@ from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
-from safety_oracle import Safety_Oracle
+from safety_oracles.safety_oracle import Safety_Oracle
 import utils
 import plot_tool
 import presets

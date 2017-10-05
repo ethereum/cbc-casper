@@ -2,7 +2,7 @@ import settings as s
 from block import Block
 from view import View
 from justification import Justification
-from safety_oracle import Safety_Oracle
+from safety_oracles.safety_oracle import Safety_Oracle
 import copy
 
 import random as r
