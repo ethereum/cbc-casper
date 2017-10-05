@@ -32,9 +32,7 @@ def init():
     ESTIMATE_SPACE = set([0, 1])
 
     # here they are... !
-    WEIGHTS = dict()
-    for v in VALIDATOR_NAMES:
-        WEIGHTS[v] = max(20, r.gauss(mu=60, sigma=40)) + 1.0/(BIGINT + r.uniform(0, 1)) + r.random()
+    WEIGHTS = {i: max(20, r.gauss(mu=60, sigma=40)) + 1.0/(BIGINT + r.uniform(0, 1)) + r.random() for i in VALIDATOR_NAMES}
 
     TOTAL_WEIGHT = sum(WEIGHTS.values())
 
