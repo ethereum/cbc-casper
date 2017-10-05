@@ -28,8 +28,14 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
     best_block = last_finalized_block
     while best_block in children.keys():
         curr_scores = dict()
+        max_score = 0
         for child in children[best_block]:
             curr_scores[child] = scores.get(child, 0)
+            max_score = max(curr_scores[child], max_score)
+
+        # we don't choose weight 0 children. Also possible to make non-deterministic decision here.
+        if max_score == 0:
+            break
 
         max_weight_children = get_max_weight_indexes(curr_scores)
 
