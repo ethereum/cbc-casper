@@ -57,7 +57,7 @@ def main():
         sending_validators = set()
         affected_validators = set()
         successful_paths = []
-        for [i, j] in messages:
+        for i, j in messages:
             old_block = old_blocks[i]
 
             if old_block not in network.validators[j].view.messages:
@@ -83,7 +83,7 @@ def main():
             if new_block.estimate is not None:
                 blockchain.append([new_block, new_block.estimate])
 
-        for [i, j] in successful_paths:
+        for i, j in successful_paths:
             for b in new_blocks:
                 if b.sender == j:
                     communications.append([old_blocks[i], b])
