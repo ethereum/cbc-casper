@@ -1,11 +1,12 @@
 import settings as s
 import random as r
+import itertools
 
 
 def message_maker(mode):
 
     if mode == "rand":
-        pairs = [[i, j] for i in xrange(s.NUM_VALIDATORS) for j in xrange(s.NUM_VALIDATORS) if not i == j]
+        pairs = list(itertools.permutations(range(s.NUM_VALIDATORS), 2))
         def random():
             return r.sample(pairs, s.NUM_MESSAGES_PER_ROUND)
 
@@ -22,7 +23,7 @@ def message_maker(mode):
         return round_robin
 
     if mode == "full":
-        pairs = [[i, j] for i in xrange(s.NUM_VALIDATORS) for j in xrange(s.NUM_VALIDATORS) if not i == j]
+        pairs = list(itertools.permutations(range(s.NUM_VALIDATORS), 2))
         def full_propagation():
             return pairs
 
