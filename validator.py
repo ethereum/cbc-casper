@@ -46,7 +46,7 @@ class Validator:
         fault_tolerance, min_node_ft = oracle.check_estimate_safety()
 
         if fault_tolerance > 0:
-            if self.view.last_finalized_block is not None:
+            if self.view.last_finalized_block:
                 assert self.view.last_finalized_block.is_in_blockchain(estimate)
 
             self.view.last_finalized_block = estimate
