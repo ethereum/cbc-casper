@@ -16,9 +16,9 @@ base = 10000000
 IMAGE_LIMIT = 75
 FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
+colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
-
-def plot_view(view, coloured_bets=[], colour='green', edges=[]):
+def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
 
     G = nx.Graph()
 
@@ -49,7 +49,11 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
     node_color_map = {}
     for b in nodes:
         if b in coloured_bets:
-            node_color_map[b] = colour
+            mag = colour_mag[b]
+            node_color_map[b] = colors[int(len(colors) * mag / s.NUM_VALIDATORS)]
+            if mag == s.NUM_VALIDATORS - 1:
+                node_color_map[b] = "Black"
+
         else:
             node_color_map[b] = 'white'
 

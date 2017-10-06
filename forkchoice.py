@@ -1,6 +1,7 @@
 import settings as s
 import random as r
 import copy
+import utils
 
 
 def get_max_weight_indexes(scores):
@@ -21,7 +22,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
     for v in latest_messages:
         current_block = latest_messages[v]
 
-        while current_block != last_finalized_block and current_block is not None:
+        while current_block and current_block != last_finalized_block:
             scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
             current_block = current_block.estimate
 
@@ -44,15 +45,3 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
         best_block = max_weight_children.pop()
 
     return best_block
-
-
-def build_chain(tip, base):
-    assert base is None or base.is_in_blockchain(tip), "expected tip to be in same blockchain as base"
-
-    chain = []
-    next_block = tip
-    while next_block != base and next_block.estimate is not None :
-        chain.append((next_block, next_block.estimate))
-        next_block = next_block.estimate
-
-    return chain
