@@ -57,9 +57,7 @@ def main():
         sending_validators = set()
         affected_validators = set()
         successful_paths = []
-        for path in messages:
-            i = path[0]
-            j = path[1]
+        for i, j in messages:
             old_block = old_blocks[i]
 
             if old_block not in network.validators[j].view.messages:
@@ -69,32 +67,31 @@ def main():
                 successful_paths.append([i, j])
 
         new_blocks = []
-        for j in xrange(s.NUM_VALIDATORS):
-            if j in affected_validators:
-                new_block = network.get_message_from_validator(j)
-                new_blocks.append(new_block)
+        for j in affected_validators:
+            new_block = network.get_message_from_validator(j)
+            new_blocks.append(new_block)
 
-                successful_paths.append([j, j])
+            successful_paths.append([j, j])
 
-                curr = new_block
-                last_finalized_block = network.validators[j].view.last_finalized_block
-                while curr != last_finalized_block:
-                    if network.validators[i].check_estimate_safety(curr):
-                        break
-                    curr = curr.estimate
+            curr = new_block
+            last_finalized_block = network.validators[j].view.last_finalized_block
+            while curr != last_finalized_block:
+                if network.validators[i].check_estimate_safety(curr):
+                    break
+                curr = curr.estimate
 
-                if new_block.estimate is not None:
-                    blockchain.append([new_block, new_block.estimate])
+            if new_block.estimate is not None:
+                blockchain.append([new_block, new_block.estimate])
 
-        for ij in successful_paths:
+        for i, j in successful_paths:
             for b in new_blocks:
-                if b.sender == ij[1]:
-                    communications.append([old_blocks[ij[0]], b])
+                if b.sender == j:
+                    communications.append([old_blocks[i], b])
 
         network.global_view.add_messages(new_blocks)
 
         tip = network.global_view.estimate()
-        while tip is not None:
+        while tip:
             if node_ft.get(tip, 0) == s.NUM_VALIDATORS - 1:
                 break
 

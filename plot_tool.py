@@ -3,6 +3,8 @@ from block import Block
 import settings as s
 from math import pi
 
+import matplotlib as mpl
+mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import pylab
 import plot_tool

@@ -20,7 +20,7 @@ def exists_free_message(estimate, val, sequence_num, view):
 
 
 def get_weight(val_set):
-    if val_set is None:
+    if not val_set:
         return 0
 
     return sum(s.WEIGHTS[v] for v in val_set)
@@ -31,7 +31,7 @@ def build_chain(tip, base):
 
     chain = []
     next_block = tip
-    while next_block != base and next_block.estimate is not None :
+    while next_block != base and next_block.estimate:
         chain.append((next_block, next_block.estimate))
         next_block = next_block.estimate
 

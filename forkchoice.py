@@ -22,15 +22,21 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
     for v in latest_messages:
         current_block = latest_messages[v]
 
-        while current_block != last_finalized_block and current_block is not None:
+        while current_block and current_block != last_finalized_block:
             scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
             current_block = current_block.estimate
 
     best_block = last_finalized_block
     while best_block in children.keys():
         curr_scores = dict()
+        max_score = 0
         for child in children[best_block]:
             curr_scores[child] = scores.get(child, 0)
+            max_score = max(curr_scores[child], max_score)
+
+        # we don't choose weight 0 children. Also possible to make non-deterministic decision here.
+        if max_score == 0:
+            break
 
         max_weight_children = get_max_weight_indexes(curr_scores)
 
