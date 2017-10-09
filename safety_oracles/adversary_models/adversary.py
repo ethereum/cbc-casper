@@ -28,8 +28,8 @@ class Adversary:
                 self.voting_against_attacker.add(v)
 
         # The attacker will also keep a close eye on the weights of the victim and target estimates:
-        self.weight_of_victim_estimate = sum({s.WEIGHTS[v] for v in self.voting_against_attacker})
-        self.weight_of_target_estimate = sum({s.WEIGHTS[v] for v in self.voting_with_attacker})
+        self.weight_of_victim_estimate = sum(s.WEIGHTS[v] for v in self.voting_against_attacker)
+        self.weight_of_target_estimate = sum(s.WEIGHTS[v] for v in self.voting_with_attacker)
 
         assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == s.NUM_VALIDATORS
         assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == round(s.TOTAL_WEIGHT, 2)
@@ -39,10 +39,7 @@ class Adversary:
 
     # if the target has more weight than the victim estimate, attack has succeeded
     def is_attack_complete(self):
-        if self.weight_of_target_estimate > self.weight_of_victim_estimate:
-            return True
-        else:
-            return False
+        return self.weight_of_target_estimate > self.weight_of_victim_estimate
 
     # this method implements an ideal network attack...
     # ...it returns the tuple (was_attack_successful, operation_log, attack_view)
