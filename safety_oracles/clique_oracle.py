@@ -22,7 +22,6 @@ class CliqueOracle:
     # c) none of them can see a new message from another not on the candidate_estimate
     # NOTE: if biggest clique can easily be determined to be < 50% by weight, will
     #       return with empty set and 0 weight.
-    @profile
     def find_biggest_clique(self):
 
         # only consider validators whose messages are compatable w/ candidate_estimate
@@ -81,7 +80,6 @@ class CliqueOracle:
         return set(max_clique), max_weight
 
 
-    @profile
     def check_estimate_safety(self):
 
         biggest_clique, clique_weight = self.find_biggest_clique()
