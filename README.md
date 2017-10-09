@@ -15,9 +15,15 @@ pip install -r requirements.txt
 ## Run Simulations
 This code is marked up for use as follows:
 ```
-kernprof -l casper.py rounds && python -m line_profiler casper.py.lprof > results.txt
+kernprof -l casper.py (rand | rrob | full | nofinal)
 ```
-OR
+
+## Run Tests
+To run all unit tests:
 ```
-kernprof -l casper.py blockchain && python -m line_profiler casper.py.lprof > results.txt
+python -m unittest discover
+```
+To run a specific test, use (or the equivalent for whatever test you wish to run)
+```
+python -m unittest test.test_safety_oracle
 ```
