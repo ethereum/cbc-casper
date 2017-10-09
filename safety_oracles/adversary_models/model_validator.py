@@ -1,10 +1,10 @@
 import settings as s
 import model_utils
-from model_bet import Model_Bet
+from model_bet import ModelBet
 from model_view import Model_View
 
 
-class Model_Validator:
+class ModelValidator:
 
     def __init__(self, validator_name, my_latest_bet, latest_bets, target_estimate):
 
@@ -24,7 +24,7 @@ class Model_Validator:
     # this method makes a bet viewable to the model validator
     def show(self, bet):
 
-        assert isinstance(bet, Model_Bet), "...expected a bet!"
+        assert isinstance(bet, ModelBet), "...expected a bet!"
         assert bet.estimate == self.target_estimate, "...should only show bets on the target_estimate!"
 
         self.latest_observed_bets[bet.sender] = bet
@@ -37,7 +37,7 @@ class Model_Validator:
             return True, self.my_latest_bet
 
         if self.my_estimate() == self.target_estimate:
-            self.my_latest_bet = Model_Bet(self.target_estimate, self.model_of)
+            self.my_latest_bet = ModelBet(self.target_estimate, self.model_of)
             return True, self.my_latest_bet
 
         return False, None

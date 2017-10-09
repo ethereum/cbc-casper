@@ -16,7 +16,7 @@ from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
-from safety_oracles.clique_oracle import Clique_Oracle
+from safety_oracles.clique_oracle import CliqueOracle
 import utils
 import plot_tool
 import presets
@@ -95,7 +95,7 @@ def main():
             if node_ft.get(tip, 0) == s.NUM_VALIDATORS - 1:
                 break
 
-            oracle = Clique_Oracle(tip, network.global_view)
+            oracle = CliqueOracle(tip, network.global_view)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:

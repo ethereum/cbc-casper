@@ -1,6 +1,6 @@
 import settings as s
 
-class Model_Bet:
+class ModelBet:
 
     # for now, this simplies the bet structure to work with the adversary
     # with no side-effects - so, no justifications necessary!
@@ -17,7 +17,7 @@ class Model_Bet:
         if not bet:
             return False
 
-        assert isinstance(B, Model_Bet), "...model_bets can only equal model_bets!"
+        assert isinstance(B, ModelBet), "...model_bets can only equal model_bets!"
 
         return self.sender == bet.sender and self.estimate == bet.estimate
 

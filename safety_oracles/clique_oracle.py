@@ -7,7 +7,7 @@ import itertools
 import networkx as nx
 
 
-class Clique_Oracle:
+class CliqueOracle:
 
     def __init__(self, candidate_estimate, view):
         if candidate_estimate is None:

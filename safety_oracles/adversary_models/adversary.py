@@ -1,5 +1,5 @@
 import settings as s
-from model_validator import Model_Validator
+from model_validator import ModelValidator
 
 class Adversary:
 
@@ -14,7 +14,7 @@ class Adversary:
 
         self.validator_models = dict()
         for v in s.VALIDATOR_NAMES:
-            self.validator_models[v] = Model_Validator(v, latest_bets[v], viewables[v], self.target_estimate)
+            self.validator_models[v] = ModelValidator(v, latest_bets[v], viewables[v], self.target_estimate)
 
         self.voting_against_attacker = set()
         self.voting_with_attacker = set()
