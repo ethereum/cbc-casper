@@ -37,7 +37,7 @@ class Adversary:
         # the attacker produces a log of the bets added during the attack...
         self.operations_log = []
 
-    # if the target has more weight that the vitctim estimate, attack has succeeded
+    # if the target has more weight than the victim estimate, attack has succeeded
     def is_attack_complete(self):
         if self.weight_of_target_estimate > self.weight_of_victim_estimate:
             return True
