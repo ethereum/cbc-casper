@@ -43,3 +43,15 @@ def init():
     REPORT_SUBJECTIVE_VIEWS = False
 
 init()
+
+
+def update(val_weights):
+    global NUM_VALIDATORS
+    global VALIDATOR_NAMES
+    global WEIGHTS
+    global TOTAL_WEIGHT
+
+    NUM_VALIDATORS = len(val_weights)
+    VALIDATOR_NAMES = set(range(NUM_VALIDATORS))
+    WEIGHTS = {i: val_weights[i] for i in VALIDATOR_NAMES}
+    TOTAL_WEIGHT = sum(val_weights)
