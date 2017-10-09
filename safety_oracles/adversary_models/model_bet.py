@@ -14,7 +14,7 @@ class Model_Bet:
         self.estimate = estimate
 
     def __eq__(self, bet):
-        if bet is None:
+        if not bet:
             return False
 
         assert isinstance(B, Model_Bet), "...model_bets can only equal model_bets!"
