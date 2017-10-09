@@ -9,7 +9,7 @@ class Adversary:
 
         self.target_estimate = 1 - victim_estimate # estimate adversary is attack towards
 
-        # the attacker adds bets the bets they created in the attack to this view...
+        # the attacker adds the bets they created in the attack to this view...
         self.attack_view = set()
 
         self.validator_models = dict()
