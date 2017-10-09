@@ -45,8 +45,7 @@ class Adversary:
             return False
 
     # this method implements an ideal network attack...
-    # ...it returns the pair (True, self.operation_log) if the attack is successful
-    # ...and (False, self.operatrion_log) otherwise
+    # ...it returns the tuple (was_attack_successful, operation_log, attack_view)
     def ideal_network_attack(self):
 
         # as work is offloaded somewhat into the get_recent_messages_and_viewables, the attack may be complete already
