@@ -2,7 +2,7 @@ import settings as s
 from block import Block
 from view import View
 from justification import Justification
-from safety_oracles.safety_oracle import Safety_Oracle
+from safety_oracles.clique_oracle import CliqueOracle
 import copy
 
 import random as r
@@ -42,7 +42,7 @@ class Validator:
 
         assert isinstance(estimate, Block), "..expected estimate to be a Block"
 
-        oracle = Safety_Oracle(estimate, self.view)
+        oracle = CliqueOracle(estimate, self.view)
         fault_tolerance, min_node_ft = oracle.check_estimate_safety()
 
         if fault_tolerance > 0:

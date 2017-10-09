@@ -1,6 +1,5 @@
 import settings as s
 from block import Block
-from adversary import Adversary
 import utils
 
 import copy
@@ -8,7 +7,7 @@ import itertools
 import networkx as nx
 
 
-class Safety_Oracle:
+class CliqueOracle:
 
     def __init__(self, candidate_estimate, view):
         if candidate_estimate is None:
