@@ -1,7 +1,8 @@
-from settings import VALIDATOR_NAMES, ESTIMATE_SPACE, WEIGHTS
+import settings as s
 from block import Block
 from view import View
 from justification import Justification
+from safety_oracles.safety_oracle import Safety_Oracle
 import copy
 
 import random as r
@@ -15,17 +16,13 @@ class Validator:
     # The validator's state is a function of its view and name alone (along with global variables)
     # However, for performance's sake the validator also stores
     def __init__(self, name):
-        assert name in VALIDATOR_NAMES, "expected a validator name"
+        assert name in s.VALIDATOR_NAMES, "expected a validator name"
         self.name = name
         self.view = View(set())
-        self.decided = False
 
     # This method is the only way that a validator can receive protocol messages
     def receive_messages(self, messages):
-        if not self.decided:
-            self.view.add_messages(messages)
-        else:
-            print "unable to show message to decided node"
+        self.view.add_messages(messages)
 
     # The estimator function returns the set of max weight estimates
     # This may not be a single-element set because the validator may have an empty view
@@ -41,16 +38,21 @@ class Validator:
             return None
 
     # The validator checks estimate safety by calling the safety oracle
-    # This method also flags the validator as having decided in the case that the estimate is safe
     def check_estimate_safety(self, estimate):
-        return False
-        assert isinstance(estimate, Block), "..expected estimate to be a Block"
-        oracle = Safety_Oracle(estimate, self.view)
-        is_safe = oracle.check_estimate_safety()
-        if is_safe:
-            self.decided = True
 
-        return is_safe
+        assert isinstance(estimate, Block), "..expected estimate to be a Block"
+
+        oracle = Safety_Oracle(estimate, self.view)
+        fault_tolerance, min_node_ft = oracle.check_estimate_safety()
+
+        if fault_tolerance > 0:
+            if self.view.last_finalized_block:
+                assert self.view.last_finalized_block.is_in_blockchain(estimate)
+
+            self.view.last_finalized_block = estimate
+            return True
+
+        return False
 
     # This function produces a new latest message for the validator
     # It updates the validator's latest message, estimate, view, and latest observed messages

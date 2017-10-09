@@ -1,5 +1,6 @@
 import copy
-from settings import VALIDATOR_NAMES
+import settings as s
+
 from justification import Justification
 
 
@@ -11,11 +12,13 @@ class Block:
             return False
         return self.hash == block.hash
 
+    def __ne__(self, block):
+        return not self.__eq__(block)
 
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
 
-        assert sender in VALIDATOR_NAMES, "...expected a validator!"
+        assert sender in s.VALIDATOR_NAMES, "...expected a validator!"
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
         assert isinstance(justification, Justification), "expected justification a Justification!"
 

@@ -1,6 +1,6 @@
 import networkx as nx
 from block import Block
-from settings import WEIGHTS, NUM_VALIDATORS, ESTIMATE_SPACE
+import settings as s
 from math import pi
 
 import matplotlib as mpl
@@ -18,9 +18,9 @@ base = 10000000
 IMAGE_LIMIT = 75
 FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
+colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
-
-def plot_view(view, coloured_bets=[], colour='green', edges=[]):
+def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
 
     G = nx.Graph()
 
@@ -46,12 +46,16 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
     positions = dict()
 
     for b in nodes:
-        positions[b] = (float)(b.sender + 1)/(float)(NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
+        positions[b] = (float)(b.sender + 1)/(float)(s.NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
 
     node_color_map = {}
     for b in nodes:
         if b in coloured_bets:
-            node_color_map[b] = colour
+            mag = colour_mag[b]
+            node_color_map[b] = colors[int(len(colors) * mag / s.NUM_VALIDATORS)]
+            if mag == s.NUM_VALIDATORS - 1:
+                node_color_map[b] = "Black"
+
         else:
             node_color_map[b] = 'white'
 
@@ -61,7 +65,7 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
 
     node_sizes = []
     for b in nodes:
-        node_sizes.append(350*pow(WEIGHTS[b.sender]/pi, 0.5))
+        node_sizes.append(350*pow(s.WEIGHTS[b.sender]/pi, 0.5))
         labels[b] = b.sequence_number
 
     nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes, node_size=node_sizes, edge_color='black')
@@ -77,9 +81,9 @@ def plot_view(view, coloured_bets=[], colour='green', edges=[]):
     ax.collections[0].set_edgecolor("black")
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
-    for v in xrange(NUM_VALIDATORS):
-        xpos = (float)(v + 1)/(float)(NUM_VALIDATORS + 1) - 0.01
-        ax.text(xpos, 0.1, (str)((int)(WEIGHTS[v])), fontsize=20)
+    for v in xrange(s.NUM_VALIDATORS):
+        xpos = (float)(v + 1)/(float)(s.NUM_VALIDATORS + 1) - 0.01
+        ax.text(xpos, 0.1, (str)((int)(s.WEIGHTS[v])), fontsize=20)
 
     pylab.show()
     # pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")

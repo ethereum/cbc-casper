@@ -10,49 +10,54 @@ this manner, yet... :)
 import sys
 
 import random as r  # to ensure the tie-breaking property
+import settings as s
 
-from settings import NUM_VALIDATORS, VALIDATOR_NAMES, WEIGHTS, REPORT_INTERVAL, NUM_MESSAGES_PER_ROUND, REPORT_SUBJECTIVE_VIEWS
 from justification import Justification
 from view import View
 from network import Network
 from validator import Validator
-import forkchoice
+from safety_oracles.safety_oracle import Safety_Oracle
+import utils
 import plot_tool
+import presets
 
 
 def main():
 
     network = Network()
 
-    print "WEIGHTS", WEIGHTS
+    print "WEIGHTS", s.WEIGHTS
 
-    decided = dict.fromkeys(VALIDATOR_NAMES, 0)
-    safe_messages = set()
+    mode = sys.argv[1]
+    if mode != "rand" and mode != "rrob" and mode != "full" and mode != "nofinal":
+        print "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
+        return
+    msg_gen = presets.message_maker(mode)
 
     network.random_initialization()
     network.report()
+
     blockchain = []
     communications = []
+    safe_blocks = set()
+    node_ft = dict()
 
-    pairs = [[i, j] for i in xrange(NUM_VALIDATORS) for j in xrange(NUM_VALIDATORS) if not i == j]
 
     iterator = 0
     while(True):
         iterator += 1
 
-        messages = r.sample(pairs, NUM_MESSAGES_PER_ROUND)
+        messages = msg_gen()
 
         old_blocks = []
-        for i in xrange(NUM_VALIDATORS):
+        for i in xrange(s.NUM_VALIDATORS):
             if network.validators[i].my_latest_message() is not None:
                 old_blocks.append(network.validators[i].my_latest_message())
 
         sending_validators = set()
         affected_validators = set()
         successful_paths = []
-        for path in messages:
-            i = path[0]
-            j = path[1]
+        for i, j in messages:
             old_block = old_blocks[i]
 
             if old_block not in network.validators[j].view.messages:
@@ -62,31 +67,51 @@ def main():
                 successful_paths.append([i, j])
 
         new_blocks = []
-        for j in xrange(NUM_VALIDATORS):
-            if j in affected_validators:
-                new_block = network.get_message_from_validator(j)
-                new_blocks.append(new_block)
+        for j in affected_validators:
+            new_block = network.get_message_from_validator(j)
+            new_blocks.append(new_block)
 
-                successful_paths.append([j, j])
+            successful_paths.append([j, j])
 
-                if new_block.estimate is not None:
-                    blockchain.append([new_block, new_block.estimate])
+            curr = new_block
+            last_finalized_block = network.validators[j].view.last_finalized_block
+            while curr != last_finalized_block:
+                if network.validators[i].check_estimate_safety(curr):
+                    break
+                curr = curr.estimate
 
-        for ij in successful_paths:
+            if new_block.estimate is not None:
+                blockchain.append([new_block, new_block.estimate])
+
+        for i, j in successful_paths:
             for b in new_blocks:
-                if b.sender == ij[1]:
-                    communications.append([old_blocks[ij[0]], b])
+                if b.sender == j:
+                    communications.append([old_blocks[i], b])
 
         network.global_view.add_messages(new_blocks)
 
-        if iterator % REPORT_INTERVAL == 0:
+        tip = network.global_view.estimate()
+        while tip:
+            if node_ft.get(tip, 0) == s.NUM_VALIDATORS - 1:
+                break
+
+            oracle = Safety_Oracle(tip, network.global_view)
+            fault_tolerance, num_node_ft = oracle.check_estimate_safety()
+
+            if fault_tolerance > 0:
+                safe_blocks.add(tip)
+                node_ft[tip] = num_node_ft
+
+            tip = tip.estimate
+
+        if iterator % s.REPORT_INTERVAL == 0:
 
             best_block = network.global_view.estimate()
-            best_chain = forkchoice.build_chain(best_block, None)
+            best_chain = utils.build_chain(best_block, None)
 
             vs_chain = []
-            for i in xrange(NUM_VALIDATORS):
-                vs_chain.append(forkchoice.build_chain(network.validators[i].my_latest_message(), None))
+            for i in xrange(s.NUM_VALIDATORS):
+                vs_chain.append(utils.build_chain(network.validators[i].my_latest_message(), None))
 
             print "BEST CHAIN----------------------", best_chain
 
@@ -96,16 +121,13 @@ def main():
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for i in xrange(NUM_VALIDATORS):
+            for i in xrange(s.NUM_VALIDATORS):
                 edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
 
             #coloured_blocks = network.global_view.latest_messages.values()
-            network.report(edges=edgelist)
+            network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 
-            #for i in xrange(NUM_VALIDATORS):
+            #for i in xrange(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
-
-    else:
-        print "\nusage: 'kernprof -l casper.py rounds' or 'kernprof -l casper.py blockchain'\n"
 
 main()
