@@ -62,15 +62,19 @@ class TestForkchoice(unittest.TestCase):
         """ Tests that the forkchoice ignores zero weight blocks """
         # for more info about test, see
         # https://gist.github.com/naterush/8d8f6ec3509f50939d7911d608f912f4
-        test_string = ("B0-A1 B0-A2 H0-A2 B1-B1 B1-B2 S3-B2 B3-D1 H3-D1 "
-                       "S3-A2 H3-A2 B3-D2 S2-B1 H2-B1 B2-C1 H2-C1 S1-D1 "
-                       "S1-D2 S1-C1 H1-B2")
+        test_string = (
+            "B0-A1 B0-A2 H0-A2 B1-B1 B1-B2 S3-B2 B3-D1 H3-D1 "
+            "S3-A2 H3-A2 B3-D2 S2-B1 H2-B1 B2-C1 H2-C1 S1-D1 "
+            "S1-D2 S1-C1 H1-B2"
+        )
         testLang = TestLangCBC(test_string, [10, 9, 8, .5])
         testLang.parse()
 
     def test_reverse_message_arrival_order_forkchoice_four_val(self):
-        test_string = ("B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D B1-E S0-E "
-                       "S2-E H2-E S3-A S3-B S3-C S3-D S3-E H3-E")
+        test_string = (
+            "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D B1-E S0-E "
+            "S2-E H2-E S3-A S3-B S3-C S3-D S3-E H3-E"
+        )
         testLang = TestLangCBC(test_string, [5, 6, 7, 8.1])
         testLang.parse()
 
