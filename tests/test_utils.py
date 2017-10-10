@@ -1,49 +1,36 @@
-import unittest
-import settings as s
+import pytest
 import random as r
+
+import settings as s
 import utils
 
 
-class TestUtils(unittest.TestCase):
+@pytest.mark.parametrize(
+    'weights, expected_weight, validators',
+    [
+        ([i for i in xrange(10)], 45, None),
+        ([i for i in xrange(9, -1, -1)], 45, None),
+        ([r.random() for i in xrange(10)], None, None),
+        ([i*2 for i in xrange(10)], 12, set([0, 1, 2, 3])),
+        ([i*2 for i in xrange(10)], 12, [0, 1, 2, 3]),
+    ]
+)
+def test_get_weight(weights, expected_weight, validators):
+    s.update(weights)
+    if expected_weight is None:
+        expected_weight = sum(weights)
+    if validators is None:
+        validators = s.VALIDATOR_NAMES
 
-    def test_get_weight_increasing(self):
-        weights = [i for i in xrange(10)]
-        s.update(weights)
-        self.assertEqual(utils.get_weight(s.VALIDATOR_NAMES), 45)
-
-    def test_get_weight_decreasing(self):
-        weights = [i for i in xrange(9, -1, -1)]
-        s.update(weights)
-
-        self.assertEqual(utils.get_weight(s.VALIDATOR_NAMES), 45)
-
-    def test_get_weight_random(self):
-        weights = [r.random() for i in xrange(10)]
-        s.update(weights)
-
-        self.assertEqual(utils.get_weight(s.VALIDATOR_NAMES), sum(weights))
-
-    def test_get_weight_partial_set(self):
-        weights = [i*2 for i in xrange(10)]
-        s.update(weights)
-
-        subset = set([0, 1, 2, 3])
-        self.assertEqual(utils.get_weight(subset), 12)
-
-    def test_get_weight_partial_list(self):
-        weights = [i*2 for i in xrange(10)]
-        s.update(weights)
-
-        self.assertEqual(utils.get_weight([0, 1, 2, 3]), 12)
-
-    def test_get_weight_none(self):
-        weight = utils.get_weight(None)
-        self.assertEqual(weight, 0)
-
-    def test_get_weight_empty(self):
-        weight = utils.get_weight(set())
-        self.assertEqual(weight, 0)
+    assert utils.get_weight(validators) == expected_weight
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize(
+    'empty_param',
+    [
+        (None),
+        (set()),
+    ]
+)
+def test_get_weight_empty(empty_param):
+    assert utils.get_weight(empty_param) == 0
