@@ -3,22 +3,21 @@ from block import Block
 from justification import Justification
 import unittest
 import settings as s
-import random as r
 import copy
+
 
 class TestUtils(unittest.TestCase):
 
     def test_equality_of_copies_off_genesis(self):
-        s.update([10]) # necessary for now due to assertions during block creation
+        s.update([10])  # necessary due to assertions during block creation
         block = Block(None, Justification(), 0)
 
-        shallow_copy =  copy.copy(block)
+        shallow_copy = copy.copy(block)
         deep_copy = copy.deepcopy(block)
 
         self.assertEqual(block, shallow_copy)
         self.assertEqual(block, deep_copy)
         self.assertEqual(shallow_copy, deep_copy)
-
 
     def test_equality_of_copies_of_non_genesis(self):
         test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
@@ -26,7 +25,7 @@ class TestUtils(unittest.TestCase):
         testLang.parse()
 
         for b in testLang.blocks:
-            shallow_copy =  copy.copy(b)
+            shallow_copy = copy.copy(b)
             deep_copy = copy.deepcopy(b)
 
             self.assertEqual(b, shallow_copy)
@@ -55,7 +54,6 @@ class TestUtils(unittest.TestCase):
                 self.assertNotEqual(b, b1)
 
         self.assertEqual(num_equal, len(testLang.blocks))
-
 
     def test_not_in_blockchain_off_genesis(self):
         s.update([10, 11])
