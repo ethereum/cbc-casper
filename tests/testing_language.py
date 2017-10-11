@@ -8,6 +8,9 @@ import utils
 
 
 class TestLangCBC:
+    # signal to py.test that TestLangCBC should not be discovered
+    __test__ = False
+
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
     def __init__(self, test_string, val_weights, display=False):
