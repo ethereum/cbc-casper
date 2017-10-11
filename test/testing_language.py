@@ -10,7 +10,7 @@ import utils
 class TestLangCBC:
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
-    def __init__(self, test_string, val_weights):
+    def __init__(self, test_string, val_weights, display=False):
         if test_string == '':
             raise Exception("Please pass in a valid test string")
 
@@ -18,6 +18,8 @@ class TestLangCBC:
         s.update(val_weights)
 
         self.test_string = test_string
+
+        self.display = display
 
         self.network = Network()
 
@@ -141,6 +143,9 @@ class TestLangCBC:
 
     def report(self, num, name):
         assert num == name and num == '', "...no validator or number needed to report!"
+
+        if not self.display:
+            return
 
         # update the safe blocks!
         tip = self.network.global_view.estimate()
