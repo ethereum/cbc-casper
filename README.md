@@ -19,11 +19,11 @@ kernprof -l casper.py (rand | rrob | full | nofinal)
 ```
 
 ## Run Tests
-To run all unit tests:
+To run all tests:
 ```
-python -m unittest discover
+pytest
 ```
 To run a specific test, use (or the equivalent for whatever test you wish to run)
 ```
-python -m unittest test.test_safety_oracle
+pytest tests/test_safety_oracle.py
 ```
