@@ -1,12 +1,12 @@
-from block import Block
-from view import View
-from justification import Justification
-from safety_oracles.clique_oracle import CliqueOracle
 import copy
-
 import random as r
-r.seed()
 
+from casper.block import Block
+from casper.view import View
+from casper.justification import Justification
+from casper.safety_oracles.clique_oracle import CliqueOracle
+
+r.seed()
 REPORT = True
 
 

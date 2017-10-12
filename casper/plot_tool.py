@@ -5,7 +5,6 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import pylab
-import plot_tool
 import copy
 import imageio as io
 
@@ -83,7 +82,7 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
     ax.collections[0].set_edgecolor("black")
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
-    for v in xrange(s.NUM_VALIDATORS):
+    for v in range(s.NUM_VALIDATORS):
         xpos = (float)(v + 1)/(float)(s.NUM_VALIDATORS + 1) - 0.01
         ax.text(xpos, 0.1, (str)((int)(s.WEIGHTS[v])), fontsize=20)
 

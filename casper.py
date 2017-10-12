@@ -9,31 +9,26 @@ this manner, yet... :)
 
 import sys
 
-import random as r  # to ensure the tie-breaking property
 import casper.settings as s
-
-from casper.justification import Justification
-from casper.view import View
 from casper.network import Network
-from casper.validator import Validator
 from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
-import casper.plot_tool as plot_tool
 import casper.presets as presets
 
 
 def main():
-
-    network = Network()
-
-    print "WEIGHTS", s.WEIGHTS
-
     mode = sys.argv[1]
-    if mode != "rand" and mode != "rrob" and mode != "full" and mode != "nofinal":
-        print "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
+    if mode not in ["rand", "rrob", "full", "nofinal"]:
+        print(
+            "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
+        )
         return
     msg_gen = presets.message_maker(mode)
 
+    if s.WEIGHTS:
+        print("WEIGHTS: {0}".format(s.WEIGHTS))
+
+    network = Network()
     network.random_initialization()
     network.report()
 
@@ -41,7 +36,6 @@ def main():
     communications = []
     safe_blocks = set()
     node_ft = dict()
-
 
     iterator = 0
     while(True):
@@ -113,7 +107,7 @@ def main():
             for i in xrange(s.NUM_VALIDATORS):
                 vs_chain.append(utils.build_chain(network.validators[i].my_latest_message(), None))
 
-            print "BEST CHAIN----------------------", best_chain
+            print("BEST CHAIN----------------------{0}".format(best_chain))
 
 
             edgelist = []

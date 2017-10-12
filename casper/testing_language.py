@@ -81,7 +81,7 @@ class TestLangCBC:
         if block_name in self.blocks:
             raise Exception('Block {} already exists'.format(block_name))
 
-        for i in xrange(s.NUM_VALIDATORS - 1):
+        for i in range(s.NUM_VALIDATORS - 1):
             rand_name = r.random()
             self.make_block((validator + i) % s.NUM_VALIDATORS, rand_name)
             self.send_block((validator + i + 1) % s.NUM_VALIDATORS, rand_name)
@@ -174,7 +174,7 @@ class TestLangCBC:
         )
         edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
 
-        for i in xrange(s.NUM_VALIDATORS):
+        for i in range(s.NUM_VALIDATORS):
             v = utils.build_chain(
                     self.network.validators[i].my_latest_message(),
                     None
