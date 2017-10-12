@@ -27,6 +27,5 @@ pytz==2017.2
 scandir==1.6
 simplegeneric==0.8.1
 six==1.11.0
-subprocess32==3.2.7
 traitlets==4.3.2
 wcwidth==0.1.7
