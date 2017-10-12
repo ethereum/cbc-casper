@@ -18,9 +18,9 @@ def test_equality_of_copies_off_genesis():
     assert shallow_copy == deep_copy
 
 
-def test_equality_of_copies_of_non_genesis():
+def test_equality_of_copies_of_non_genesis(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    testLang = TestLangCBC(test_string, [10, 11])
+    testLang = TestLangCBC(test_string, [10, 11], report)
     testLang.parse()
 
     for b in testLang.blocks:
@@ -40,9 +40,9 @@ def test_non_equality_of_copies_off_genesis():
     assert block_0 != block_1
 
 
-def test_unique_block_creation_in_test_lang():
+def test_unique_block_creation_in_test_lang(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    testLang = TestLangCBC(test_string, [10, 11])
+    testLang = TestLangCBC(test_string, [10, 11], report)
     testLang.parse()
 
     num_equal = 0
@@ -66,9 +66,9 @@ def test_is_in_blockchain__separate_genesis():
     assert not block_1.is_in_blockchain(block_0)
 
 
-def test_is_in_blockchain__test_lang():
+def test_is_in_blockchain__test_lang(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    testLang = TestLangCBC(test_string, [11, 10])
+    testLang = TestLangCBC(test_string, [11, 10], report)
     testLang.parse()
 
     prev = testLang.blocks['A']
