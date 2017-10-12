@@ -78,27 +78,76 @@ def test_parse_only_valid_tokens(test_string, valid_tokens, error):
 
 
 @pytest.mark.parametrize(
-    'test_string, val_weights, valid_validators',
+    'test_string, val_weights, exception',
     [
-        ('B0-A B1-B B2-C B3-D B4-E', TEST_WEIGHT, True),
-        ('B0-A S1-A S2-A S3-A S4-A', TEST_WEIGHT, True),
-        ('B0-A S1-A U1-A', [1, 2], True),
-        ('B0-A S1-A H1-A', [2, 1], True),
-        ('RR0-A RR0-B C0-A', [2,1], True),
-        ('B5-A', TEST_WEIGHT, False),
-        ('B0-A S1-A', [1], False),
-        ('B0-A S1-A S2-A S3-A S4-A', [0], False),
-        ('B4-A S5-A', TEST_WEIGHT, False),
-        ('B0-A S1-A U2-A', [1, 2], False),
-        ('B0-A S1-A H2-A', [2, 1], False),
-        ('RR0-A RR0-B C2-A', [2, 1], False),
+        ('B0-A B1-B B2-C B3-D B4-E', TEST_WEIGHT, ''),
+        ('B0-A S1-A S2-A S3-A S4-A', TEST_WEIGHT, ''),
+        ('B0-A S1-A U1-A', [1, 2], ''),
+        ('B0-A S1-A H1-A', [2, 1], ''),
+        ('RR0-A RR0-B C0-A', [2,1], ''),
+        ('B5-A', TEST_WEIGHT, 'Validator'),
+        ('B0-A S1-A', [1], 'Validator'),
+        ('B0-A S1-A S2-A S3-A S4-A', [0], 'Validator'),
+        ('B4-A S5-A', TEST_WEIGHT, 'Validator'),
+        ('B0-A S1-A U2-A', [1, 2], 'Validator'),
+        ('B0-A S1-A H2-A', [2, 1], 'Validator'),
+        ('RR0-A RR0-B C2-A', [2, 1], 'Validator'),
+        ('B0-A S1-B', TEST_WEIGHT, 'Block'),
+        ('B0-A S1-A U1-B', TEST_WEIGHT, 'Block'),
+        ('B0-A S1-A H1-B', TEST_WEIGHT, 'Block'),
+        ('B0-A RR0-B RR0-C C0-D', TEST_WEIGHT, 'Block'),
     ]
 )
-def test_parse_only_valid_validators(test_string, val_weights, valid_validators):
+def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
     test_lang = TestLangCBC(test_string, val_weights)
 
-    if valid_validators:
+    if exception == '':
         test_lang.parse()
     else:
-        with pytest.raises(Exception, match='Validator'):
+        with pytest.raises(Exception, match=exception):
             test_lang.parse()
+
+
+
+# NOTE: network.global_view.messages starts with 5 messages from random_initialization
+@pytest.mark.parametrize(
+    'test_string, num_blocks, exception',
+    [
+        ('B0-A', 6, ''),
+        ('B0-A S1-A', 6, ''),
+        ('B0-A S1-A U1-A', 6, ''),
+        ('B0-A S1-A H1-A', 6, ''),
+        ('B0-A RR0-B RR0-C C0-A', 16, ''),
+        ('B0-A B1-B B2-C B3-D B4-E', 10, ''),
+        ('B0-A S1-A S2-A S3-A S4-A', 6, ''),
+        ('RR0-A RR0-B', 15, ''),
+        ('B0-A B1-A', 6, 'already exists'),
+        ('B0-A S1-A S2-A S3-A S4-A B4-B B4-A', 6, 'already exists'),
+        ('RR0-A RR0-A', 15, 'already exists'),
+    ]
+)
+def test_make_blocks(test_string, num_blocks, exception):
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+
+    if exception == '':
+        test_lang.parse()
+        assert len(test_lang.network.global_view.messages) == num_blocks
+    else:
+        with pytest.raises(Exception, match=exception):
+            test_lang.parse()
+
+
+
+# test that creating blocks adds them to the global view, and validator view
+
+# test blocks make include all previous blocks recieved
+
+# test that sending blocks sends the correct block
+
+#
+
+
+# test that
+
+
+# test that report does not generate
