@@ -130,4 +130,6 @@ def main():
             #for i in xrange(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
 
-main()
+
+if __name__ == "__main__":
+    main()

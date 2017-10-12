@@ -1,9 +1,9 @@
 import copy
 
-from block import Block
-from justification import Justification
-import settings as s
-from testing_language import TestLangCBC
+from casper.block import Block
+from casper.justification import Justification
+import casper.settings as s
+from casper.testing_language import TestLangCBC
 
 
 def test_equality_of_copies_off_genesis():

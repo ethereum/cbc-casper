@@ -1,8 +1,8 @@
 import pytest
 import random as r
 
-import settings as s
-import utils
+import casper.settings as s
+import casper.utils as utils
 
 
 @pytest.mark.parametrize(

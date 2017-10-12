@@ -1,6 +1,6 @@
 import pytest
 
-from testing_language import TestLangCBC
+from casper.testing_language import TestLangCBC
 
 
 def pytest_addoption(parser):
@@ -17,8 +17,13 @@ def run_test_lang_without_reports(test_string, weights):
 
 
 @pytest.fixture
-def test_lang_runner(request):
-    if request.config.getoption("--report"):
+def report(request):
+    return request.config.getoption("--report")
+
+
+@pytest.fixture
+def test_lang_runner(report):
+    if report:
         return run_test_lang_with_reports
     else:
         return run_test_lang_without_reports

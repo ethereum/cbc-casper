@@ -4,7 +4,7 @@ import random as r
 import settings as s
 from network import Network
 from safety_oracles.clique_oracle import CliqueOracle
-import utils
+import utils as utils
 
 
 class TestLangCBC:
