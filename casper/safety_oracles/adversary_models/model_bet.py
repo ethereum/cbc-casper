@@ -1,4 +1,5 @@
-import settings as s
+import casper.settings as s
+
 
 class ModelBet:
 

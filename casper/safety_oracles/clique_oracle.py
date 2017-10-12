@@ -1,8 +1,6 @@
-import settings as s
-from block import Block
-import utils
+import casper.settings as s
+import casper.utils as utils
 
-import copy
 import itertools
 import networkx as nx
 

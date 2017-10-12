@@ -5,3 +5,5 @@ venv*
 *.prof
 *.orig
 results.txt
+
+.cache/

@@ -1,7 +1,4 @@
-import settings as s
-import random as r
-import copy
-import utils
+import casper.settings as s
 
 
 def get_max_weight_indexes(scores):
@@ -34,7 +31,8 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
             curr_scores[child] = scores.get(child, 0)
             max_score = max(curr_scores[child], max_score)
 
-        # we don't choose weight 0 children. Also possible to make non-deterministic decision here.
+        # we don't choose weight 0 children.
+        # Also possible to make non-deterministic decision here.
         if max_score == 0:
             break
 

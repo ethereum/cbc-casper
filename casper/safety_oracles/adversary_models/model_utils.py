@@ -1,4 +1,5 @@
-import settings as s
+import casper.settings as s
+
 
 def get_estimate_from_latest_messages(latest_bets, default=None):
 

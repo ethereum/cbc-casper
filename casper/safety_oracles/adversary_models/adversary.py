@@ -1,5 +1,8 @@
-import settings as s
-from model_validator import ModelValidator
+import casper.settings as s
+from casper.safety_oracles.adversary_models.model_validator import (
+    ModelValidator
+)
+
 
 class Adversary:
 

@@ -1,7 +1,7 @@
-import settings as s
-from adversary_models.model_bet import ModelBet
-from adversary_models.adversary import Adversary
-import utils
+import casper.settings as s
+from casper.adversary_models.model_bet import ModelBet
+from casper.adversary_models.adversary import Adversary
+import capser.utils as utils
 
 
 class AdversaryOracle:
