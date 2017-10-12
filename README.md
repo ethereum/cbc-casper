@@ -27,3 +27,5 @@ To run a specific test, use (or the equivalent for whatever test you wish to run
 ```
 pytest tests/test_safety_oracle.py
 ```
+
+A `--report` flag can optionally be added to display test visualizations. Note: each view graph must be closed for the tests to continue running.
