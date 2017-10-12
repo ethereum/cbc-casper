@@ -44,7 +44,7 @@ def main():
         messages = msg_gen()
 
         old_blocks = []
-        for i in xrange(s.NUM_VALIDATORS):
+        for i in range(s.NUM_VALIDATORS):
             if network.validators[i].my_latest_message() is not None:
                 old_blocks.append(network.validators[i].my_latest_message())
 
@@ -104,7 +104,7 @@ def main():
             best_chain = utils.build_chain(best_block, None)
 
             vs_chain = []
-            for i in xrange(s.NUM_VALIDATORS):
+            for i in range(s.NUM_VALIDATORS):
                 vs_chain.append(utils.build_chain(network.validators[i].my_latest_message(), None))
 
             print("BEST CHAIN----------------------{0}".format(best_chain))
@@ -115,13 +115,13 @@ def main():
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for i in xrange(s.NUM_VALIDATORS):
+            for i in range(s.NUM_VALIDATORS):
                 edgelist.append({'edges':vs_chain[i],'width':2,'edge_color':'blue','style':'solid'})
 
             #coloured_blocks = network.global_view.latest_messages.values()
             network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 
-            #for i in xrange(s.NUM_VALIDATORS):
+            #for i in range(s.NUM_VALIDATORS):
             #    plot_tool.plot_view(network.validators[i].view)
 
 
