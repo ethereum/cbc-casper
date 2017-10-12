@@ -3,8 +3,8 @@ jobs:
   build:
     working_directory: ~/cbc-casper
     docker:
-     # NOTE: to be updated in issue #18
      - image: circleci/python:2.7
+     - image: circleci/python:3.6
     steps:
       - checkout
       - restore_cache:
