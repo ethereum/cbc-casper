@@ -45,6 +45,16 @@ class TestLangCBC:
         self.handlers['RR'] = self.round_robin
         self.handlers['R'] = self.report
 
+    def parse(self):
+        for token in self.test_string.split(' '):
+            letter, number, d, name = re.match(self.TOKEN_PATTERN, token).groups()
+            if letter+number+d+name != token:
+                raise ValueError("Bad token: %s" % token)
+            if number != '':
+                number = int(number)
+
+            self.handlers[letter](number, name)
+
     def send_block(self, validator, block_name):
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
@@ -61,6 +71,7 @@ class TestLangCBC:
 
         self.network.propagate_message_to_validator(block, validator)
 
+
     def make_block(self, validator, block_name):
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
@@ -74,6 +85,7 @@ class TestLangCBC:
 
         self.blocks[block_name] = new_block
         self.network.global_view.add_messages(set([new_block]))
+
 
     def round_robin(self, validator, block_name):
         if validator not in self.network.validators:
@@ -92,6 +104,7 @@ class TestLangCBC:
         self.make_block(block_maker, block_name)
         self.send_block(block_receiver, block_name)
 
+
     def check_safety(self, validator, block_name):
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
@@ -104,6 +117,7 @@ class TestLangCBC:
         # NOTE: This may fail because the safety_oracle might be a lower bound,
         # so this be better not as an assert :)
         assert safe, "Block {} failed safety assert".format(block_name)
+
 
     def no_safety(self, validator, block_name):
         if validator not in self.network.validators:
@@ -120,6 +134,7 @@ class TestLangCBC:
         # safety when there is no safety
         assert not safe, "Block {} failed no-safety assert".format(block_name)
 
+
     def check_head_equals_block(self, validator, block_name):
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
@@ -134,15 +149,6 @@ class TestLangCBC:
 
         assert block == head, "Validator {} does not have block {} at head".format(validator, block_name)
 
-    def parse(self):
-        for token in self.test_string.split(' '):
-            letter, number, d, name = re.match(self.TOKEN_PATTERN, token).groups()
-            if letter+number+d+name != token:
-                raise Exception("Bad token: %s" % token)
-            if number != '':
-                number = int(number)
-
-            self.handlers[letter](number, name)
 
     def report(self, num, name):
         assert num == name and num == '', "...no validator or number needed to report!"
