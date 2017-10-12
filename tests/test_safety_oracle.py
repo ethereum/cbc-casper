@@ -1,21 +1,4 @@
-import pytest
-
 from testing_language import TestLangCBC
-
-
-@pytest.mark.parametrize(
-    'test_string, weights',
-    [
-        ((  # round robin safety
-            'R B0-A S1-A RR1-B RR1-C RR1-D RR1-E S2-E '
-            'S3-E S4-E H0-E H1-E H2-E H3-E H4-E C0-A '
-            'C1-A C2-A C3-A C4-A R'
-            ), [9.3, 8.2, 7.1, 6, 5]),
-    ]
-)
-def test_via_test_lang(test_string, weights):
-    test = TestLangCBC(test_string, weights)
-    test.parse()
 
 
 def test_round_robin_safety():
