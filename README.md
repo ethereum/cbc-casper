@@ -18,6 +18,17 @@ This code is marked up for use as follows:
 kernprof -l casper.py (rand | rrob | full | nofinal)
 ```
 
+`rand:` each round, some randomly selected validators propagate their most recent message to other randomly selected validators, who then create new messages.
+
+`rrob:` each round, the creator of the last round's block sends it to the next receiver, who then creates a block.
+
+`full:` each round, all validators receive all other validators previous messages, and then all create messages.
+
+`nofinal:` each round, two simultaneous round-robin message propagations occur at the same time. This results in validators never being able to finalize later blocks (they may finalize initial blocks, depending on weight distribution).
+
+The number of validators, the number of messages that propagate per round, and the report interval can be edited in `casper/settings.py`.
+
+
 ## Run Tests
 To run all tests:
 ```
