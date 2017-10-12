@@ -1,6 +1,7 @@
-import settings as s
 import random as r
 import itertools
+
+import casper.settings as s
 
 
 def message_maker(mode):

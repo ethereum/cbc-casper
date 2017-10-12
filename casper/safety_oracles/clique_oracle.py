@@ -1,5 +1,5 @@
-import settings as s
-import utils
+import casper.settings as s
+import casper.utils as utils
 
 import itertools
 import networkx as nx

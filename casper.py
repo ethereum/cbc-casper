@@ -10,16 +10,16 @@ this manner, yet... :)
 import sys
 
 import random as r  # to ensure the tie-breaking property
-import settings as s
+import casper.settings as s
 
-from justification import Justification
-from view import View
-from network import Network
-from validator import Validator
-from safety_oracles.clique_oracle import CliqueOracle
-import utils
-import plot_tool
-import presets
+from casper.justification import Justification
+from casper.view import View
+from casper.network import Network
+from casper.validator import Validator
+from casper.safety_oracles.clique_oracle import CliqueOracle
+import casper.utils as utils
+import casper.plot_tool as plot_tool
+import casper.presets as presets
 
 
 def main():

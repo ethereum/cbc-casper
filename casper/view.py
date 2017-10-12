@@ -1,7 +1,5 @@
-from block import Block
-from justification import Justification
-import forkchoice
-import copy
+from casper.justification import Justification
+import casper.forkchoice as forkchoice
 
 
 class View:

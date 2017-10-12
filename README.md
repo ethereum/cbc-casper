@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ## Run Simulations
 This code is marked up for use as follows:
 ```
-kernprof -l casper/casper.py (rand | rrob | full | nofinal)
+kernprof -l casper.py (rand | rrob | full | nofinal)
 ```
 
 ## Run Tests

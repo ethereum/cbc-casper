@@ -1,10 +1,8 @@
-import random as r  # to ensure the tie-breaking property
-import settings as s
+import casper.settings as s
 
-from view import View
-from validator import Validator
-from block import Block
-import plot_tool
+from casper.validator import Validator
+from casper.view import View
+import casper.plot_tool as plot_tool
 
 
 class Network:

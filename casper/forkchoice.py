@@ -1,4 +1,4 @@
-import settings as s
+import casper.settings as s
 
 
 def get_max_weight_indexes(scores):

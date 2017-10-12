@@ -1,10 +1,10 @@
 import re
 import random as r
 
-import settings as s
-from network import Network
-from safety_oracles.clique_oracle import CliqueOracle
-import utils as utils
+import casper.settings as s
+from casper.network import Network
+from casper.safety_oracles.clique_oracle import CliqueOracle
+import casper.utils as utils
 
 
 class TestLangCBC:

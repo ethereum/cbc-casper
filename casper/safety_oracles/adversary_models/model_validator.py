@@ -1,7 +1,8 @@
-import settings as s
-import model_utils
-from model_bet import ModelBet
-from model_view import Model_View
+import casper.settings as s
+import casper.safety_oracles.adversary_models.model_utils as model_utils
+from casper.safety_oracles.adversary_models.model_bet import (
+    ModelBet
+)
 
 
 class ModelValidator:

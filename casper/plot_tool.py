@@ -1,6 +1,4 @@
 import networkx as nx
-from block import Block
-import settings as s
 from math import pi
 
 import matplotlib as mpl
@@ -13,6 +11,10 @@ import imageio as io
 
 from PIL import Image
 import os
+
+from casper.block import Block
+import casper.settings as s
+
 
 base = 10000000
 IMAGE_LIMIT = 75

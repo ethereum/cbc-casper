@@ -1,7 +1,5 @@
-import copy
-import settings as s
-
-from justification import Justification
+import casper.settings as s
+from casper.justification import Justification
 
 
 class Block:
