@@ -7,7 +7,7 @@ import casper.settings as s
 from casper.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
-TEST_WEIGHT = [i for i in range(4, -1, -1)]
+TEST_WEIGHT = [i for i in range(5, 0, -1)]
 
 def test_init_non_empty_string():
     TestLangCBC(TEST_STRING, [1])
@@ -225,3 +225,24 @@ def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_
         assert len(test_lang.network.validators[v].view.latest_messages) == len(other_val_seen[v])
         for v in other_val_seen[v]:
             assert v in test_lang.network.validators[v].view.latest_messages
+
+
+
+
+@pytest.mark.parametrize(
+    'test_string, val_forkchoice',
+    [
+        ('B0-A S1-A H1-A', {1: 'A'}),
+        ('RR0-A', {0: 'A'}),
+        ('B0-A S1-A S2-A S3-A S4-A H1-A H2-A H3-A H4-A', {i: 'A' for i in range(5)}),
+        ('RR0-A RR0-B H0-B', {0: 'B'}),
+        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E H0-A H1-B H2-C H3-D H4-E',
+            {0:'A', 1:'B', 2:'C', 3:'D', 4:'E'})
+    ]
+)
+def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+    test_lang.parse()
+
+    for v in val_forkchoice:
+        assert test_lang.blocks[val_forkchoice[v]] == test_lang.network.validators[v].estimate()
