@@ -18,3 +18,6 @@ class ValidatorSet:
 
     def validator_names(self):
         return set(map(lambda v: v.name, self.validators))
+
+    def validator_weights(self):
+        return set(map(lambda v: v.weight, self.validators))

@@ -36,6 +36,23 @@ def test_validator_names(weights, expected_names):
 
 
 @pytest.mark.parametrize(
+    'weights, expected_weights',
+    [
+        ({i: i for i in range(10)}, list(range(10))),
+        ({i: 9 - i for i in range(9, -1, -1)}, list(range(10))),
+        (
+            {"one": 0, "two": 10, "three": 1000},
+            [0, 10, 1000]
+        ),
+    ]
+)
+def test_validator_weights(weights, expected_weights):
+    vs = ValidatorSet(weights)
+
+    assert vs.validator_weights() == set(expected_weights)
+
+
+@pytest.mark.parametrize(
     'weights, expected_weight, validators',
     [
         ({i: i for i in range(10)}, 45, None),
