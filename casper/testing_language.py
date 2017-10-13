@@ -73,7 +73,6 @@ class TestLangCBC:
             self.blockchain.append([new_block, new_block.estimate])
 
         self.blocks[block_name] = new_block
-        self.network.global_view.add_messages(set([new_block]))
 
     def round_robin(self, validator, block_name):
         if validator not in self.network.validators:

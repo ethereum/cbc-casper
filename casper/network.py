@@ -19,6 +19,8 @@ class Network:
         assert validator in self.validator_set, "...expected a known validator"
 
         new_message = validator.make_new_message()
+        self.global_view.add_messages(set([new_message]))
+
         return new_message
 
     def view_initialization(self, view):

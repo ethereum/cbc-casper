@@ -22,3 +22,16 @@ def test_get_message_from_validator(network):
     message = network.get_message_from_validator(validator)
 
     assert message.sender == validator.name
+
+
+def test_propagate_message_to_validator(network):
+    from_validator, to_validator = r.sample(
+        network.validator_set.validators,
+        2
+    )
+
+    message = network.get_message_from_validator(from_validator)
+    network.propagate_message_to_validator(message, to_validator)
+
+    assert message in to_validator.view.messages
+    assert message == to_validator.view.latest_messages[from_validator.name]

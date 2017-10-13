@@ -85,7 +85,7 @@ def main():
                 if b.sender == j:
                     communications.append([old_blocks[i], b])
 
-        network.global_view.add_messages(new_blocks)
+        # network.global_view.add_messages(new_blocks)
 
         tip = network.global_view.estimate()
         while tip:
