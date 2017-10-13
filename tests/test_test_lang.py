@@ -108,16 +108,15 @@ def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
             test_lang.parse()
 
 
-
 # NOTE: network.global_view.messages starts with 5 messages from random_initialization
 @pytest.mark.parametrize(
     'test_string, num_blocks, exception',
     [
         ('B0-A', 6, ''),
         ('B0-A S1-A', 6, ''),
-        ('B0-A S1-A U1-A', 6, ''),
-        ('B0-A S1-A H1-A', 6, ''),
-        ('B0-A RR0-B RR0-C C0-A', 16, ''),
+        ('B0-A S1-A U1-A B1-B', 7, ''),
+        ('B0-A S1-A H1-A B1-B', 7, ''),
+        ('B0-A RR0-B RR0-C C0-A B0-D', 17, ''),
         ('B0-A B1-B B2-C B3-D B4-E', 10, ''),
         ('B0-A S1-A S2-A S3-A S4-A', 6, ''),
         ('RR0-A RR0-B', 15, ''),
@@ -126,7 +125,7 @@ def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
         ('RR0-A RR0-A', 15, 'already exists'),
     ]
 )
-def test_make_blocks(test_string, num_blocks, exception):
+def test_make_blocks_makes_only_new_blocks(test_string, num_blocks, exception):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
 
     if exception == '':
@@ -135,6 +134,98 @@ def test_make_blocks(test_string, num_blocks, exception):
     else:
         with pytest.raises(Exception, match=exception):
             test_lang.parse()
+
+# NOTE: network.global_view.messages starts with 5 messages from random_initialization
+@pytest.mark.parametrize(
+    'test_string, exception',
+    [
+        ('B0-A S1-A', ''),
+        ('B0-A S1-A S2-A S3-A S4-A', ''),
+        ('B0-A S1-A S1-A', 'has already seen block'),
+        ('B0-A S0-A', 'has already seen block'),
+        ('RR0-A RR0-B S0-A', 'has already seen block'),
+    ]
+)
+def test_send_block_sends_only_existing_blocks(test_string, exception):
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+
+    if exception == '':
+        test_lang.parse()
+    else:
+        with pytest.raises(Exception, match=exception):
+            test_lang.parse()
+
+def test_send_block_updates_view_one_message():
+    test_string = 'B0-A S1-A'
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+    test_lang.parse()
+
+    block_a = test_lang.blocks['A']
+    assert block_a in test_lang.network.validators[1].view.messages
+    assert block_a == test_lang.network.validators[1].view.latest_messages[0]
+
+
+def test_send_block_updates_view_many_messages():
+    test_string = 'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D'
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+    test_lang.parse()
+
+    assert len(test_lang.network.validators[4].view.messages) == 9
+    for v in test_lang.network.validators:
+        assert v in test_lang.network.validators[4].view.latest_messages
+    for b in test_lang.blocks:
+        assert test_lang.blocks[b] in test_lang.network.validators[4].view.messages
+
+
+def test_round_robin_updates_latest_messages():
+    test_string = 'RR0-A'
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+    test_lang.parse()
+
+    for v in test_lang.network.validators:
+        if v == 0:
+            assert len(test_lang.network.validators[v].view.messages) == 10
+            assert len(test_lang.network.validators[v].view.latest_messages) == s.NUM_VALIDATORS
+        else:
+            assert len(test_lang.network.validators[v].view.messages) == 2 * (v + 1)
+            assert len(test_lang.network.validators[v].view.latest_messages) == v + 1
+            for v1 in test_lang.network.validators:
+                if v1 > v:
+                    assert v1 not in test_lang.network.validators[v].view.latest_messages
+                else:
+                    assert v1 in test_lang.network.validators[v].view.latest_messages
+
+
+def test_round_robin_builds_off_most_recent_block():
+    test_string = 'B0-A B0-B B0-C B0-D RR0-E'
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+    test_lang.parse()
+
+    for v in test_lang.network.validators:
+        if v == 0:
+            assert len(test_lang.network.validators[v].view.messages) == 14
+            assert len(test_lang.network.validators[v].view.latest_messages) == s.NUM_VALIDATORS
+        else:
+            assert len(test_lang.network.validators[v].view.messages) == 2 * (v + 3)
+            assert len(test_lang.network.validators[v].view.latest_messages) == v + 1
+            for v1 in test_lang.network.validators:
+                if v1 > v:
+                    assert v1 not in test_lang.network.validators[v].view.latest_messages
+                else:
+                    assert v1 in test_lang.network.validators[v].view.latest_messages
+
+
+    block_on_block_d = False
+    for b in test_lang.blocks:
+        block = test_lang.blocks[b]
+        if block.estimate == test_lang.blocks['D']:
+            block_on_block_d = True
+
+    assert block_on_block_d
+
+# test round robin off of most recent block recieved.
+
+
 
 
 
