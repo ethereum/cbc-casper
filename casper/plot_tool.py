@@ -1,15 +1,16 @@
-import networkx as nx
+"""The plot tool module ... """
+import copy
 from math import pi
+import os
+import networkx as nx
 
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import pylab
-import copy
 import imageio as io
 
 from PIL import Image
-import os
 
 from casper.block import Block
 import casper.settings as s
@@ -22,7 +23,7 @@ THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
-
+    """Defines the graphs that will be produced."""
     G = nx.Graph()
 
     nodes = view.messages
@@ -92,7 +93,7 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
 
 
 def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
-
+    """Make thumbnail images in PNG format."""
     file_names = sorted([fn for fn in os.listdir(FRAMES) if fn.endswith('.png')])
 
     images = []
@@ -112,6 +113,7 @@ def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
 
 
 def make_gif(frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
+    """Make a GIF visualization."""
 
     file_names = sorted([fn for fn in os.listdir(THUMBNAILS) if fn.endswith('thumbnail.png')])
 

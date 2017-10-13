@@ -1,3 +1,4 @@
+"""The clique oracle module ... """
 import casper.settings as s
 import casper.utils as utils
 
@@ -14,7 +15,7 @@ class CliqueOracle:
         self.candidate_estimate = candidate_estimate
         self.view = view
 
-    # find biggest set of validators that
+    # Find biggest set of validators that
     # a) each of their latest messages is on the candidate_estimate
     # b) each of them have seen from eachother a latest message on the candidate_estimate
     # c) none of them can see a new message from another not on the candidate_estimate
