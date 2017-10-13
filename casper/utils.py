@@ -1,6 +1,7 @@
 """The utils module ..."""
 import casper.settings as s
 
+
 def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
     return not estimate.is_in_blockchain(possibly_conflicting_estimate)
 

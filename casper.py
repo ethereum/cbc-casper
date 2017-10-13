@@ -14,6 +14,9 @@ from casper.network import Network
 from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
 import casper.presets as presets
+from casper.simulation_utils import (
+    generate_random_validator_set
+)
 
 
 def main():
@@ -25,8 +28,8 @@ def main():
         return
     msg_gen = presets.message_maker(mode)
 
-    if s.WEIGHTS:
-        print("WEIGHTS: {0}".format(s.WEIGHTS))
+    vs = generate_random_validator_set()
+    print("WEIGHTS: {0}".format(s.validator_weights()))
 
     network = Network()
     network.random_initialization()
