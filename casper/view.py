@@ -21,11 +21,12 @@ class View:
         return s
 
     def estimate(self):
-        """The estimator function returns the set of max weight estimates
+        """The estimate function returns the set of max weight estimates
         This may not be a single-element set because the validator may have an empty view."""
         return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
 
     def justification(self):
+        """This method justifies ... """
         return Justification(self.last_finalized_block, self.latest_messages)
 
     def add_messages(self, showed_messages):
@@ -59,7 +60,7 @@ class View:
                 self.latest_messages[b.sender] = b
                 continue
 #            assert (b == self.latest_messages[b.sender] or
-#                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "...did not expect any equivocating nodes!"
+#                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "did not expect any equivocating nodes!"
 
         #### PART 3 - updating children
 
@@ -69,7 +70,8 @@ class View:
             self.children[b.estimate].add(b)
 
     def get_new_messages(self, showed_messages):
-        """This method returns the set of messages out of showed_messages and their dependency that isn't part of the view."""
+        """This method returns the set of messages out of showed_messages
+        and their dependency that isn't part of the view."""
 
         new_messages = set()
         # The memo will keep track of messages we've already looked at, so we don't redo work.

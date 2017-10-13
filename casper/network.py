@@ -7,6 +7,7 @@ import casper.plot_tool as plot_tool
 
 
 class Network:
+    """Simulates a network."""
     def __init__(self):
         self.validators = dict()
         for v in s.VALIDATOR_NAMES:
@@ -14,11 +15,13 @@ class Network:
         self.global_view = View()
 
     def propagate_message_to_validator(self, message, validator_name):
-        assert message in self.global_view.messages, "...expected only to propagate messages from the global view"
+        """Propogate a message to a validator."""
+        assert message in self.global_view.messages, "expected only to propagate messages from the global view"
         self.validators[validator_name].receive_messages(set([message]))
 
     def get_message_from_validator(self, validator_name):
-        assert validator_name in s.VALIDATOR_NAMES, "...expected a known validator"
+        """Get a message from a validator."""
+        assert validator_name in s.VALIDATOR_NAMES, "expected a known validator"
 
         new_message = self.validators[validator_name].make_new_message()
         return new_message
@@ -40,4 +43,5 @@ class Network:
             self.global_view.add_messages(set([new_bet]))
 
     def report(self, colored_messages=set(), color_mag=dict(), edges=[]):
-        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages, colour_mag=color_mag, edges=edges)
+        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages,
+                            colour_mag=color_mag, edges=edges)

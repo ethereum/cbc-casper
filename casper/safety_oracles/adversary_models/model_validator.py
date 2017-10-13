@@ -7,10 +7,11 @@ from casper.safety_oracles.adversary_models.model_bet import (
 
 
 class ModelValidator:
+    """Simulates a model validator."""
 
     def __init__(self, validator_name, my_latest_bet, latest_bets, target_estimate):
 
-        assert validator_name in s.VALIDATOR_NAMES, "... model dator should be a dator!"
+        assert validator_name in s.VALIDATOR_NAMES, "model dator should be a dator!"
 
         self.model_of = validator_name
 
@@ -26,8 +27,8 @@ class ModelValidator:
     def show(self, bet):
         """This method makes a bet viewable to the model validator."""
 
-        assert isinstance(bet, ModelBet), "...expected a bet!"
-        assert bet.estimate == self.target_estimate, "...should only show bets on the target_estimate!"
+        assert isinstance(bet, ModelBet), "expected a bet!"
+        assert bet.estimate == self.target_estimate, "should only show bets on the target_estimate!"
 
         self.latest_observed_bets[bet.sender] = bet
 

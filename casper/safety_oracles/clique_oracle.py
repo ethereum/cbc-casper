@@ -8,7 +8,7 @@ import casper.utils as utils
 
 
 class CliqueOracle:
-
+    """Simulates a clique oracle."""
     def __init__(self, candidate_estimate, view):
         if candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
@@ -23,19 +23,20 @@ class CliqueOracle:
     # NOTE: if biggest clique can easily be determined to be < 50% by weight, will
     #       return with empty set and 0 weight.
     def find_biggest_clique(self):
+        """Finds the biggest clique."""
 
-        # only consider validators whose messages are compatable w/ candidate_estimate
+        # Only consider validators whose messages are compatable w/ candidate_estimate.
         with_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
                                  not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
 
-        # do not have safety if less than half have candidate_estimate
+        # Do not have safety if less than half have candidate_estimate.
         if utils.get_weight(with_candidate) < s.TOTAL_WEIGHT / 2:
             return set(), 0
 
         edges = []
-        #for each pair of validators, v, w, add an edge if...
+        # For each pair of validators, v, w, add an edge if...
         for v, w in itertools.combinations(with_candidate, 2):
-            # the latest message v has seen from w is on the candidate estimate
+            # ... the latest message v has seen from w is on the candidate estimate ...
             v_msg = self.view.latest_messages[v]
             if w not in v_msg.justification.latest_messages:
                 continue
@@ -44,7 +45,7 @@ class CliqueOracle:
             if utils.are_conflicting_estimates(self.candidate_estimate, w_msg_in_v_view):
                 continue
 
-            # the latest block w has seen from v is on the candidate estimate
+            # ... the latest block w has seen from v is on the candidate estimate ...
             w_msg = self.view.latest_messages[w]
             if v not in w_msg.justification.latest_messages:
                 continue
@@ -53,11 +54,11 @@ class CliqueOracle:
             if utils.are_conflicting_estimates(self.candidate_estimate, v_msg_in_w_view):
                 continue
 
-            # there are no blocks from w, that v has not seen, that might change v's estimate
+            # ... there are no blocks from w, that v has not seen, that might change v's estimate ...
             if utils.exists_free_message(self.candidate_estimate, w, w_msg_in_v_view.sequence_number, self.view):
                 continue
 
-            # there are no blocks from v, that w has not seen, that might change w's estimate
+            # ... and if there are no blocks from v, that w has not seen, that might change w's estimate.
             if utils.exists_free_message(self.candidate_estimate, v, v_msg_in_w_view.sequence_number, self.view):
                 continue
 
@@ -84,18 +85,21 @@ class CliqueOracle:
 
         biggest_clique, clique_weight = self.find_biggest_clique()
 
-        # minumum amount of weight that has to equivocate
+        # Minumum amount of weight that has to equivocate.
         fault_tolerance = 2 * clique_weight - s.TOTAL_WEIGHT
 
         if fault_tolerance > 0:
             clique_weights = {s.WEIGHTS[v] for v in biggest_clique}
 
-            # minimum number of validators that need to equivocate
+            # Minimum number of validators that need to equivocate.
             equivocating = set()
-            while round(sum(equivocating), 2) < round(fault_tolerance, 2): # round to stop issues w/ floating point rounding
+            
+            # Round to stop issues w/ floating point rounding.
+            while round(sum(equivocating), 2) < round(fault_tolerance, 2): 
                 equivocating.add(max(clique_weights.difference(equivocating)))
 
-            # return the number of faults we can tolerate, which is one less than the number that need to equivocate.
+            # Return the number of faults we can tolerate, which is one less
+            # than the number that need to equivocate.
             return fault_tolerance, len(equivocating) - 1
         else:
             return 0, 0

@@ -68,11 +68,13 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
         node_sizes.append(350*pow(s.WEIGHTS[b.sender]/pi, 0.5))
         labels[b] = b.sequence_number
 
-    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes, node_size=node_sizes, edge_color='black')
+    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
+                           node_size=node_sizes, edge_color='black')
 
     for e in edges:
         if isinstance(e, dict):
-            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'], edge_color=e['edge_color'], style=e['style'], alpha=0.5)
+            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'],
+                                   edge_color=e['edge_color'], style=e['style'], alpha=0.5)
         else:
             assert False, e
     nx.draw_networkx_labels(G, positions, labels=labels)
@@ -100,7 +102,7 @@ def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
         if len(images) == frame_count_limit:
             break
 
-    size = (1000, 1000)
+    size = (xsize, ysize)
     iterator = 0
     for im in images:
         im.thumbnail(size, Image.ANTIALIAS)
