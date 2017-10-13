@@ -1,6 +1,5 @@
 from block import Block
 from view import View
-from justification import Justification
 from safety_oracles.clique_oracle import CliqueOracle
 import copy
 
@@ -12,13 +11,15 @@ REPORT = True
 
 class Validator:
 
-    # The validator's state is a function of its view and name alone (along with global variables)
+    # The validator's state is a function of its view
+    # and name alone (along with global variables)
     # However, for performance's sake the validator also stores
-    def __init__(self, name):
+    def __init__(self, name, weight):
         self.name = name
+        self.weight = weight
         self.view = View(set())
 
-    # This method is the only way that a validator can receive protocol messages
+    # This method is the only way that a validator receives protocol messages
     def receive_messages(self, messages):
         self.view.add_messages(messages)
 
