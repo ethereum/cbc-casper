@@ -1,6 +1,11 @@
 # Casper CBC
 A python implementation of Vlad Zamfir's Correct by Construction Casper.
 
+Branch    | Tests
+----------|------
+master    | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master.svg?style=shield)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master)
+develop   |[![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop.svg?style=shield)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop)
+
 ## Requirements
 * Python 3
 * ubuntu/debian: `sudo apt-get install python3-venv`
