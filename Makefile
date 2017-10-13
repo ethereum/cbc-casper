@@ -8,20 +8,23 @@ install:
 	)
 
 test:
-	pytest
+	venv/bin/pytest $(TEST)
+
+test-with-reports:
+	venv/bin/pytest $(TEST) --report
 
 lint:
-	pylint casper/
+	venv/bin/pylint casper/
 
 run-rand:
-	kernprof -l casper.py rand
+	venv/bin/kernprof -l casper.py rand
 
 run-rrob:
-	kernprof -l casper.py rrob
+	venv/bin/kernprof -l casper.py rrob
 
 run-full:
-	kernprof -l casper.py full
+	venv/bin/kernprof -l casper.py full
 
 run-nofinal:
-	kernprof -l casper.py nofinal
+	venv/bin/kernprof -l casper.py nofinal
 
