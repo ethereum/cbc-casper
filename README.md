@@ -3,7 +3,8 @@ A python implementation of Vlad Zamfir's Correct by Construction Casper.
 
 ## Requirements
 * Python 3
-* `virtualenv` for easy development: `pip install virtualenv` | `sudo apt-get install python3-venv`
+* ubuntu/debian: `sudo apt-get install python3-venv`
+* OSX via Homebrew: `brew install python3`
 * `kernprof` for running simulations: `pip install line_profiler`
 
 
