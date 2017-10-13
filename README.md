@@ -30,7 +30,7 @@ make test
 To run a specific test, use (or the equivalent for whatever test you wish to run)
 
 ```
-make TEST=tests/test_safety_oracle.py
+make test TEST=tests/test_safety_oracle.py
 ```
 
 To run tests with visualizations:
