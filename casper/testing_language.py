@@ -100,9 +100,8 @@ class TestLangCBC:
 
         # only the last block of the round robin is named
         block_maker = (validator + s.NUM_VALIDATORS - 1) % s.NUM_VALIDATORS
-        block_receiver = (validator + s.NUM_VALIDATORS) % s.NUM_VALIDATORS
         self.make_block(block_maker, block_name)
-        self.send_block(block_receiver, block_name)
+        self.send_block(validator, block_name)
 
 
     def check_safety(self, validator, block_name):
