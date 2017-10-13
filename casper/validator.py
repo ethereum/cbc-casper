@@ -1,5 +1,6 @@
 """The validator module ... """
 import copy
+import numbers
 import random as r
 
 from casper.block import Block
@@ -14,6 +15,13 @@ class Validator:
     """The validator's state is a function of its view and name alone (along w/ global variables).
     However, for performance's sake the validator also stores."""
     def __init__(self, name, weight):
+        if name is None:
+            raise ValueError("Validator name must be defined.")
+        if not isinstance(weight, numbers.Number):
+            raise ValueError("Validator weight must a number.")
+        if weight < 0:
+            raise ValueError("Validator weight cannot be less than 0.")
+
         self.name = name
         self.weight = weight
         self.view = View(set())

@@ -4,12 +4,15 @@ from casper.validator import Validator
 
 
 @pytest.mark.parametrize(
-    'name, weight, error'
+    'name, weight, error',
     [
         (1, 10.2, None),
         ("Jim", 5, None),
         (2, 0, None),
         (3, -12, ValueError),
+        (None, 13, ValueError),
+        (10, None, ValueError),
+        (10, 'weightstring', ValueError),
     ]
 )
 def test_new_validator(name, weight, error):
@@ -18,6 +21,6 @@ def test_new_validator(name, weight, error):
             Validator(name, weight)
         return
 
-    v = Validator(name, weight)
-    assert v.name == name
-    assert v.weight == weight
+    validator = Validator(name, weight)
+    assert validator.name == name
+    assert validator.weight == weight
