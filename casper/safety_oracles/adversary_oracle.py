@@ -73,7 +73,7 @@ class AdversaryOracle:
 
         if not attack_success:
             # Because the adversary tells us nothing about validators that need to equivocate,
-            # assume the worst. 
+            # assume the worst.
             return min(s.WEIGHTS.values()), 1
         else:
             return 0, 0

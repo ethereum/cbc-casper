@@ -1,3 +1,4 @@
+"""The block module ... """
 import casper.settings as s
 from casper.justification import Justification
 
@@ -26,13 +27,14 @@ class Block:
         self.estimate = estimate
         self.justification = justification
 
-        # the sequence number makes certain operations more efficient (like checking if bets are later)
+        # The sequence number makes certain operations more
+        # efficient (like checking if bets are later).
         if self.sender not in self.justification.latest_messages:
             self.sequence_number = 0
         else:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
-        # the "heights" of bets are used for visualization of views
+        # The "heights" of bets are used for visualization of views.
         if self.justification.is_null():
             self.height = 0
         else:

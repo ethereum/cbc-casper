@@ -8,11 +8,11 @@ import casper.utils as utils
 @pytest.mark.parametrize(
     'weights, expected_weight, validators',
     [
-        ([i for i in xrange(10)], 45, None),
-        ([i for i in xrange(9, -1, -1)], 45, None),
-        ([r.random() for i in xrange(10)], None, None),
-        ([i*2 for i in xrange(10)], 12, set([0, 1, 2, 3])),
-        ([i*2 for i in xrange(10)], 12, [0, 1, 2, 3]),
+        ([i for i in range(10)], 45, None),
+        ([i for i in range(9, -1, -1)], 45, None),
+        ([r.random() for i in range(10)], None, None),
+        ([i*2 for i in range(10)], 12, set([0, 1, 2, 3])),
+        ([i*2 for i in range(10)], 12, [0, 1, 2, 3]),
     ]
 )
 def test_get_weight(weights, expected_weight, validators):
