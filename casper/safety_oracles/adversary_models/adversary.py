@@ -8,11 +8,13 @@ class Adversary:
 
     def __init__(self, victim_estimate, latest_bets, viewables):
 
-        self.victim_estimate = victim_estimate # estimate being attacked
+        # Estimate being attacked
+        self.victim_estimate = victim_estimate
 
-        self.target_estimate = 1 - victim_estimate # estimate adversary is attack towards
+        # Estimate adversary is attack towards
+        self.target_estimate = 1 - victim_estimate
 
-        # the attacker adds the bets they created in the attack to this view...
+        # The attacker adds the bets they created in the attack to this view...
         self.attack_view = set()
 
         self.validator_models = dict()
@@ -37,23 +39,24 @@ class Adversary:
         assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == s.NUM_VALIDATORS
         assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == round(s.TOTAL_WEIGHT, 2)
 
-        # the attacker produces a log of the bets added during the attack...
+        # The attacker produces a log of the bets added during the attack...
         self.operations_log = []
 
-    # if the target has more weight than the victim estimate, attack has succeeded
     def is_attack_complete(self):
+        """If the target has more weight than the victim estimate, attack has succeeded."""
         return self.weight_of_target_estimate > self.weight_of_victim_estimate
 
-    # this method implements an ideal network attack...
-    # ...it returns the tuple (was_attack_successful, operation_log, attack_view)
     def ideal_network_attack(self):
+        """This method implements an ideal network attack;
+        it returns the tuple (was_attack_successful, operation_log, attack_view)."""
 
-        # as work is offloaded somewhat into the get_recent_messages_and_viewables, the attack may be complete already
+        # As work is offloaded somewhat into the get_recent_messages_and_viewables,
+        # the attack may be complete already.
         if self.is_attack_complete():
             return True, self.operations_log, self.attack_view
 
-        # first, show all validators not yet on target_estimate all bets
-        # that are on the target_estimate
+        # First, show all validators not yet on target_estimate
+        # all bets that are on the target_estimate
         for v in self.voting_with_attacker:
             on_target, bet = self.validator_models[v].make_new_latest_bet()
             assert on_target and bet.estimate == self.target_estimate, '...in voting_with_attacker!'
@@ -71,7 +74,7 @@ class Adversary:
             for v in self.voting_against_attacker:
 
                 success, new_bet = self.validator_models[v].make_new_latest_bet()
-                # if this validator failed to make a bet on target_estimate, continue
+                # If this validator failed to make a bet on target_estimate, continue.
                 if not success:
                     continue
 
@@ -83,24 +86,24 @@ class Adversary:
                 self.weight_of_victim_estimate -= s.WEIGHTS[v]
                 self.weight_of_target_estimate += s.WEIGHTS[v]
 
-                # ...add a log of our operations
+                # Add a log of our operations.
                 self.operations_log.append(["added valid bet for a validator voting against the attacker",
                                             hash(new_bet)])
-                # ...updating the attack view
+                # Update the attack view.
                 self.attack_view.add(new_bet)
 
-                # if attack is complete, stop attacking!
+                # If attack is complete, stop attacking!
                 if self.is_attack_complete():
                     return True, self.operations_log, self.attack_view
 
-                # show other validators this new bet on target_estimate
+                # Show other validators this new bet on target_estimate.
                 for v2 in self.voting_against_attacker.difference(to_remove):
                     self.validator_models[v2].show(new_bet)
 
-            # we can remove the validators who are now voting on target_estimate
+            # We can remove the validators who are now voting on target_estimate.
             self.voting_against_attacker.difference_update(to_remove)
 
-            # sanity check!
+            # Sanity check!
             assert not self.is_attack_complete(), "...expected attack to be ongoing, at this point"
 
         return False, self.operations_log, self.attack_view

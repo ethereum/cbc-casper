@@ -7,7 +7,7 @@ import casper.forkchoice as forkchoice
 def test_single_validator_correct_forkchoice(test_lang_runner):
     """ This tests that a single validator remains on their own chain """
     test_string = ""
-    for i in xrange(100):
+    for i in range(100):
         test_string += "B0-" + str(i) + " " + "H0-" + str(i) + " "
     test_string = test_string[:-1]
 
@@ -25,7 +25,7 @@ def test_many_val_round_robin_forkchoice(test_lang_runner):
     validators choose the one chain as their fork choice
     """
     test_string = ""
-    for i in xrange(100):
+    for i in range(100):
         test_string += "B" + str(i % 10) + "-" + str(i) + " " \
                      + "S" + str((i+1) % 10) + "-" + str(i) + " " \
                      + "H" + str((i+1) % 10) + "-" + str(i) + " "
@@ -33,7 +33,7 @@ def test_many_val_round_robin_forkchoice(test_lang_runner):
 
     test_lang_runner(
         test_string,
-        [x + r.random() for x in xrange(10, 0, -1)]
+        [x + r.random() for x in range(10, 0, -1)]
     )
 
 
@@ -84,12 +84,12 @@ def test_different_message_arrival_order_forkchoice_many_val():
 @pytest.mark.parametrize(
     'weights, expected',
     [
-        ({i: i for i in xrange(10)}, {9}),
-        ({i: 9 - i for i in xrange(10)}, {0}),
-        ({i: i % 5 for i in xrange(10)}, {4, 9}),
-        ({i: 10 for i in xrange(10)}, {i for i in xrange(10)}),
+        ({i: i for i in range(10)}, {9}),
+        ({i: 9 - i for i in range(10)}, {0}),
+        ({i: i % 5 for i in range(10)}, {4, 9}),
+        ({i: 10 for i in range(10)}, {i for i in range(10)}),
         ({}, ValueError),
-        ({i: 0 for i in xrange(10)}, AssertionError),
+        ({i: 0 for i in range(10)}, AssertionError),
     ]
 )
 def test_max_weight_indexes(weights, expected):
