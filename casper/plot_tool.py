@@ -1,5 +1,4 @@
 """The plot tool module ... """
-import copy
 from math import pi
 import os
 import networkx as nx
@@ -12,7 +11,6 @@ import imageio as io
 
 from PIL import Image
 
-from casper.block import Block
 import casper.settings as s
 
 

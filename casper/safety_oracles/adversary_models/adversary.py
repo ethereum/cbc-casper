@@ -1,3 +1,4 @@
+"""The adversary module ... """
 import casper.settings as s
 from casper.safety_oracles.adversary_models.model_validator import (
     ModelValidator

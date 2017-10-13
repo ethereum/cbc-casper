@@ -1,9 +1,10 @@
 """The clique oracle module ... """
+import itertools
+import networkx as nx
+
 import casper.settings as s
 import casper.utils as utils
 
-import itertools
-import networkx as nx
 
 
 class CliqueOracle:
