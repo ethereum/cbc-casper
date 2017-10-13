@@ -1,3 +1,4 @@
+"""The presets module ... """
 import random as r
 import itertools
 
@@ -5,7 +6,7 @@ import casper.settings as s
 
 
 def message_maker(mode):
-
+    """The message maker defines the logic for running each type of simulation."""
     if mode == "rand":
         pairs = list(itertools.permutations(range(s.NUM_VALIDATORS), 2))
         def random():
@@ -31,7 +32,7 @@ def message_maker(mode):
         return full_propagation
 
     if mode == "nofinal":
-        # depending on val weights, this message prop order could never finalize a block
+        # Depending on val weights, this message prop order could never finalize a block.
         msg = [0, 1]
         def no_final():
             to_return = [[msg[0], msg[1]]]

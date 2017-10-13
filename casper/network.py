@@ -1,3 +1,4 @@
+"""The network module .... """
 import casper.settings as s
 
 from casper.validator import Validator

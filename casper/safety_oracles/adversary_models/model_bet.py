@@ -1,10 +1,11 @@
+"""The model bet module ... """
 import casper.settings as s
 
 
 class ModelBet:
+    """For now, this simplies the bet structure to work with the adversary
+    with no side-effects - so, no justifications necessary!"""
 
-    # for now, this simplies the bet structure to work with the adversary
-    # with no side-effects - so, no justifications necessary!
     def __init__(self, estimate, sender):
 
         # be safe. type check!...

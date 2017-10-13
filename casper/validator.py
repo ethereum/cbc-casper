@@ -4,7 +4,6 @@ import random as r
 
 from casper.block import Block
 from casper.view import View
-from casper.justification import Justification
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 r.seed()
