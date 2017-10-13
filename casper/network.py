@@ -1,28 +1,25 @@
 import casper.settings as s
 
-from casper.validator import Validator
 from casper.view import View
 import casper.plot_tool as plot_tool
 
 
 class Network:
-    def __init__(self):
-        self.validators = dict()
-        for v in s.VALIDATOR_NAMES:
-            self.validators[v] = Validator(v)
+    def __init__(self, validator_set):
+        self.validator_set = validator_set
         self.global_view = View()
 
-    def propagate_message_to_validator(self, message, validator_name):
+    def propagate_message_to_validator(self, message, validator):
         assert message in self.global_view.messages, "...expected only to propagate messages from the global view"
-        self.validators[validator_name].receive_messages(set([message]))
+        assert validator in self.validator_set, "...expected a known validator"
 
-    def get_message_from_validator(self, validator_name):
-        assert validator_name in s.VALIDATOR_NAMES, "...expected a known validator"
+        validator.receive_messages(set([message]))
 
-        new_message = self.validators[validator_name].make_new_message()
+    def get_message_from_validator(self, validator):
+        assert validator in self.validator_set, "...expected a known validator"
+
+        new_message = validator.make_new_message()
         return new_message
-
-    # def let_validator_push
 
     def view_initialization(self, view):
         assert isinstance(view, View)
@@ -34,7 +31,7 @@ class Network:
             self.validators[v].receive_messages(set([latest[v]]))
 
     def random_initialization(self):
-        for v in s.VALIDATOR_NAMES:
+        for v in self.validator_set:
             new_bet = self.get_message_from_validator(v)
             self.global_view.add_messages(set([new_bet]))
 

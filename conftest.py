@@ -1,5 +1,7 @@
 import pytest
 
+from casper.network import Network
+from casper.simulation_utils import generate_random_validator_set
 from casper.testing_language import TestLangCBC
 
 
@@ -27,3 +29,15 @@ def test_lang_runner(report):
         return run_test_lang_with_reports
     else:
         return run_test_lang_without_reports
+
+
+@pytest.fixture
+def validator_set():
+    return generate_random_validator_set()
+
+
+@pytest.fixture
+def network(validator_set):
+    network = Network(validator_set)
+    network.random_initialization()
+    return network

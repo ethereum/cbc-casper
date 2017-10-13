@@ -5,6 +5,9 @@ class ValidatorSet:
     def __init__(self, weights):
         self.validators = {Validator(name, weights[name]) for name in weights}
 
+    def __len__(self):
+        return len(self.validators)
+
     def __iter__(self):
         return iter(self.validators)
 

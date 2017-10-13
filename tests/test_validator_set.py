@@ -33,6 +33,19 @@ def test_in(weights):
 
 
 @pytest.mark.parametrize(
+    'weights',
+    [
+        ({i: i for i in range(10)}),
+        ({"name": 5, "cool": 1}),
+    ]
+)
+def test_len(weights):
+    vs = ValidatorSet(weights)
+
+    assert len(vs) == len(weights)
+
+
+@pytest.mark.parametrize(
     'weights, expected_names',
     [
         ({i: i for i in range(10)}, list(range(10))),
