@@ -7,7 +7,7 @@ import casper.settings as s
 from casper.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
-TEST_WEIGHT = [i for i in xrange(4, -1, -1)]
+TEST_WEIGHT = [i for i in range(4, -1, -1)]
 
 def test_init_non_empty_string():
     TestLangCBC(TEST_STRING, [1])
@@ -20,8 +20,8 @@ def test_init_fail_empty_string():
 @pytest.mark.parametrize(
     'weight_list, num_val, weight_dict, total_weight',
     [
-        ([i for i in xrange(10)], 10, {i: i for i in xrange(10)}, 45),
-        ([i for i in xrange(9, -1, -1)], 10, {i: 9 - i for i in xrange(10)}, 45),
+        ([i for i in range(10)], 10, {i: i for i in range(10)}, 45),
+        ([i for i in range(9, -1, -1)], 10, {i: 9 - i for i in range(10)}, 45),
         ([0], 1, {0: 0}, 0),
         ([], 0, {}, 0),
     ]
@@ -143,7 +143,13 @@ def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, 
     [
         ('B0-A', {'A': {0: None}}),
         ('B0-A S1-A B1-B', {'B': {0: 'A', 1: None}}),
-        ('RR0-A', {'A': {i: None for i in xrange(5)}}),
+        ('RR0-A', {'A': {i: None for i in range(5)}}),
+        ('RR0-A B0-B S1-B B1-C', {'C': {0:'B', 1:None, 2:None, 3:None, 4:None}}),
+        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
+            {'E': {0:'A', 1:'B', 2:'C', 3:'D', 4:None}}),
+        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E S0-E B0-F',
+            {'F': {0:'A', 1:'B', 2:'C', 3:'D', 4:'E'}})
+
     ]
 )
 def test_make_block_builds_on_entire_view(test_string, block_justification):
@@ -183,7 +189,7 @@ def test_send_block_sends_only_existing_blocks(test_string, exception):
     'test_string, num_messages_per_view, message_keys',
     [
         ('B0-A S1-A', {0:2, 1:3}, {0: ['A'], 1: ['A']}),
-        ('B0-A S1-A S2-A S3-A S4-A', {0:2, 1:3, 2:3, 3:3, 4:3}, {i: ['A'] for i in xrange(5)}),
+        ('B0-A S1-A S2-A S3-A S4-A', {0:2, 1:3, 2:3, 3:3, 4:3}, {i: ['A'] for i in range(5)}),
         ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E', {0:2, 1:4, 2:6, 3:8, 4:10},
             {0: ['A'], 1: ['A', 'B'], 2: ['A', 'B', 'C'], 3: ['A', 'B', 'C', 'D'], 4: ['A', 'B', 'C', 'D', 'E']}),
         ('B0-A B0-B B0-C B0-D B0-E', {0:6, 1:1, 2:1, 3:1, 4:1},
@@ -204,10 +210,10 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
     'test_string, num_messages_per_view, other_val_seen',
     [
         ('RR0-A', {0:10, 1:4, 2:6, 3:8, 4:10}, {0:[0,1,2,3,4], 1:[0,1], 2:[0,1,2], 3:[0,1,2,3], 4:[0,1,2,3,4]}),
-        ('RR0-A RR0-B', {0:15, 1:12, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in xrange(5)}),
+        ('RR0-A RR0-B', {0:15, 1:12, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in range(5)}),
         ('B0-A S1-A B1-B RR1-C', {0:12, 1:12, 2:7, 3:9, 4:11},
             {0:[0,1,2,3,4], 1:[0,1,2,3,4], 2:[0,1,2], 3:[0,1,2,3], 4:[0,1,2,3,4]}),
-        ('RR0-A B0-B S1-B RR1-C', {0:16, 1:16, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in xrange(5)}),
+        ('RR0-A B0-B S1-B RR1-C', {0:16, 1:16, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in range(5)}),
     ]
 )
 def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_val_seen):
