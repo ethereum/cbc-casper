@@ -5,6 +5,12 @@ class ValidatorSet:
     def __init__(self, weights):
         self.validators = {Validator(name, weights[name]) for name in weights}
 
+    def __iter__(self):
+        return iter(self.validators)
+
+    def __contains__(self, v):
+        return v in self.validators
+
     def weight(self, validator_names=None):
         if validator_names is None:
             validators = self.validators

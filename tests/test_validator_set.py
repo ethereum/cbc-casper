@@ -19,6 +19,20 @@ def test_new_validator_set(weights):
 
 
 @pytest.mark.parametrize(
+    'weights',
+    [
+        ({i: i for i in range(10)}),
+        ({"name": 5, "cool": 1}),
+    ]
+)
+def test_in(weights):
+    vs = ValidatorSet(weights)
+
+    for validator in vs.validators:
+        assert validator in vs
+
+
+@pytest.mark.parametrize(
     'weights, expected_names',
     [
         ({i: i for i in range(10)}, list(range(10))),
@@ -67,4 +81,4 @@ def test_weight(weights, expected_weight, validators):
     if expected_weight is None:
         expected_weight = sum(weights.values())
 
-    assert vs.weight(validators) == expected_weight
+    assert round(vs.weight(validators), 2) == round(expected_weight, 2)
