@@ -123,8 +123,8 @@ class TestLangCBC:
     def check_head_equals_block(self, validator, block_name):
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
-            # TODO: add special validator number to check the global forkchoice
-            # same with safety and no safety
+            # NOTE: Need to add special validator number to check the global forkchoice,
+            # see issue #42 (same with safety and no safety).
         if block_name not in self.blocks:
             raise Exception('Block {} does not exist'.format(block_name))
 
@@ -176,8 +176,8 @@ class TestLangCBC:
 
         for i in range(s.NUM_VALIDATORS):
             v = utils.build_chain(
-                    self.network.validators[i].my_latest_message(),
-                    None
+                self.network.validators[i].my_latest_message(),
+                None
                 )
             edgelist.append(self._edge(v, 2, 'blue', 'solid'))
 

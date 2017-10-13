@@ -1,3 +1,4 @@
+"""The view module ... """
 from casper.justification import Justification
 import casper.forkchoice as forkchoice
 

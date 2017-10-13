@@ -31,7 +31,8 @@ class ModelValidator:
         self.latest_observed_bets[bet.sender] = bet
 
 
-    # This function attempts to make a new latest bet for this validator (self) with a given estimate
+    # This function attempts to make a new latest bet for 
+    # this validator (self) with a given estimate.
     def make_new_latest_bet(self):
 
         if self.my_latest_bet.estimate == self.target_estimate:
