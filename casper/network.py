@@ -1,5 +1,3 @@
-import casper.settings as s
-
 from casper.view import View
 import casper.plot_tool as plot_tool
 
