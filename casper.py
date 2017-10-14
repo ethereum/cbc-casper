@@ -89,7 +89,7 @@ def main():
             # TODO: decide which oracle to use when displaying global ft.
             # When refactoring visualizations, could give options to switch
             # between different oracles while displaying a view!
-            oracle = CliqueOracle(tip, network.global_view)
+            oracle = CliqueOracle(tip, network.global_view, validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:

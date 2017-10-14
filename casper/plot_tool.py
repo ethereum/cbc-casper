@@ -20,7 +20,8 @@ FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
-def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
+
+def plot_view(view, validator_set, coloured_bets=[], colour_mag=dict(), edges=[]):
     """Creates and displays view graphs."""
     G = nx.Graph()
 
@@ -46,14 +47,15 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
     positions = dict()
 
     for b in nodes:
-        positions[b] = (float)(b.sender + 1)/(float)(s.NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
+        # assuming validator name here is super hacky
+        positions[b] = (float)(b.sender.name + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*b.height
 
     node_color_map = {}
     for b in nodes:
         if b in coloured_bets:
             mag = colour_mag[b]
-            node_color_map[b] = colors[int(len(colors) * mag / s.NUM_VALIDATORS)]
-            if mag == s.NUM_VALIDATORS - 1:
+            node_color_map[b] = colors[int(len(colors) * mag / len(validator_set))]
+            if mag == len(validator_set) - 1:
                 node_color_map[b] = "Black"
 
         else:
@@ -65,7 +67,7 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
 
     node_sizes = []
     for b in nodes:
-        node_sizes.append(350*pow(s.WEIGHTS[b.sender]/pi, 0.5))
+        node_sizes.append(350*pow(b.sender.weight/pi, 0.5))
         labels[b] = b.sequence_number
 
     nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
@@ -83,9 +85,9 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
     ax.collections[0].set_edgecolor("black")
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
-    for v in range(s.NUM_VALIDATORS):
-        xpos = (float)(v + 1)/(float)(s.NUM_VALIDATORS + 1) - 0.01
-        ax.text(xpos, 0.1, (str)((int)(s.WEIGHTS[v])), fontsize=20)
+    for v in validator_set:
+        xpos = (float)(v.name + 1)/(float)(len(validator_set) + 1) - 0.01
+        ax.text(xpos, 0.1, (str)((int)(v.weight)), fontsize=20)
 
     pylab.show()
     # pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")

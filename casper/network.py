@@ -44,5 +44,10 @@ class Network:
 
     def report(self, colored_messages=set(), color_mag=dict(), edges=[]):
         """Displays a view graph."""
-        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages,
-                            colour_mag=color_mag, edges=edges)
+        plot_tool.plot_view(
+            self.global_view,
+            self.validator_set,
+            coloured_bets=colored_messages,
+            colour_mag=color_mag,
+            edges=edges
+        )

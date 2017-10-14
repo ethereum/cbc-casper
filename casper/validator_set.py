@@ -3,7 +3,7 @@ from casper.validator import Validator
 
 class ValidatorSet:
     def __init__(self, weights):
-        self.validators = {Validator(name, weights[name]) for name in weights}
+        self.validators = {Validator(name, weights[name], self) for name in weights}
 
     def __len__(self):
         return len(self.validators)
@@ -14,11 +14,9 @@ class ValidatorSet:
     def __contains__(self, v):
         return v in self.validators
 
-    def weight(self, validator_names=None):
-        if validator_names is None:
+    def weight(self, validators=None):
+        if validators is None:
             validators = self.validators
-        else:
-            validators = self.get_validators_by_names(validator_names)
 
         return sum(map(lambda v: v.weight, validators))
 

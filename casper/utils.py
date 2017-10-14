@@ -1,5 +1,4 @@
 """The utils module ..."""
-import casper.settings as s
 
 
 def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
@@ -31,7 +30,7 @@ def get_weight(val_set):
     if not val_set:
         return 0
 
-    return sum(s.WEIGHTS[v] for v in val_set)
+    return sum(v.weight for v in val_set)
 
 
 def build_chain(tip, base):
