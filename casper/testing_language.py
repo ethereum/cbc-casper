@@ -173,7 +173,7 @@ class TestLangCBC:
                 break
 
             # Clique_Oracle used for display - change?
-            oracle = CliqueOracle(tip, self.network.global_view)
+            oracle = CliqueOracle(tip, self.network.global_view, self.validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
@@ -190,9 +190,9 @@ class TestLangCBC:
         )
         edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
 
-        for i in range(s.NUM_VALIDATORS):
+        for validator in self.validator_set:
             v = utils.build_chain(
-                self.network.validators[i].my_latest_message(),
+                validator.my_latest_message(),
                 None
                 )
             edgelist.append(self._edge(v, 2, 'blue', 'solid'))
