@@ -2,7 +2,6 @@
 import itertools
 import networkx as nx
 
-import casper.settings as s
 import casper.utils as utils
 
 
