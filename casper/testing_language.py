@@ -87,11 +87,11 @@ class TestLangCBC:
         if block_name in self.blocks:
             raise Exception('Block {} already exists'.format(block_name))
 
-        # TODO start round robin at validator speicied by validator in args
+        # start round robin at validator speicied by validator in args
         validators = self.validator_set.sorted_by_name()
         start_index = validators.index(validator)
         validators = validators[start_index:] + validators[:start_index]
-        print("startRR - {}".format(block_name))
+
         for i in range(len(self.validator_set)):
             if i == len(self.validator_set) - 1:
                 name = block_name
@@ -100,20 +100,9 @@ class TestLangCBC:
 
             maker = validators[i]
             receiver = validators[(i + 1) % len(validators)]
-            print(maker.name)
-            print(receiver.name)
-            print(name)
-            print()
 
             self.make_block(maker, name)
             self.send_block(receiver, name)
-        print("endRR - {}".format(block_name))
-
-        # Only the last block of the round robin is named.
-        # block_maker = (validator + s.NUM_VALIDATORS - 1) % s.NUM_VALIDATORS
-        # block_receiver = (validator + s.NUM_VALIDATORS) % s.NUM_VALIDATORS
-        # self.make_block(block_maker, block_name)
-        # self.send_block(block_receiver, block_name)
 
     def check_safety(self, validator, block_name):
         """Check that some validator detects safety on a block."""
