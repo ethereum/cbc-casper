@@ -6,7 +6,7 @@ import capser.utils as utils
 
 
 class AdversaryOracle:
-    """Simulate an adversary oracle."""
+    """Runs an lower bound adversary to check safety on some estimate."""
 
     # We say candidate_estimate is 0, other is 1
     CAN_ESTIMATE = 0
@@ -21,12 +21,12 @@ class AdversaryOracle:
 
 
     def get_recent_messages_and_viewables(self):
-        """'converts' the current view to binary before running the safety oracle;
-        makes reasoning about best viewables much easier. If, for two validators..."""
+        """Converts some current view to binary to make reasoning about viewables easier."""
 
         recent_messages = dict()
         viewables = dict()
 
+        # For some validator ...
         for v in s.VALIDATOR_NAMES:
             # ... if nothing is seen from validator, assume the worst ...
             if v not in self.view.latest_messages:
@@ -62,7 +62,6 @@ class AdversaryOracle:
                         viewables[v][v2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, v2)
                     else:
                         viewables[v][v2] = ModelBet(AdversaryOracle.CAN_ESTIMATE, v2)
-
 
         return recent_messages, viewables
 

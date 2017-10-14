@@ -9,7 +9,9 @@ import casper.utils as utils
 
 
 class TestLangCBC:
-    """Signal to py.test that TestLangCBC should not be discovered."""
+    """Allows testing of simulation scenarios with small testing language."""
+
+    # Signal to py.test that TestLangCBC should not be discovered.
     __test__ = False
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'

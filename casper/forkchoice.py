@@ -4,9 +4,7 @@ import casper.settings as s
 
 def get_max_weight_indexes(scores):
     """Returns the keys that map to the max value in a dict.
-
-    The max value must be greater than zero.
-    """
+    The max value must be greater than zero."""
 
     max_score = max(scores.values())
 
@@ -19,9 +17,7 @@ def get_max_weight_indexes(scores):
 
 def get_fork_choice(last_finalized_block, children, latest_messages):
     """Returns the estimate by selecting highest weight sub-trees.
-
-    Starts from the last_finalized_block and stops when it reaches a tip.
-    """
+    Starts from the last_finalized_block and stops when it reaches a tip."""
 
     scores = dict()
 

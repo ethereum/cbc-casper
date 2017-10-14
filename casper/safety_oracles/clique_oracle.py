@@ -8,7 +8,8 @@ import casper.utils as utils
 
 
 class CliqueOracle:
-    """Simulates a clique oracle."""
+    """A clique safety oracle detecting safety from validators committed to an estimate."""
+
     def __init__(self, candidate_estimate, view):
         if candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
@@ -23,7 +24,7 @@ class CliqueOracle:
     # NOTE: if biggest clique can easily be determined to be < 50% by weight, will
     #       return with empty set and 0 weight.
     def find_biggest_clique(self):
-        """Finds the biggest clique."""
+        """Finds the biggest clique of validators committed to target estimate."""
 
         # Only consider validators whose messages are compatable w/ candidate_estimate.
         with_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
@@ -82,6 +83,7 @@ class CliqueOracle:
 
 
     def check_estimate_safety(self):
+        """Returns lower bound on amount of fault tolerance some estimate has."""
 
         biggest_clique, clique_weight = self.find_biggest_clique()
 
@@ -93,9 +95,9 @@ class CliqueOracle:
 
             # Minimum number of validators that need to equivocate.
             equivocating = set()
-            
+
             # Round to stop issues w/ floating point rounding.
-            while round(sum(equivocating), 2) < round(fault_tolerance, 2): 
+            while round(sum(equivocating), 2) < round(fault_tolerance, 2):
                 equivocating.add(max(clique_weights.difference(equivocating)))
 
             # Return the number of faults we can tolerate, which is one less

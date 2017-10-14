@@ -3,8 +3,7 @@ import casper.settings as s
 
 
 class ModelBet:
-    """For now, this simplies the bet structure to work with the adversary
-    with no side-effects - so, no justifications necessary!"""
+    """Simple bet structure for binary consensus for side effect free adversary"""
 
     def __init__(self, estimate, sender):
 
