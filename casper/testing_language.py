@@ -5,6 +5,7 @@ import random as r
 import casper.settings as s
 from casper.network import Network
 from casper.safety_oracles.clique_oracle import CliqueOracle
+from casper.validator_set import ValidatorSet
 import casper.utils as utils
 
 
@@ -21,13 +22,13 @@ class TestLangCBC:
             raise Exception("Please pass in a valid test string")
 
         # Update the settings for this test.
-        s.update(val_weights)
+        self.validator_set = ValidatorSet({i: w for i, w in enumerate(val_weights)})
 
         self.test_string = test_string
 
         self.display = display
 
-        self.network = Network()
+        self.network = Network(self.validator_set)
 
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
@@ -67,7 +68,7 @@ class TestLangCBC:
 
     def make_block(self, validator, block_name):
         """Have some validator produce a block."""
-        if validator not in self.network.validators:
+        if validator not in self.network.validator_set:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name in self.blocks:
             raise Exception('Block {} already exists'.format(block_name))
@@ -86,16 +87,25 @@ class TestLangCBC:
         if block_name in self.blocks:
             raise Exception('Block {} already exists'.format(block_name))
 
-        for i in range(s.NUM_VALIDATORS - 1):
-            rand_name = r.random()
-            self.make_block((validator + i) % s.NUM_VALIDATORS, rand_name)
-            self.send_block((validator + i + 1) % s.NUM_VALIDATORS, rand_name)
+        # TODO start round robin at validator speicied by validator in args
+        validators = self.validator_set.sorted_by_name()
+        for i in range(len(self.validator_set)):
+            if i == len(self.validator_set) - 1:
+                name = block_name
+            else:
+                name = r.random()
+
+            maker = validators[i]
+            receiver = validators[(i + 1) % len(validators)]
+
+            self.make_block(maker, name)
+            self.send_block(receiver, name)
 
         # Only the last block of the round robin is named.
-        block_maker = (validator + s.NUM_VALIDATORS - 1) % s.NUM_VALIDATORS
-        block_receiver = (validator + s.NUM_VALIDATORS) % s.NUM_VALIDATORS
-        self.make_block(block_maker, block_name)
-        self.send_block(block_receiver, block_name)
+        # block_maker = (validator + s.NUM_VALIDATORS - 1) % s.NUM_VALIDATORS
+        # block_receiver = (validator + s.NUM_VALIDATORS) % s.NUM_VALIDATORS
+        # self.make_block(block_maker, block_name)
+        # self.send_block(block_receiver, block_name)
 
     def check_safety(self, validator, block_name):
         """Check that some validator detects safety on a block."""
@@ -144,13 +154,13 @@ class TestLangCBC:
     def parse(self):
         """Parse the test_string, and run the test"""
         for token in self.test_string.split(' '):
-            letter, number, d, name = re.match(self.TOKEN_PATTERN, token).groups()
-            if letter+number+d+name != token:
+            letter, validator, d, name = re.match(self.TOKEN_PATTERN, token).groups()
+            if letter+validator+d+name != token:
                 raise Exception("Bad token: %s" % token)
-            if number != '':
-                number = int(number)
+            if validator != '':
+                validator = self.validator_set.get_validator_by_name(int(validator))
 
-            self.handlers[letter](number, name)
+            self.handlers[letter](validator, name)
 
     def report(self, num, name):
         """Display the view graph of the current global_view"""
