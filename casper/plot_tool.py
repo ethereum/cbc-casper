@@ -21,7 +21,7 @@ THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
-    """Defines the graphs that will be produced."""
+    """Creates and displays view graphs."""
     G = nx.Graph()
 
     nodes = view.messages
@@ -113,7 +113,7 @@ def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
 
 
 def make_gif(frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
-    """Make a GIF visualization."""
+    """Make a GIF visualization of view graph."""
 
     file_names = sorted([fn for fn in os.listdir(THUMBNAILS) if fn.endswith('thumbnail.png')])
 

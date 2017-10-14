@@ -9,7 +9,9 @@ import casper.utils as utils
 
 
 class TestLangCBC:
-    """Signal to py.test that TestLangCBC should not be discovered."""
+    """Allows testing of simulation scenarios with small testing language."""
+
+    # Signal to py.test that TestLangCBC should not be discovered.
     __test__ = False
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
@@ -47,7 +49,7 @@ class TestLangCBC:
         self.handlers['R'] = self.report
 
     def send_block(self, validator, block_name):
-        """Send a block."""
+        """Send some validator a block."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name not in self.blocks:
@@ -64,7 +66,7 @@ class TestLangCBC:
         self.network.propagate_message_to_validator(block, validator)
 
     def make_block(self, validator, block_name):
-        """Make a block."""
+        """Have some validator produce a block."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name in self.blocks:
@@ -79,7 +81,7 @@ class TestLangCBC:
         self.network.global_view.add_messages(set([new_block]))
 
     def round_robin(self, validator, block_name):
-        """Select a block via round robin."""
+        """Have each validator create a block in a perfect round robin."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name in self.blocks:
@@ -97,7 +99,7 @@ class TestLangCBC:
         self.send_block(block_receiver, block_name)
 
     def check_safety(self, validator, block_name):
-        """Check safety."""
+        """Check that some validator detects safety on a block."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name not in self.blocks:
@@ -111,7 +113,7 @@ class TestLangCBC:
         assert safe, "Block {} failed safety assert".format(block_name)
 
     def no_safety(self, validator, block_name):
-        """Check no safety."""
+        """Check that some validator does not detect safety on a block."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
         if block_name not in self.blocks:
@@ -126,7 +128,7 @@ class TestLangCBC:
         assert not safe, "Block {} failed no-safety assert".format(block_name)
 
     def check_head_equals_block(self, validator, block_name):
-        """Check that the head equal the block."""
+        """Check some validators forkchoice is the correct block."""
         if validator not in self.network.validators:
             raise Exception('Validator {} does not exist'.format(validator))
             # NOTE: Need to add special validator number to check the global forkchoice,
@@ -141,6 +143,7 @@ class TestLangCBC:
         assert block == head, "Validator {} does not have block {} at head".format(validator, block_name)
 
     def parse(self):
+        """Parse the test_string, and run the test"""
         for token in self.test_string.split(' '):
             letter, number, d, name = re.match(self.TOKEN_PATTERN, token).groups()
             if letter+number+d+name != token:
@@ -151,6 +154,7 @@ class TestLangCBC:
             self.handlers[letter](number, name)
 
     def report(self, num, name):
+        """Display the view graph of the current global_view"""
         assert num == name and num == '', "...no validator or number needed to report!"
 
         if not self.display:

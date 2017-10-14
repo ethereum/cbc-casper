@@ -6,7 +6,7 @@ from casper.safety_oracles.adversary_models.model_validator import (
 
 
 class Adversary:
-    """Simulates an adversary."""
+    """Simulates a lower bound, side-effects free adversary."""
 
     def __init__(self, victim_estimate, latest_bets, viewables):
 

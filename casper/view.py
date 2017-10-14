@@ -4,6 +4,8 @@ import casper.forkchoice as forkchoice
 
 
 class View:
+    """A set of seen messages. For performance, also stores a dict of most recent messages."""
+    
     def __init__(self, messages=set()):
 
         # now for some assignment...
@@ -26,7 +28,7 @@ class View:
         return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
 
     def justification(self):
-        """This method justifies ... """
+        """Returns the latest messages seen from other validators, to justify estimate."""
         return Justification(self.last_finalized_block, self.latest_messages)
 
     def add_messages(self, showed_messages):

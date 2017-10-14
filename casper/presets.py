@@ -7,6 +7,7 @@ import casper.settings as s
 
 def message_maker(mode):
     """The message maker defines the logic for running each type of simulation."""
+
     if mode == "rand":
         pairs = list(itertools.permutations(range(s.NUM_VALIDATORS), 2))
         def random():
