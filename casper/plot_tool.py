@@ -21,7 +21,7 @@ THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
-    """Defines the graphs that will be produced."""
+    """Creates and displays view graphs."""
     G = nx.Graph()
 
     nodes = view.messages

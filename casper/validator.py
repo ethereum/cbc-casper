@@ -11,14 +11,13 @@ REPORT = True
 
 
 class Validator:
-    """The validator's state is a function of its view and name alone (along w/ global variables).
-    However, for performance's sake the validator also stores."""
+    """A validator has a view from which it generates new messages and detects finalized blocks."""
     def __init__(self, name):
         self.name = name
         self.view = View(set())
 
     def receive_messages(self, messages):
-        """This method is the only way that a validator can receive protocol messages."""
+        """Allows the validator to receive protocol messages."""
         self.view.add_messages(messages)
 
     def estimate(self):
@@ -35,7 +34,7 @@ class Validator:
             return None
 
     def check_estimate_safety(self, estimate):
-        """The validator checks estimate safety by calling the safety oracle."""
+        """The validator checks estimate safety on some estimate with some safety oracle."""
 
         assert isinstance(estimate, Block), "..expected estimate to be a Block"
 

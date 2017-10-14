@@ -15,7 +15,7 @@ class Network:
         self.global_view = View()
 
     def propagate_message_to_validator(self, message, validator_name):
-        """Propogate a message to a validator."""
+        """Propagate a message to a validator."""
         assert message in self.global_view.messages, "expected only to propagate messages from the global view"
         self.validators[validator_name].receive_messages(set([message]))
 
