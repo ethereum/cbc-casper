@@ -18,11 +18,14 @@ class ValidatorSet:
         if validator_names is None:
             validators = self.validators
         else:
-            validators = self.get_validators_by_name(validator_names)
+            validators = self.get_validators_by_names(validator_names)
 
         return sum(map(lambda v: v.weight, validators))
 
-    def get_validators_by_name(self, names):
+    def get_validator_by_name(self, name):
+        return self.get_validators_by_names([name]).pop()
+
+    def get_validators_by_names(self, names):
         return set(filter(lambda v: v.name in names, self.validators))
 
     def validator_names(self):

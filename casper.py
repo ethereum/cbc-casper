@@ -31,7 +31,7 @@ def main():
     validator_set = generate_random_validator_set()
     print("WEIGHTS: {0}".format(validator_set.validator_weights()))
 
-    network = Network()
+    network = Network(validator_set)
     network.random_initialization()
     network.report()
 
@@ -53,7 +53,7 @@ def main():
         old_messages = {}
         for sender in sending_validators:
             # We assume here that validators all have a most recent message
-            old_messages[sender] = network.validators[sender].my_latest_message()
+            old_messages[sender] = sender.my_latest_message()
 
         # Send these messages to the respective recieving validators
         for sender, reciever in message_paths:
@@ -70,9 +70,9 @@ def main():
 
             # Have validators try to find newly finalized blocks
             curr = new_message
-            last_finalized_block = network.validators[v].view.last_finalized_block
+            last_finalized_block = v.view.last_finalized_block
             while curr != last_finalized_block:
-                if network.validators[v].check_estimate_safety(curr):
+                if v.check_estimate_safety(curr):
                     break
                 curr = curr.estimate
 
@@ -106,17 +106,17 @@ def main():
 
             # Build each validators forkchoice, so we can display as well!
             vals_chain = []
-            for i in range(s.NUM_VALIDATORS):
+            for v in validator_set:
                 vals_chain.append(
-                    utils.build_chain(network.validators[i].my_latest_message(), None)
+                    utils.build_chain(v.my_latest_message(), None)
                 )
 
             edgelist = []
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for i in range(s.NUM_VALIDATORS):
-                edgelist.append({'edges':vals_chain[i],'width':2,'edge_color':'blue','style':'solid'})
+            for vals in vals_chain:
+                edgelist.append({'edges':vals,'width':2,'edge_color':'blue','style':'solid'})
 
             network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 

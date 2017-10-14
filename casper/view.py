@@ -27,7 +27,7 @@ class View:
         return forkchoice.get_fork_choice(
                 self.last_finalized_block,
                 self.children,
-                self.latest_message
+                self.latest_messages
         )
 
     def justification(self):

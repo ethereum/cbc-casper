@@ -95,3 +95,13 @@ def test_weight(weights, expected_weight, validators):
         expected_weight = sum(weights.values())
 
     assert round(vs.weight(validators), 2) == round(expected_weight, 2)
+
+
+@pytest.mark.skip(reason="test not yet implemented")
+def test_get_validator_by_name():
+    pass
+
+
+@pytest.mark.skip(reason="test not yet implemented")
+def test_get_validators_by_names():
+    pass

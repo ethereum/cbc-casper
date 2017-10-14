@@ -19,16 +19,21 @@ def message_maker(mode):
         return random
 
     if mode == "rrob":
-        msg = [0, 1]
 
         def round_robin(validator_set):
             """Each round, the creator of the last round's block sends it to the next
             receiver, who then creates a block."""
-            to_return = [[msg[0], msg[1]]]
-            msg[0] = (msg[0] + 1) % len(validator_set)
-            msg[1] = (msg[1] + 1) % len(validator_set)
-            return to_return
+            sorted_names = sorted(list(validator_set.validator_names()))
+            sender_index = round_robin.next_sender_index
+            round_robin.next_sender_index = (sender_index + 1) % len(validator_set)
+            receiver_index = round_robin.next_sender_index
 
+            return [[
+                validator_set.get_validator_by_name(sorted_names[sender_index]),
+                validator_set.get_validator_by_name(sorted_names[receiver_index])
+            ]]
+
+        round_robin.next_sender_index = 0
         return round_robin
 
     if mode == "full":
