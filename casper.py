@@ -28,8 +28,8 @@ def main():
         return
     msg_gen = presets.message_maker(mode)
 
-    vs = generate_random_validator_set()
-    print("WEIGHTS: {0}".format(s.validator_weights()))
+    validator_set = generate_random_validator_set()
+    print("WEIGHTS: {0}".format(validator_set.validator_weights()))
 
     network = Network()
     network.random_initialization()
@@ -44,7 +44,7 @@ def main():
     while True:
         iterator += 1
 
-        message_paths = msg_gen()
+        message_paths = msg_gen(validator_set)
 
         sending_validators = {i for i, j in message_paths}
         affected_validators = {j for i, j in message_paths}

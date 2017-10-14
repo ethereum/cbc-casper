@@ -5,7 +5,6 @@ import casper.forkchoice as forkchoice
 
 class View:
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    
     def __init__(self, messages=set()):
 
         # now for some assignment...
@@ -25,7 +24,11 @@ class View:
     def estimate(self):
         """The estimate function returns the set of max weight estimates
         This may not be a single-element set because the validator may have an empty view."""
-        return forkchoice.get_fork_choice(self.last_finalized_block, self.children, self.latest_messages)
+        return forkchoice.get_fork_choice(
+                self.last_finalized_block,
+                self.children,
+                self.latest_message
+        )
 
     def justification(self):
         """Returns the latest messages seen from other validators, to justify estimate."""
