@@ -4,6 +4,7 @@ from casper.justification import Justification
 
 
 class Block:
+    """Message/bet data structure for blockchain consensus"""
     def __eq__(self, block):
         if block is None:
             return False
@@ -54,6 +55,7 @@ class Block:
             return hash(str(self.sequence_number) + str(self.estimate.hash) + str(10000*self.sender))
 
     def is_in_blockchain(self, block):
+        """Returns True if self is an ancestor of block."""
         assert isinstance(block, Block), "...expected a block"
 
         if self == block:

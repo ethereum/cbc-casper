@@ -1,3 +1,4 @@
+"""The adversary module ... """
 import casper.settings as s
 from casper.safety_oracles.adversary_models.model_validator import (
     ModelValidator
@@ -5,16 +6,17 @@ from casper.safety_oracles.adversary_models.model_validator import (
 
 
 class Adversary:
+    """Simulates a lower bound, side-effects free adversary."""
 
     def __init__(self, victim_estimate, latest_bets, viewables):
 
-        # Estimate being attacked
+        # Estimate being attacked.
         self.victim_estimate = victim_estimate
 
-        # Estimate adversary is attack towards
+        # Estimate adversary is attack towards.
         self.target_estimate = 1 - victim_estimate
 
-        # The attacker adds the bets they created in the attack to this view...
+        # The attacker adds the bets they created in the attack to this view.
         self.attack_view = set()
 
         self.validator_models = dict()
@@ -27,7 +29,8 @@ class Adversary:
             success, new_bet = self.validator_models[v].make_new_latest_bet()
 
             if success:
-                assert new_bet.estimate == self.target_estimate # sanity check
+                # Sanity check!
+                assert new_bet.estimate == self.target_estimate
                 self.voting_with_attacker.add(v)
             else:
                 self.voting_against_attacker.add(v)
@@ -39,7 +42,7 @@ class Adversary:
         assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == s.NUM_VALIDATORS
         assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == round(s.TOTAL_WEIGHT, 2)
 
-        # The attacker produces a log of the bets added during the attack...
+        # The attacker produces a log of the bets added during the attack.
         self.operations_log = []
 
     def is_attack_complete(self):
@@ -59,12 +62,12 @@ class Adversary:
         # all bets that are on the target_estimate
         for v in self.voting_with_attacker:
             on_target, bet = self.validator_models[v].make_new_latest_bet()
-            assert on_target and bet.estimate == self.target_estimate, '...in voting_with_attacker!'
+            assert on_target and bet.estimate == self.target_estimate, 'in voting_with_attacker!'
             for v2 in self.voting_against_attacker:
                 self.validator_models[v2].show(bet)
 
-        # We'll continue the attack until we no longer make progress
-        # Or until the attack is successful and the victim estimate dethroned
+        # We'll continue the attack until we no longer make progress,
+        # or until the attack is successful and the victim estimate dethroned.
         progress_made = True
         while progress_made:
             progress_made = False
@@ -104,6 +107,6 @@ class Adversary:
             self.voting_against_attacker.difference_update(to_remove)
 
             # Sanity check!
-            assert not self.is_attack_complete(), "...expected attack to be ongoing, at this point"
+            assert not self.is_attack_complete(), "expected attack to be ongoing, at this point"
 
         return False, self.operations_log, self.attack_view
