@@ -44,8 +44,10 @@ class Validator:
 
     def check_estimate_safety(self, estimate):
         """The validator checks estimate safety on some estimate with some safety oracle."""
-
         assert isinstance(estimate, Block), "..expected estimate to be a Block"
+
+        if self.validator_set is None:
+            raise AttributeError("Validator must have a validator_set to check estimate safety.")
 
         oracle = CliqueOracle(estimate, self.view, self.validator_set)
         fault_tolerance, _ = oracle.check_estimate_safety()

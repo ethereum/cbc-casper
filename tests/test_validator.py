@@ -1,5 +1,7 @@
 import pytest
 
+from casper.block import Block
+from casper.justification import Justification
 from casper.validator import Validator
 
 
@@ -24,3 +26,11 @@ def test_new_validator(name, weight, error):
     validator = Validator(name, weight)
     assert validator.name == name
     assert validator.weight == weight
+
+
+def test_check_estimate_safety_without_validator_set():
+    validator = Validator("cool", 10.2)
+    block = Block(None, Justification(), validator)
+
+    with pytest.raises(AttributeError):
+        validator.check_estimate_safety(block)
