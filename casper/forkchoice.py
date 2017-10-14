@@ -1,6 +1,4 @@
 """The forkchoice module implements the estimator function a blockchain"""
-import casper.settings as s
-
 
 def get_max_weight_indexes(scores):
     """Returns the keys that map to the max value in a dict.
