@@ -1,11 +1,13 @@
 """The adversary oracle module ... """
 import casper.settings as s
-from casper.adversary_models.model_bet import ModelBet
-from casper.adversary_models.adversary import Adversary
+from casper.safety_oracles.adversary_models.model_bet import ModelBet
+from casper.safety_oracles.adversary_models.adversary import Adversary
 import capser.utils as utils
 
 
 class AdversaryOracle:
+    """Simulate an adversary oracle."""
+
     # We say candidate_estimate is 0, other is 1
     CAN_ESTIMATE = 0
     ADV_ESTIMATE = 1
@@ -47,8 +49,8 @@ class AdversaryOracle:
                 # now construct the messages that they can see from other validators
                 for v2 in s.VALIDATOR_NAMES:
                     # if they have seen nothing from some validator, assume the worst
-                    # NOTE: This may not be necessary, might be possible to do a free block check here?
-                    # see issue #44
+                    # NOTE: This may not be necessary, might be possible to do a free
+                    # block check here? see issue #44
                     if v2 not in self.view.latest_messages[v].justification.latest_messages:
                         viewables[v][v2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, v2)
                         continue
@@ -66,6 +68,7 @@ class AdversaryOracle:
 
 
     def check_estimate_safety(self):
+        """Check the safety of the estimate."""
 
         recent_messages, viewables = self.get_recent_messages_and_viewables()
 

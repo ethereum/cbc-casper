@@ -3,6 +3,7 @@ import casper.settings as s
 
 
 def get_max_weight_indexes(scores):
+    """Returns the max weight estimates."""
 
     max_score = max(scores.values())
 
@@ -14,6 +15,7 @@ def get_max_weight_indexes(scores):
 
 
 def get_fork_choice(last_finalized_block, children, latest_messages):
+    """Returns the best block."""
 
     scores = dict()
 

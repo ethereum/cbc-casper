@@ -1,8 +1,11 @@
 """The settings module ... """
-import random as r  # to ensure the tie-breaking property
+
+# Used to ensure the tie-breaking property.
+import random as r
 
 
 def init():
+    """Initialize all the default settings."""
     r.seed()
 
     # Declare our global variables.
@@ -32,7 +35,7 @@ def init():
     # It's a bit underwhelming, sure, but it's foundational.
     ESTIMATE_SPACE = set([0, 1])
 
-    # Here are the weights ...!
+    # Here are the weights!
     WEIGHTS = {i: max(20, r.gauss(mu=60, sigma=40)) + 1.0/(BIGINT + r.uniform(0, 1)) + r.random() for i in VALIDATOR_NAMES}
 
     TOTAL_WEIGHT = sum(WEIGHTS.values())
@@ -45,6 +48,7 @@ def init():
 
 
 def update(val_weights):
+    """Update the global settings given new validator weights."""
     global NUM_VALIDATORS
     global VALIDATOR_NAMES
     global WEIGHTS
