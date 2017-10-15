@@ -47,17 +47,13 @@ def message_maker(mode):
         return full_propagation
 
     if mode == "nofinal":
-        msg = [0, 1]
+        rrob = message_maker("rrob")
 
         def no_final(validator_set):
             """Each round, two simultaneous round-robin message propagations occur at the same
             time. This results in validators never being able to finalize later blocks (they
             may finalize initial blocks, depending on validator weight distribution)."""
-            to_return = [[msg[0], msg[1]]]
-            msg[0] = (msg[0] + 1) % len(validator_set)
-            msg[1] = (msg[1] + 1) % len(validator_set)
-            to_return.append([msg[0], msg[1]])
-            return to_return
+            return [rrob(validator_set)[0], rrob(validator_set)[0]]
 
         return no_final
 

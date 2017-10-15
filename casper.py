@@ -61,23 +61,20 @@ def main():
 
         # Have recieving/affected validators make new blocks
         new_messages = {}
-        for v in affected_validators:
-            new_message = network.get_message_from_validator(v)
-            new_messages[v] = new_message
+        for validator in affected_validators:
+            new_message = network.get_message_from_validator(validator)
+            new_messages[validator] = new_message
             # Update display to show this new message properly
             if new_message.estimate is not None:
                 blockchain.append([new_message, new_message.estimate])
 
             # Have validators try to find newly finalized blocks
             curr = new_message
-            last_finalized_block = v.view.last_finalized_block
+            last_finalized_block = validator.view.last_finalized_block
             while curr != last_finalized_block:
-                if v.check_estimate_safety(curr):
+                if validator.check_estimate_safety(curr):
                     break
                 curr = curr.estimate
-
-        # Add all new messages to the global_view
-        # network.global_view.add_messages(new_messages.values())
 
         # Display the fact that these messages propagated
         for sender, reciever in message_paths:
@@ -85,7 +82,7 @@ def main():
 
         # Display the fault tolerance in the global view
         tip = network.global_view.estimate()
-        while tip and node_ft.get(tip, 0) != s.NUM_VALIDATORS - 1:
+        while tip and node_ft.get(tip, 0) != len(validator_set) - 1:
             # TODO: decide which oracle to use when displaying global ft.
             # When refactoring visualizations, could give options to switch
             # between different oracles while displaying a view!
@@ -106,9 +103,9 @@ def main():
 
             # Build each validators forkchoice, so we can display as well!
             vals_chain = []
-            for v in validator_set:
+            for validator in validator_set:
                 vals_chain.append(
-                    utils.build_chain(v.my_latest_message(), None)
+                    utils.build_chain(validator.my_latest_message(), None)
                 )
 
             edgelist = []
