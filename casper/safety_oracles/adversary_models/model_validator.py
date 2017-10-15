@@ -1,5 +1,4 @@
 """The model validator module ... """
-import casper.settings as s
 import casper.safety_oracles.adversary_models.model_utils as model_utils
 from casper.safety_oracles.adversary_models.model_bet import (
     ModelBet

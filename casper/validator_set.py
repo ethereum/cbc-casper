@@ -11,8 +11,8 @@ class ValidatorSet:
     def __iter__(self):
         return iter(self.validators)
 
-    def __contains__(self, v):
-        return v in self.validators
+    def __contains__(self, validator):
+        return validator in self.validators
 
     def weight(self, validators=None):
         if validators is None:

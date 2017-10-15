@@ -25,9 +25,9 @@ class View:
         """The estimate function returns the set of max weight estimates
         This may not be a single-element set because the validator may have an empty view."""
         return forkchoice.get_fork_choice(
-                self.last_finalized_block,
-                self.children,
-                self.latest_messages
+            self.last_finalized_block,
+            self.children,
+            self.latest_messages
         )
 
     def justification(self):

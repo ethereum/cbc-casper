@@ -1,17 +1,15 @@
 """The plot tool module ... """
+
 from math import pi
 import os
 import networkx as nx
-
-import matplotlib as mpl
-mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import pylab
 import imageio as io
-
 from PIL import Image
+import matplotlib as mpl
+mpl.use('TkAgg')
 
-import casper.settings as s
 
 
 base = 10000000

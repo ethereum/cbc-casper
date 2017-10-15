@@ -10,7 +10,7 @@ def exists_free_message(estimate, val, sequence_num, view):
     """Returns whether there exists a free message.
     A free message is a message later than the sequence number from some val,
     and conflicts with the estimate."""
-    
+
     curr_message = view.latest_messages[val]
 
     while curr_message.sequence_number >= sequence_num:
