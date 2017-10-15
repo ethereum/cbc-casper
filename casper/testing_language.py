@@ -21,13 +21,9 @@ class TestLangCBC:
         if test_string == '':
             raise Exception("Please pass in a valid test string")
 
-        # Update the settings for this test.
         self.validator_set = ValidatorSet({i: w for i, w in enumerate(val_weights)})
-
         self.test_string = test_string
-
         self.display = display
-
         self.network = Network(self.validator_set)
 
         # This seems to be misnamed. Just generates starting blocks.
@@ -49,12 +45,22 @@ class TestLangCBC:
         self.handlers['RR'] = self.round_robin
         self.handlers['R'] = self.report
 
-    def send_block(self, validator, block_name):
-        """Send some validator a block."""
+    def _validate_validator(self, validator):
         if validator not in self.network.validator_set:
             raise Exception('Validator {} does not exist'.format(validator))
+
+    def _validate_block_exists(self, block_name):
         if block_name not in self.blocks:
             raise Exception('Block {} does not exist'.format(block_name))
+
+    def _validate_block_does_not_exist(self, block_name):
+        if block_name in self.blocks:
+            raise Exception('Block {} already exists'.format(block_name))
+
+    def send_block(self, validator, block_name):
+        """Send some validator a block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
@@ -68,10 +74,8 @@ class TestLangCBC:
 
     def make_block(self, validator, block_name):
         """Have some validator produce a block."""
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name in self.blocks:
-            raise Exception('Block {} already exists'.format(block_name))
+        self._validate_validator(validator)
+        self._validate_block_does_not_exist(block_name)
 
         new_block = self.network.get_message_from_validator(validator)
 
@@ -82,10 +86,8 @@ class TestLangCBC:
 
     def round_robin(self, validator, block_name):
         """Have each validator create a block in a perfect round robin."""
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name in self.blocks:
-            raise Exception('Block {} already exists'.format(block_name))
+        self._validate_validator(validator)
+        self._validate_block_does_not_exist(block_name)
 
         # start round robin at validator speicied by validator in args
         validators = self.validator_set.sorted_by_name()
@@ -106,10 +108,8 @@ class TestLangCBC:
 
     def check_safety(self, validator, block_name):
         """Check that some validator detects safety on a block."""
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
         safe = validator.check_estimate_safety(block)
@@ -120,10 +120,8 @@ class TestLangCBC:
 
     def no_safety(self, validator, block_name):
         """Check that some validator does not detect safety on a block."""
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
@@ -135,12 +133,8 @@ class TestLangCBC:
 
     def check_head_equals_block(self, validator, block_name):
         """Check some validators forkchoice is the correct block."""
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
-            # NOTE: Need to add special validator number to check the global forkchoice,
-            # see issue #42 (same with safety and no safety).
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
@@ -169,7 +163,7 @@ class TestLangCBC:
         # Update the safe blocks!
         tip = self.network.global_view.estimate()
         while tip:
-            if self.color_mag.get(tip, 0) == s.NUM_VALIDATORS - 1:
+            if self.color_mag.get(tip, 0) == len(self.validator_set) - 1:
                 break
 
             # Clique_Oracle used for display - change?
