@@ -1,4 +1,5 @@
 import random as r
+import pytest
 
 from casper.network import Network
 
@@ -35,3 +36,8 @@ def test_propagate_message_to_validator(network):
 
     assert message in to_validator.view.messages
     assert message == to_validator.view.latest_messages[from_validator]
+
+
+@pytest.mark.skip(reason="test not yet implemented")
+def test_view_initialization():
+    pass

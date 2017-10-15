@@ -27,19 +27,22 @@ class Network:
         return new_message
 
     def view_initialization(self, view):
-        """Initalizes all validators with all messages in some view."""
+        """
+        Initalizes all validators with all messages in some view.
+        NOTE: This method is not currently tested or called anywhere in repo
+        """
         assert isinstance(view, View)
         self.global_view = view.messages
 
         latest = view.latest_messages
 
-        for v in latest:
-            self.validators[v].receive_messages(set([latest[v]]))
+        for validator in latest:
+            validator.receive_messages(set([latest[validator]]))
 
     def random_initialization(self):
         """Generates starting messages for all validators with None as an estiamte."""
-        for v in self.validator_set:
-            new_bet = self.get_message_from_validator(v)
+        for validator in self.validator_set:
+            new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
 
     def report(self, colored_messages=set(), color_mag=dict(), edges=[]):
