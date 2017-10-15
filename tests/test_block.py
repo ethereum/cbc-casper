@@ -8,7 +8,6 @@ from casper.validator import Validator
 
 
 def test_equality_of_copies_off_genesis(validator):
-    s.update([10])  # necessary due to assertions during block creation
     block = Block(None, Justification(), validator)
 
     shallow_copy = copy.copy(block)
