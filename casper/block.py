@@ -39,9 +39,9 @@ class Block:
             self.height = 0
         else:
             candidate_max = 0
-            for v in self.justification.latest_messages:
-                if self.justification.latest_messages[v].height > candidate_max:
-                    candidate_max = self.justification.latest_messages[v].height
+            for validator in self.justification.latest_messages:
+                if self.justification.latest_messages[validator].height > candidate_max:
+                    candidate_max = self.justification.latest_messages[validator].height
 
             self.height = candidate_max + 1
 

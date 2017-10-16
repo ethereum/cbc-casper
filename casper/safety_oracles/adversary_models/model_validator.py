@@ -19,7 +19,8 @@ class ModelValidator:
 
     def my_estimate(self):
         """Model validators use their latest_observed_bets to calculate an estimate."""
-        return model_utils.get_estimate_from_latest_messages(self.latest_observed_bets, self.target_estimate)
+        return model_utils.get_estimate_from_latest_messages(self.latest_observed_bets,
+                                                             self.target_estimate)
 
     def show(self, bet):
         """This method makes a bet viewable to the model validator."""

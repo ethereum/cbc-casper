@@ -144,8 +144,8 @@ class TestLangCBC:
     def parse(self):
         """Parse the test_string, and run the test"""
         for token in self.test_string.split(' '):
-            letter, validator, d, name = re.match(self.TOKEN_PATTERN, token).groups()
-            if letter+validator+d+name != token:
+            letter, validator, dummy, name = re.match(self.TOKEN_PATTERN, token).groups()
+            if letter+validator+dummy+name != token:
                 raise Exception("Bad token: %s" % token)
             if validator != '':
                 validator = self.validator_set.get_validator_by_name(int(validator))

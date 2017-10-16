@@ -34,7 +34,8 @@ class AdversaryOracle:
 
             # ... or if their most recent messages conflicts w/ estimate,
             # again working with adversary.
-            elif utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[validator]):
+            elif utils.are_conflicting_estimates(self.candidate_estimate,
+                                                 self.view.latest_messages[validator]):
                 recent_messages[validator] = ModelBet(AdversaryOracle.ADV_ESTIMATE, validator)
                 viewables[validator] = dict()
 
@@ -46,21 +47,22 @@ class AdversaryOracle:
                 recent_messages[validator] = ModelBet(AdversaryOracle.CAN_ESTIMATE, validator)
                 viewables[validator] = dict()
                 # now construct the messages that they can see from other validators
-                for v2 in self.validator_set:
+                for val2 in self.validator_set:
                     # if they have seen nothing from some validator, assume the worst
                     # NOTE: This may not be necessary, might be possible to do a free
                     # block check here? see issue #44
-                    if v2 not in self.view.latest_messages[validator].justification.latest_messages:
-                        viewables[validator][v2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, v2)
+                    if val2 not in self.view.latest_messages[validator].justification.latest_messages:
+                        viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                         continue
 
                     # If they have seen something from other validators, do a free block check
                     # If there is a free block, assume they will see that (side-effects free!)
-                    v2_msg_in_v_view = self.view.latest_messages[validator].justification.latest_messages[v2]
-                    if utils.exists_free_message(self.candidate_estimate, v2, v2_msg_in_v_view.sequence_number, self.view):
-                        viewables[validator][v2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, v2)
+                    val2_msg_in_v_view = self.view.latest_messages[validator].justification.latest_messages[val2]
+                    if utils.exists_free_message(self.candidate_estimate,
+                                                 val2, val2_msg_in_v_view.sequence_number, self.view):
+                        viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                     else:
-                        viewables[validator][v2] = ModelBet(AdversaryOracle.CAN_ESTIMATE, v2)
+                        viewables[validator][val2] = ModelBet(AdversaryOracle.CAN_ESTIMATE, val2)
 
         return recent_messages, viewables
 

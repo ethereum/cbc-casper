@@ -28,42 +28,47 @@ class CliqueOracle:
 
         # Only consider validators whose messages are compatable w/ candidate_estimate.
         with_candidate = {v for v in self.validator_set if v in self.view.latest_messages and \
-                             not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
+                             not utils.are_conflicting_estimates(self.candidate_estimate,
+                                                                 self.view.latest_messages[v])}
 
         # Do not have safety if less than half have candidate_estimate.
         if self.validator_set.weight(with_candidate) < self.validator_set.weight() / 2:
             return set(), 0
 
         edges = []
-        # For each pair of validators, v, w, add an edge if...
-        for v, w in itertools.combinations(with_candidate, 2):
-            # ... the latest message v has seen from w is on the candidate estimate ...
-            v_msg = self.view.latest_messages[v]
-            if w not in v_msg.justification.latest_messages:
+        # For each pair of validators, validator, weight, add an edge if:
+        for validator, weight in itertools.combinations(with_candidate, 2):
+            # the latest message validatorhas seen from weight is on the candidate estimate,
+            v_msg = self.view.latest_messages[validator]
+            if weight not in v_msg.justification.latest_messages:
                 continue
 
-            w_msg_in_v_view = v_msg.justification.latest_messages[w]
+            w_msg_in_v_view = v_msg.justification.latest_messages[weight]
             if utils.are_conflicting_estimates(self.candidate_estimate, w_msg_in_v_view):
                 continue
 
-            # ... the latest block w has seen from v is on the candidate estimate ...
-            w_msg = self.view.latest_messages[w]
-            if v not in w_msg.justification.latest_messages:
+            # the latest block weight has seen from validator is on the candidate estimate
+            w_msg = self.view.latest_messages[weight]
+            if validator not in w_msg.justification.latest_messages:
                 continue
 
-            v_msg_in_w_view = w_msg.justification.latest_messages[v]
+            v_msg_in_w_view = w_msg.justification.latest_messages[validator]
             if utils.are_conflicting_estimates(self.candidate_estimate, v_msg_in_w_view):
                 continue
 
-            # ... there are no blocks from w, that v has not seen, that might change v's estimate ...
-            if utils.exists_free_message(self.candidate_estimate, w, w_msg_in_v_view.sequence_number, self.view):
+            # there are no blocks from weight, that validator has not seen,
+            # that might change validators's estimate,
+            if utils.exists_free_message(self.candidate_estimate, weight,
+                                         w_msg_in_v_view.sequence_number, self.view):
                 continue
 
-            # ... and if there are no blocks from v, that w has not seen, that might change w's estimate.
-            if utils.exists_free_message(self.candidate_estimate, v, v_msg_in_w_view.sequence_number, self.view):
+            # and if there are no blocks from validator, that weight has not seen,
+            # that might change w's estimate.
+            if utils.exists_free_message(self.candidate_estimate, validator,
+                                         v_msg_in_w_view.sequence_number, self.view):
                 continue
 
-            edges.append((v, w))
+            edges.append((validator, weight))
 
         G = nx.Graph()
 
@@ -73,10 +78,10 @@ class CliqueOracle:
 
         max_clique = []
         max_weight = 0
-        for c in cliques:
-            test_weight = utils.get_weight(c)
+        for clique in cliques:
+            test_weight = utils.get_weight(clique)
             if test_weight > max_weight:
-                max_clique = c
+                max_clique = clique
                 max_weight = test_weight
 
         return set(max_clique), max_weight
