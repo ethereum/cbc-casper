@@ -23,14 +23,14 @@ def message_maker(mode):
         def round_robin(validator_set):
             """Each round, the creator of the last round's block sends it to the next
             receiver, who then creates a block."""
-            sorted_names = sorted(list(validator_set.validator_names()))
+            sorted_validators = validator_set.sorted_by_name()
             sender_index = round_robin.next_sender_index
             round_robin.next_sender_index = (sender_index + 1) % len(validator_set)
             receiver_index = round_robin.next_sender_index
 
             return [[
-                validator_set.get_validator_by_name(sorted_names[sender_index]),
-                validator_set.get_validator_by_name(sorted_names[receiver_index])
+                sorted_validators[sender_index],
+                sorted_validators[receiver_index]
             ]]
 
         round_robin.next_sender_index = 0

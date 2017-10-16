@@ -52,9 +52,10 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
 
     positions = dict()
 
+    sorted_validators = validator_set.sorted_by_name()
     for b in nodes:
-        # assuming validator name here is super hacky
-        positions[b] = (float)(b.sender.name + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*b.height
+        # index of val in list may have some small performance concerns
+        positions[b] = (float)(sorted_validators.index(b.sender) + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*b.height
 
     node_color_map = {}
     for b in nodes:
