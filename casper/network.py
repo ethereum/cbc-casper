@@ -57,7 +57,7 @@ class Network:
         plot_tool.plot_view(
             self.global_view,
             self.validator_set,
-            coloured_bets=colored_messages,
-            colour_mag=color_mag,
+            colored_bets=colored_messages,
+            color_mag=color_mag,
             edges=edges
         )

@@ -19,8 +19,16 @@ THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 
-def plot_view(view, validator_set, coloured_bets=[], colour_mag=dict(), edges=[]):
+def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None):
     """Creates and displays view graphs."""
+
+    if colored_bets is None:
+        colored_bets = set()
+    if color_mag is None:
+        color_mag = {}
+    if edges is None:
+        edges = []
+
     G = nx.Graph()
 
     nodes = view.messages
@@ -50,8 +58,8 @@ def plot_view(view, validator_set, coloured_bets=[], colour_mag=dict(), edges=[]
 
     node_color_map = {}
     for b in nodes:
-        if b in coloured_bets:
-            mag = colour_mag[b]
+        if b in colored_bets:
+            mag = color_mag[b]
             node_color_map[b] = colors[int(len(colors) * mag / len(validator_set))]
             if mag == len(validator_set) - 1:
                 node_color_map[b] = "Black"
