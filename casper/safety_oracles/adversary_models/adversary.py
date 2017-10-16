@@ -102,8 +102,8 @@ class Adversary:
                     return True, self.operations_log, self.attack_view
 
                 # Show other validators this new bet on target_estimate.
-                for v2 in self.voting_against_attacker.difference(to_remove):
-                    self.validator_models[v2].show(new_bet)
+                for val2 in self.voting_against_attacker.difference(to_remove):
+                    self.validator_models[val2].show(new_bet)
 
             # We can remove the validators who are now voting on target_estimate.
             self.voting_against_attacker.difference_update(to_remove)

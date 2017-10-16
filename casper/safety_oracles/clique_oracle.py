@@ -36,39 +36,39 @@ class CliqueOracle:
             return set(), 0
 
         edges = []
-        # For each pair of validators, validator, weight, add an edge if:
-        for validator, weight in itertools.combinations(with_candidate, 2):
-            # the latest message validatorhas seen from weight is on the candidate estimate,
-            v_msg = self.view.latest_messages[validator]
-            if weight not in v_msg.justification.latest_messages:
+        # For each pair of validators, val1, val2, add an edge if:
+        for val1, val2 in itertools.combinations(with_candidate, 2):
+            # the latest message val1 has seen from val2 is on the candidate estimate,
+            v1_msg = self.view.latest_messages[val1]
+            if val2 not in v1_msg.justification.latest_messages:
                 continue
 
-            w_msg_in_v_view = v_msg.justification.latest_messages[weight]
-            if utils.are_conflicting_estimates(self.candidate_estimate, w_msg_in_v_view):
+            v2_msg_in_v1_view = v1_msg.justification.latest_messages[val2]
+            if utils.are_conflicting_estimates(self.candidate_estimate, v2_msg_in_v1_view):
                 continue
 
-            # the latest block weight has seen from validator is on the candidate estimate
-            w_msg = self.view.latest_messages[weight]
-            if validator not in w_msg.justification.latest_messages:
+            # the latest block val2 has seen from val1 is on the candidate estimate
+            v2_msg = self.view.latest_messages[val2]
+            if val1 not in v2_msg.justification.latest_messages:
                 continue
 
-            v_msg_in_w_view = w_msg.justification.latest_messages[validator]
-            if utils.are_conflicting_estimates(self.candidate_estimate, v_msg_in_w_view):
+            v1_msg_in_v2_view = v2_msg.justification.latest_messages[val1]
+            if utils.are_conflicting_estimates(self.candidate_estimate, v1_msg_in_v2_view):
                 continue
 
-            # there are no blocks from weight, that validator has not seen,
-            # that might change validators's estimate,
-            if utils.exists_free_message(self.candidate_estimate, weight,
-                                         w_msg_in_v_view.sequence_number, self.view):
+            # there are no blocks from val2, that val1 has not seen;
+            # that might change validators' estimate.
+            if utils.exists_free_message(self.candidate_estimate, val2,
+                                         v2_msg_in_v1_view.sequence_number, self.view):
                 continue
 
-            # and if there are no blocks from validator, that weight has not seen,
-            # that might change w's estimate.
-            if utils.exists_free_message(self.candidate_estimate, validator,
-                                         v_msg_in_w_view.sequence_number, self.view):
+            # and if there are no blocks from val1, that val2 has not seen,
+            # that might change val2's estimate.
+            if utils.exists_free_message(self.candidate_estimate, val1,
+                                         v1_msg_in_v2_view.sequence_number, self.view):
                 continue
 
-            edges.append((validator, weight))
+            edges.append((val1, val2))
 
         G = nx.Graph()
 

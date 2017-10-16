@@ -98,9 +98,9 @@ class View:
                     # But if we do have a new message, then we add it to our pile..
                     new_messages.add(message)
 
-                    # and add the best in its justification to our next working set
-                    for b in message.justification.latest_messages.values():
-                        next_set.add(b)
+                    # and add the bet in its justification to our next working set
+                    for bet in message.justification.latest_messages.values():
+                        next_set.add(bet)
                     # Keeping a record of very message we inspect, being sure not
                     # to do any extra (exponential complexity) work.
                     memo.add(message)
