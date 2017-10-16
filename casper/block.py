@@ -17,7 +17,8 @@ class Block:
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
 
-        # assert sender in s.VALIDATOR_NAMES, "...expected a validator!"
+        # TODO: assert block created by a validator defined by the validator_set
+        #       in the estimate once validator_set is part of Block (message)
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
         assert isinstance(justification, Justification), "expected justification a Justification!"
 
