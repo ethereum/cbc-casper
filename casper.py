@@ -112,8 +112,8 @@ def main():
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for vals in vals_chain:
-                edgelist.append({'edges':vals,'width':2,'edge_color':'blue','style':'solid'})
+            for chains in vals_chain:
+                edgelist.append({'edges':chains,'width':2,'edge_color':'blue','style':'solid'})
 
             network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 
