@@ -2,7 +2,6 @@
 import itertools
 import networkx as nx
 
-import casper.settings as s
 import casper.utils as utils
 
 
@@ -10,12 +9,13 @@ import casper.utils as utils
 class CliqueOracle:
     """A clique safety oracle detecting safety from validators committed to an estimate."""
 
-    def __init__(self, candidate_estimate, view):
+    def __init__(self, candidate_estimate, view, validator_set):
         if candidate_estimate is None:
             raise Exception("cannot decide if safe without an estimate")
 
         self.candidate_estimate = candidate_estimate
         self.view = view
+        self.validator_set = validator_set
 
     # Find biggest set of validators that
     # a) each of their latest messages is on the candidate_estimate
@@ -27,11 +27,11 @@ class CliqueOracle:
         """Finds the biggest clique of validators committed to target estimate."""
 
         # Only consider validators whose messages are compatable w/ candidate_estimate.
-        with_candidate = {v for v in s.VALIDATOR_NAMES if v in self.view.latest_messages and \
-                                 not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
+        with_candidate = {v for v in self.validator_set if v in self.view.latest_messages and \
+                             not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
 
         # Do not have safety if less than half have candidate_estimate.
-        if utils.get_weight(with_candidate) < s.TOTAL_WEIGHT / 2:
+        if self.validator_set.weight(with_candidate) < self.validator_set.weight() / 2:
             return set(), 0
 
         edges = []
@@ -81,17 +81,16 @@ class CliqueOracle:
 
         return set(max_clique), max_weight
 
-
     def check_estimate_safety(self):
         """Returns lower bound on amount of fault tolerance some estimate has."""
 
         biggest_clique, clique_weight = self.find_biggest_clique()
 
         # Minumum amount of weight that has to equivocate.
-        fault_tolerance = 2 * clique_weight - s.TOTAL_WEIGHT
+        fault_tolerance = 2 * clique_weight - self.validator_set.weight()
 
         if fault_tolerance > 0:
-            clique_weights = {s.WEIGHTS[v] for v in biggest_clique}
+            clique_weights = {v.weight for v in biggest_clique}
 
             # Minimum number of validators that need to equivocate.
             equivocating = set()

@@ -1,5 +1,6 @@
 """The validator module ... """
 import copy
+import numbers
 import random as r
 
 from casper.block import Block
@@ -12,9 +13,18 @@ REPORT = True
 
 class Validator:
     """A validator has a view from which it generates new messages and detects finalized blocks."""
-    def __init__(self, name):
+    def __init__(self, name, weight, validator_set=None):
+        if name is None:
+            raise ValueError("Validator name must be defined.")
+        if not isinstance(weight, numbers.Number):
+            raise ValueError("Validator weight must a number.")
+        if weight < 0:
+            raise ValueError("Validator weight cannot be less than 0.")
+
         self.name = name
+        self.weight = weight
         self.view = View(set())
+        self.validator_set = validator_set
 
     def receive_messages(self, messages):
         """Allows the validator to receive protocol messages."""
@@ -27,18 +37,19 @@ class Validator:
 
     def my_latest_message(self):
         """This function returns the validator's latest message."""
-        if self.name in self.view.latest_messages:
-            return self.view.latest_messages[self.name]
+        if self in self.view.latest_messages:
+            return self.view.latest_messages[self]
         else:
             assert False
-            return None
 
     def check_estimate_safety(self, estimate):
         """The validator checks estimate safety on some estimate with some safety oracle."""
-
         assert isinstance(estimate, Block), "..expected estimate to be a Block"
 
-        oracle = CliqueOracle(estimate, self.view)
+        if self.validator_set is None:
+            raise AttributeError("Validator must have a validator_set to check estimate safety.")
+
+        oracle = CliqueOracle(estimate, self.view, self.validator_set)
         fault_tolerance, _ = oracle.check_estimate_safety()
 
         if fault_tolerance > 0:
@@ -56,9 +67,8 @@ class Validator:
 
         justification = self.view.justification()
         estimate = copy.copy(self.view.estimate())
-        sender = self.name
 
-        new_message = Block(estimate, justification, sender)
+        new_message = Block(estimate, justification, self)
 
         self.view.add_messages(set([new_message]))
 

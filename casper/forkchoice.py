@@ -1,6 +1,4 @@
 """The forkchoice module implements the estimator function a blockchain"""
-import casper.settings as s
-
 
 def get_max_weight_indexes(scores):
     """Returns the keys that map to the max value in a dict.
@@ -25,7 +23,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
         current_block = latest_messages[v]
 
         while current_block and current_block != last_finalized_block:
-            scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
+            scores[current_block] = scores.get(current_block, 0) + v.weight
             current_block = current_block.estimate
 
     best_block = last_finalized_block

@@ -1,5 +1,4 @@
 """The block module ... """
-import casper.settings as s
 from casper.justification import Justification
 
 
@@ -18,7 +17,8 @@ class Block:
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
 
-        assert sender in s.VALIDATOR_NAMES, "...expected a validator!"
+        # TODO: assert block created by a validator defined by the validator_set
+        #       in the estimate once validator_set is part of Block (message)
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
         assert isinstance(justification, Justification), "expected justification a Justification!"
 
@@ -50,9 +50,9 @@ class Block:
 
     def __hash__(self):
         if self.estimate is None:
-            return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
+            return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
         else:
-            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(10000*self.sender))
+            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(self.sender.name))
 
     def is_in_blockchain(self, block):
         """Returns True if self is an ancestor of block."""

@@ -14,6 +14,9 @@ from casper.network import Network
 from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
 import casper.presets as presets
+from casper.simulation_utils import (
+    generate_random_validator_set
+)
 
 
 def main():
@@ -25,10 +28,10 @@ def main():
         return
     msg_gen = presets.message_maker(mode)
 
-    if s.WEIGHTS:
-        print("WEIGHTS: {0}".format(s.WEIGHTS))
+    validator_set = generate_random_validator_set()
+    print("WEIGHTS: {0}".format(validator_set.validator_weights()))
 
-    network = Network()
+    network = Network(validator_set)
     network.random_initialization()
     network.report()
 
@@ -41,7 +44,7 @@ def main():
     while True:
         iterator += 1
 
-        message_paths = msg_gen()
+        message_paths = msg_gen(validator_set)
 
         sending_validators = {i for i, j in message_paths}
         affected_validators = {j for i, j in message_paths}
@@ -50,7 +53,7 @@ def main():
         old_messages = {}
         for sender in sending_validators:
             # We assume here that validators all have a most recent message
-            old_messages[sender] = network.validators[sender].my_latest_message()
+            old_messages[sender] = sender.my_latest_message()
 
         # Send these messages to the respective recieving validators
         for sender, reciever in message_paths:
@@ -58,23 +61,20 @@ def main():
 
         # Have recieving/affected validators make new blocks
         new_messages = {}
-        for v in affected_validators:
-            new_message = network.get_message_from_validator(v)
-            new_messages[v] = new_message
+        for validator in affected_validators:
+            new_message = network.get_message_from_validator(validator)
+            new_messages[validator] = new_message
             # Update display to show this new message properly
             if new_message.estimate is not None:
                 blockchain.append([new_message, new_message.estimate])
 
             # Have validators try to find newly finalized blocks
             curr = new_message
-            last_finalized_block = network.validators[v].view.last_finalized_block
+            last_finalized_block = validator.view.last_finalized_block
             while curr != last_finalized_block:
-                if network.validators[v].check_estimate_safety(curr):
+                if validator.check_estimate_safety(curr):
                     break
                 curr = curr.estimate
-
-        # Add all new messages to the global_view
-        network.global_view.add_messages(new_messages.values())
 
         # Display the fact that these messages propagated
         for sender, reciever in message_paths:
@@ -82,11 +82,11 @@ def main():
 
         # Display the fault tolerance in the global view
         tip = network.global_view.estimate()
-        while tip and node_ft.get(tip, 0) != s.NUM_VALIDATORS - 1 :
+        while tip and node_ft.get(tip, 0) != len(validator_set) - 1:
             # TODO: decide which oracle to use when displaying global ft.
             # When refactoring visualizations, could give options to switch
             # between different oracles while displaying a view!
-            oracle = CliqueOracle(tip, network.global_view)
+            oracle = CliqueOracle(tip, network.global_view, validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
@@ -103,15 +103,17 @@ def main():
 
             # Build each validators forkchoice, so we can display as well!
             vals_chain = []
-            for i in range(s.NUM_VALIDATORS):
-                vals_chain.append(utils.build_chain(network.validators[i].my_latest_message(), None))
+            for validator in validator_set:
+                vals_chain.append(
+                    utils.build_chain(validator.my_latest_message(), None)
+                )
 
             edgelist = []
             edgelist.append({'edges':blockchain, 'width':2,'edge_color':'grey','style':'solid'})
             edgelist.append({'edges':communications, 'width':1,'edge_color':'black','style':'dotted'})
             edgelist.append({'edges':best_chain, 'width':5,'edge_color':'red','style':'solid'})
-            for i in range(s.NUM_VALIDATORS):
-                edgelist.append({'edges':vals_chain[i],'width':2,'edge_color':'blue','style':'solid'})
+            for chains in vals_chain:
+                edgelist.append({'edges':chains,'width':2,'edge_color':'blue','style':'solid'})
 
             network.report(edges=edgelist, colored_messages=safe_blocks, color_mag=node_ft)
 

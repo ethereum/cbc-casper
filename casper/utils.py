@@ -1,5 +1,5 @@
 """The utils module ..."""
-import casper.settings as s
+
 
 def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
     """Returns whether or there are conflicting estimates."""
@@ -10,7 +10,7 @@ def exists_free_message(estimate, val, sequence_num, view):
     """Returns whether there exists a free message.
     A free message is a message later than the sequence number from some val,
     and conflicts with the estimate."""
-    
+
     curr_message = view.latest_messages[val]
 
     while curr_message.sequence_number >= sequence_num:
@@ -30,7 +30,7 @@ def get_weight(val_set):
     if not val_set:
         return 0
 
-    return sum(s.WEIGHTS[v] for v in val_set)
+    return sum(v.weight for v in val_set)
 
 
 def build_chain(tip, base):
