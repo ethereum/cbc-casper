@@ -16,10 +16,10 @@ class View:
         self.add_messages(messages)
 
     def __str__(self):
-        s = "View: \n"
-        for b in self.messages:
-            s += str(b) + "\n"
-        return s
+        output = "View: \n"
+        for bet in self.messages:
+            output += str(bet) + "\n"
+        return output
 
     def estimate(self):
         """The estimate function returns the set of max weight estimates
@@ -38,7 +38,8 @@ class View:
         """This method updates a validator's observed latest messages
         (and vicarious latest messages) in response to seeing new messages."""
 
-        if len(showed_messages) == 0:
+        len_showed = len(showed_messages)
+        if len_showed == 0:
             return
 
         #### PART -1 - type check
@@ -57,22 +58,23 @@ class View:
         #### PART 2 - updating latest messages
 
         # Updating latest messages...
-        for b in newly_discovered_messages:
-            if b.sender not in self.latest_messages:
-                self.latest_messages[b.sender] = b
+        for bet in newly_discovered_messages:
+            if bet.sender not in self.latest_messages:
+                self.latest_messages[bet.sender] = bet
                 continue
-            if self.latest_messages[b.sender].sequence_number < b.sequence_number:
-                self.latest_messages[b.sender] = b
+            if self.latest_messages[bet.sender].sequence_number < bet.sequence_number:
+                self.latest_messages[bet.sender] = bet
                 continue
-#            assert (b == self.latest_messages[b.sender] or
-#                    b.is_dependency_from_same_validator(self.latest_messages[b.sender])), "did not expect any equivocating nodes!"
+#            assert (bet == self.latest_messages[bet.sender] or
+#                    bet.is_dependency_from_same_validator(self.latest_messages[bet.sender])),
+#                   "did not expect any equivocating nodes!"
 
         #### PART 3 - updating children
 
-        for b in newly_discovered_messages:
-            if b.estimate not in self.children:
-                self.children[b.estimate] = set()
-            self.children[b.estimate].add(b)
+        for bet in newly_discovered_messages:
+            if bet.estimate not in self.children:
+                self.children[bet.estimate] = set()
+            self.children[bet.estimate].add(bet)
 
     def get_new_messages(self, showed_messages):
         """This method returns the set of messages out of showed_messages
@@ -96,9 +98,9 @@ class View:
                     # But if we do have a new message, then we add it to our pile..
                     new_messages.add(message)
 
-                    # and add the best in its justification to our next working set
-                    for b in message.justification.latest_messages.values():
-                        next_set.add(b)
+                    # and add the bet in its justification to our next working set
+                    for bet in message.justification.latest_messages.values():
+                        next_set.add(bet)
                     # Keeping a record of very message we inspect, being sure not
                     # to do any extra (exponential complexity) work.
                     memo.add(message)

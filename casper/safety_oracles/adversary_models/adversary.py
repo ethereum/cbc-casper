@@ -22,7 +22,8 @@ class Adversary:
 
         self.validator_models = dict()
         for validator in validator_set:
-            self.validator_models[validator] = ModelValidator(validator, latest_bets[validator], viewables[validator], self.target_estimate)
+            self.validator_models[validator] = ModelValidator(validator, latest_bets[validator],
+                                                              viewables[validator], self.target_estimate)
 
         self.voting_against_attacker = set()
         self.voting_with_attacker = set()
@@ -64,8 +65,8 @@ class Adversary:
         for validator in self.voting_with_attacker:
             on_target, bet = self.validator_models[validator].make_new_latest_bet()
             assert on_target and bet.estimate == self.target_estimate, 'in voting_with_attacker!'
-            for v2 in self.voting_against_attacker:
-                self.validator_models[v2].show(bet)
+            for val2 in self.voting_against_attacker:
+                self.validator_models[val2].show(bet)
 
         # We'll continue the attack until we no longer make progress,
         # or until the attack is successful and the victim estimate dethroned.
@@ -101,8 +102,8 @@ class Adversary:
                     return True, self.operations_log, self.attack_view
 
                 # Show other validators this new bet on target_estimate.
-                for v2 in self.voting_against_attacker.difference(to_remove):
-                    self.validator_models[v2].show(new_bet)
+                for val2 in self.voting_against_attacker.difference(to_remove):
+                    self.validator_models[val2].show(new_bet)
 
             # We can remove the validators who are now voting on target_estimate.
             self.voting_against_attacker.difference_update(to_remove)

@@ -28,42 +28,47 @@ class CliqueOracle:
 
         # Only consider validators whose messages are compatable w/ candidate_estimate.
         with_candidate = {v for v in self.validator_set if v in self.view.latest_messages and \
-                             not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[v])}
+                             not utils.are_conflicting_estimates(self.candidate_estimate,
+                                                                 self.view.latest_messages[v])}
 
         # Do not have safety if less than half have candidate_estimate.
         if self.validator_set.weight(with_candidate) < self.validator_set.weight() / 2:
             return set(), 0
 
         edges = []
-        # For each pair of validators, v, w, add an edge if...
-        for v, w in itertools.combinations(with_candidate, 2):
-            # ... the latest message v has seen from w is on the candidate estimate ...
-            v_msg = self.view.latest_messages[v]
-            if w not in v_msg.justification.latest_messages:
+        # For each pair of validators, val1, val2, add an edge if:
+        for val1, val2 in itertools.combinations(with_candidate, 2):
+            # the latest message val1 has seen from val2 is on the candidate estimate,
+            v1_msg = self.view.latest_messages[val1]
+            if val2 not in v1_msg.justification.latest_messages:
                 continue
 
-            w_msg_in_v_view = v_msg.justification.latest_messages[w]
-            if utils.are_conflicting_estimates(self.candidate_estimate, w_msg_in_v_view):
+            v2_msg_in_v1_view = v1_msg.justification.latest_messages[val2]
+            if utils.are_conflicting_estimates(self.candidate_estimate, v2_msg_in_v1_view):
                 continue
 
-            # ... the latest block w has seen from v is on the candidate estimate ...
-            w_msg = self.view.latest_messages[w]
-            if v not in w_msg.justification.latest_messages:
+            # the latest block val2 has seen from val1 is on the candidate estimate
+            v2_msg = self.view.latest_messages[val2]
+            if val1 not in v2_msg.justification.latest_messages:
                 continue
 
-            v_msg_in_w_view = w_msg.justification.latest_messages[v]
-            if utils.are_conflicting_estimates(self.candidate_estimate, v_msg_in_w_view):
+            v1_msg_in_v2_view = v2_msg.justification.latest_messages[val1]
+            if utils.are_conflicting_estimates(self.candidate_estimate, v1_msg_in_v2_view):
                 continue
 
-            # ... there are no blocks from w, that v has not seen, that might change v's estimate ...
-            if utils.exists_free_message(self.candidate_estimate, w, w_msg_in_v_view.sequence_number, self.view):
+            # there are no blocks from val2, that val1 has not seen;
+            # that might change validators' estimate.
+            if utils.exists_free_message(self.candidate_estimate, val2,
+                                         v2_msg_in_v1_view.sequence_number, self.view):
                 continue
 
-            # ... and if there are no blocks from v, that w has not seen, that might change w's estimate.
-            if utils.exists_free_message(self.candidate_estimate, v, v_msg_in_w_view.sequence_number, self.view):
+            # and if there are no blocks from val1, that val2 has not seen,
+            # that might change val2's estimate.
+            if utils.exists_free_message(self.candidate_estimate, val1,
+                                         v1_msg_in_v2_view.sequence_number, self.view):
                 continue
 
-            edges.append((v, w))
+            edges.append((val1, val2))
 
         G = nx.Graph()
 
@@ -73,10 +78,10 @@ class CliqueOracle:
 
         max_clique = []
         max_weight = 0
-        for c in cliques:
-            test_weight = utils.get_weight(c)
+        for clique in cliques:
+            test_weight = utils.get_weight(clique)
             if test_weight > max_weight:
-                max_clique = c
+                max_clique = clique
                 max_weight = test_weight
 
         return set(max_clique), max_weight

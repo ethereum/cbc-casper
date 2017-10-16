@@ -19,11 +19,11 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
 
     scores = dict()
 
-    for v in latest_messages:
-        current_block = latest_messages[v]
+    for validator in latest_messages:
+        current_block = latest_messages[validator]
 
         while current_block and current_block != last_finalized_block:
-            scores[current_block] = scores.get(current_block, 0) + v.weight
+            scores[current_block] = scores.get(current_block, 0) + validator.weight
             current_block = current_block.estimate
 
     best_block = last_finalized_block
