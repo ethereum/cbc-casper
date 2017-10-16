@@ -184,11 +184,11 @@ class TestLangCBC:
         edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
 
         for validator in self.validator_set:
-            val = utils.build_chain(
+            chain = utils.build_chain(
                 validator.my_latest_message(),
                 None
                 )
-            edgelist.append(self._edge(val, 2, 'blue', 'solid'))
+            edgelist.append(self._edge(chain, 2, 'blue', 'solid'))
 
         edgelist.append(self._edge(self.blockchain, 2, 'grey', 'solid'))
         edgelist.append(self._edge(self.communications, 1, 'black', 'dotted'))
