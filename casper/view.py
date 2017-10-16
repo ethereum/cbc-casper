@@ -16,10 +16,10 @@ class View:
         self.add_messages(messages)
 
     def __str__(self):
-        sel = "View: \n"
+        output = "View: \n"
         for bet in self.messages:
-            sel += str(bet) + "\n"
-        return sel
+            output += str(bet) + "\n"
+        return output
 
     def estimate(self):
         """The estimate function returns the set of max weight estimates
