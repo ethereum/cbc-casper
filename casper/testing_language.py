@@ -20,7 +20,7 @@ class TestLangCBC:
         if test_string == '':
             raise Exception("Please pass in a valid test string")
 
-        self.validator_set = ValidatorSet({i: w for i, w in enumerate(val_weights)})
+        self.validator_set = ValidatorSet(val_weights)
         self.test_string = test_string
         self.display = display
         self.network = Network(self.validator_set)
