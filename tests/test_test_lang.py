@@ -89,7 +89,7 @@ def test_parse_only_valid_tokens(test_string, error):
         ('B0-A S1-A S2-A S3-A S4-A', TEST_WEIGHT, ''),
         ('B0-A S1-A U1-A', [1, 2], ''),
         ('B0-A S1-A H1-A', [2, 1], ''),
-        ('RR0-A RR0-B C0-A', [2,1], ''),
+        ('RR0-A RR0-B C0-A', [2, 1], ''),
         ('B5-A', TEST_WEIGHT, 'Validator'),
         ('B0-A S1-A', [1], 'Validator'),
         ('B0-A S1-A S2-A S3-A S4-A', [0], 'Validator'),
@@ -290,7 +290,7 @@ def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_
         assert len(validator.view.messages) == num_messages_per_view[validator_name]
         assert len(validator.view.latest_messages) == len(other_val_seen[validator_name])
         for other_validator_name in other_val_seen[validator_name]:
-            other_validator = test_lang.validator_set.get_validator_by_name(validator_name)
+            other_validator = test_lang.validator_set.get_validator_by_name(other_validator_name)
 
             assert other_validator in validator.view.latest_messages
 
