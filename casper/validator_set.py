@@ -25,6 +25,9 @@ class ValidatorSet:
     def sorted_by_name(self):
         return sorted(list(self.validators), key=lambda v: v.name)
 
+    def sorted_by_weight(self):
+        return sorted(list(self.validators), key=lambda v: v.weight)
+
     def get_validator_by_name(self, name):
         return self.get_validators_by_names([name]).pop()
 
