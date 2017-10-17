@@ -1,10 +1,11 @@
 # Casper CBC
 A python implementation of Vlad Zamfir's Correct by Construction Casper.
 
+
 Branch    | Tests
 ----------|------
-master    | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master.svg?style=shield)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master)
-develop   |[![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop.svg?style=shield)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop)
+master    | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master)
+develop   | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop)
 
 ## Requirements
 * Python 3
