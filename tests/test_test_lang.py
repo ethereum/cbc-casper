@@ -1,9 +1,6 @@
 import pytest
 
 from casper.network import Network
-from casper.block import Block
-from casper.justification import Justification
-import casper.settings as s
 from casper.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
