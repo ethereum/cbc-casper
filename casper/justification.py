@@ -1,13 +1,12 @@
-import random as r
-import forkchoice
-
-
+"""The justification module ..."""
 class Justification:
+    """The justification class ..."""
     def __init__(self, last_finalized_block=None, latest_messages=dict()):
         self.last_finalized_block = last_finalized_block
         self.latest_messages = dict()
-        for v in latest_messages:
-            self.latest_messages[v] = latest_messages[v]
+        for validator in latest_messages:
+            self.latest_messages[validator] = latest_messages[validator]
 
     def is_null(self):
+        """Returns True if latest messages equal dict."""
         return self.latest_messages == dict()

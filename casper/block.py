@@ -1,10 +1,9 @@
-import copy
-import settings as s
-
-from justification import Justification
+"""The block module ... """
+from casper.justification import Justification
 
 
 class Block:
+    """Message/bet data structure for blockchain consensus"""
     def __eq__(self, block):
         if block is None:
             return False
@@ -18,7 +17,8 @@ class Block:
     def __init__(self, estimate, justification, sender):
         # genesis block! 0
 
-        assert sender in s.VALIDATOR_NAMES, "...expected a validator!"
+        # TODO: assert block created by a validator defined by the validator_set
+        #       in the estimate once validator_set is part of Block (message)
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
         assert isinstance(justification, Justification), "expected justification a Justification!"
 
@@ -28,20 +28,21 @@ class Block:
         self.estimate = estimate
         self.justification = justification
 
-        # the sequence number makes certain operations more efficient (like checking if bets are later)
+        # The sequence number makes certain operations more
+        # efficient (like checking if bets are later).
         if self.sender not in self.justification.latest_messages:
             self.sequence_number = 0
         else:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
-        # the "heights" of bets are used for visualization of views
+        # The "heights" of bets are used for visualization of views.
         if self.justification.is_null():
             self.height = 0
         else:
             candidate_max = 0
-            for v in self.justification.latest_messages:
-                if self.justification.latest_messages[v].height > candidate_max:
-                    candidate_max = self.justification.latest_messages[v].height
+            for validator in self.justification.latest_messages:
+                if self.justification.latest_messages[validator].height > candidate_max:
+                    candidate_max = self.justification.latest_messages[validator].height
 
             self.height = candidate_max + 1
 
@@ -49,11 +50,12 @@ class Block:
 
     def __hash__(self):
         if self.estimate is None:
-            return hash(str(self.sequence_number) + str(123123124124) + str(10000*self.sender))
+            return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
         else:
-            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(10000*self.sender))
+            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(self.sender.name))
 
     def is_in_blockchain(self, block):
+        """Returns True if self is an ancestor of block."""
         assert isinstance(block, Block), "...expected a block"
 
         if self == block:

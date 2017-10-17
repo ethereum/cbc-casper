@@ -5,3 +5,7 @@ venv*
 *.prof
 *.orig
 results.txt
+notes.txt
+
+.cache/
+.tox/

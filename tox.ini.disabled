@@ -1,0 +1,21 @@
+[tox]
+skipsdist=True
+envlist=
+    py{27,34,35}
+    flake8
+
+[flake8]
+max-line-length= 100
+exclude= venv*,.tox,
+ignore=
+
+[testenv]
+commands=
+    py.test
+deps=
+    -r{toxinidir}/requirements.txt
+
+[testenv:flake8]
+basepython=python
+deps=flake8
+commands=flake8 {toxinidir} {toxinidir}/casper {toxinidir}/tests

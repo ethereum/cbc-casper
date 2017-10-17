@@ -1,10 +1,8 @@
-import settings as s
-import random as r
-import copy
-import utils
-
+"""The forkchoice module implements the estimator function a blockchain"""
 
 def get_max_weight_indexes(scores):
+    """Returns the keys that map to the max value in a dict.
+    The max value must be greater than zero."""
 
     max_score = max(scores.values())
 
@@ -16,14 +14,16 @@ def get_max_weight_indexes(scores):
 
 
 def get_fork_choice(last_finalized_block, children, latest_messages):
+    """Returns the estimate by selecting highest weight sub-trees.
+    Starts from the last_finalized_block and stops when it reaches a tip."""
 
     scores = dict()
 
-    for v in latest_messages:
-        current_block = latest_messages[v]
+    for validator in latest_messages:
+        current_block = latest_messages[validator]
 
         while current_block and current_block != last_finalized_block:
-            scores[current_block] = scores.get(current_block, 0) + s.WEIGHTS[v]
+            scores[current_block] = scores.get(current_block, 0) + validator.weight
             current_block = current_block.estimate
 
     best_block = last_finalized_block
@@ -34,7 +34,8 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
             curr_scores[child] = scores.get(child, 0)
             max_score = max(curr_scores[child], max_score)
 
-        # we don't choose weight 0 children. Also possible to make non-deterministic decision here.
+        # We don't choose weight 0 children.
+        # Also possible to make non-deterministic decision here.
         if max_score == 0:
             break
 
