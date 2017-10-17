@@ -4,7 +4,7 @@ from casper.network import Network
 from casper.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
-TEST_WEIGHT = {i: i for i in range(5, 0, -1)}
+TEST_WEIGHT = {i: 5 - i for i in range(5)}
 
 
 def test_init_non_empty_string():
@@ -87,16 +87,16 @@ def test_parse_only_valid_tokens(test_string, error):
     [
         ('B0-A B1-B B2-C B3-D B4-E', TEST_WEIGHT, ''),
         ('B0-A S1-A S2-A S3-A S4-A', TEST_WEIGHT, ''),
-        ('B0-A S1-A U1-A', [1, 2], ''),
-        ('B0-A S1-A H1-A', [2, 1], ''),
-        ('RR0-A RR0-B C0-A', [2, 1], ''),
+        ('B0-A S1-A U1-A', {0: 1, 1: 2}, ''),
+        ('B0-A S1-A H1-A', {0: 2, 1: 1}, ''),
+        ('RR0-A RR0-B C0-A', {0: 2, 1: 1}, ''),
         ('B5-A', TEST_WEIGHT, 'Validator'),
-        ('B0-A S1-A', [1], 'Validator'),
-        ('B0-A S1-A S2-A S3-A S4-A', [0], 'Validator'),
+        ('B0-A S1-A', {0: 1}, 'Validator'),
+        ('B0-A S1-A S2-A S3-A S4-A', {0: 0}, 'Validator'),
         ('B4-A S5-A', TEST_WEIGHT, 'Validator'),
-        ('B0-A S1-A U2-A', [1, 2], 'Validator'),
-        ('B0-A S1-A H2-A', [2, 1], 'Validator'),
-        ('RR0-A RR0-B C2-A', [2, 1], 'Validator'),
+        ('B0-A S1-A U2-A', {0: 1, 1: 2}, 'Validator'),
+        ('B0-A S1-A H2-A', {0: 2, 1: 1}, 'Validator'),
+        ('RR0-A RR0-B C2-A', {0: 2, 1: 1}, 'Validator'),
         ('B0-A S1-B', TEST_WEIGHT, 'Block'),
         ('B0-A S1-A U1-B', TEST_WEIGHT, 'Block'),
         ('B0-A S1-A H1-B', TEST_WEIGHT, 'Block'),
@@ -316,3 +316,29 @@ def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
         validator = test_lang.validator_set.get_validator_by_name(validator_name)
         block_name = val_forkchoice[validator_name]
         assert test_lang.blocks[block_name] == validator.estimate()
+
+
+@pytest.mark.parametrize(
+    'test_string, error',
+    [
+        (('NOFINAL'),''),
+        ('RR0-A RR0-B RR0-C RR0-D RR0-E RR0-F U0-A', 'failed no-safety assert'),
+    ]
+)
+def test_no_safety(test_string, error):
+    if test_string == 'NOFINAL':
+        test_string = ''
+        for i in range(100):
+            test_string += 'B' + str(i % len(TEST_WEIGHT)) + '-' + str(i) + ' ' + \
+            'B' + str((i + 1) % len(TEST_WEIGHT)) + '-' + str(100 + i) + ' ' + \
+            'S' + str((i + 2) % len(TEST_WEIGHT)) + '-' + str(100 + i) + ' ' +\
+            'S' + str((i + 1) % len(TEST_WEIGHT)) + '-' + str(i) + ' '
+        test_string += 'U0-0'
+
+    test_lang = TestLangCBC(test_string, TEST_WEIGHT)
+
+    if error == '':
+        test_lang.parse()
+    else:
+        with pytest.raises(Exception, match=error):
+            test_lang.parse()

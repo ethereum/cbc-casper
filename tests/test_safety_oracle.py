@@ -4,7 +4,7 @@ def test_round_robin_safety(test_lang_runner):
         'S3-E S4-E H0-E H1-E H2-E H3-E H4-E C0-A '
         'C1-A C2-A C3-A C4-A R'
     )
-    weights = [9.3, 8.2, 7.1, 6, 5]
+    weights = {0: 9.3, 1: 8.2, 2: 7.1, 3: 6, 4: 5}
     test_lang_runner(test_string, weights)
 
 
@@ -16,7 +16,7 @@ def test_majority_fork_safe(test_lang_runner):
         # other fork shows safe fork blocks, but they remain stuck
         'S2-A B2-R0 S0-R0 H0-L4 S1-R0 H0-L4 R'
     )
-    weights = [5, 6, 7]
+    weights = {0: 5, 1: 6, 2: 7}
     test_lang_runner(test_string, weights)
 
 
@@ -29,7 +29,7 @@ def test_no_majority_fork_unsafe(test_lang_runner):
         'S3-A B3-R0 S4-R0 B4-R1 S3-R1 B3-R2 S4-R2 B4-R3 '
         'S3-R3 B3-R4 S4-R4 H4-R4 U4-R0 H3-R4 U3-R0 R'
     )
-    weights = [5, 4.5, 6, 4, 5.25]
+    weights = {0: 5, 1: 4.5, 2: 6, 3: 4, 4: 5.25}
     test_lang_runner(test_string, weights)
 
 
@@ -47,5 +47,5 @@ def test_no_majority_fork_safe_after_union(test_lang_runner):
         # two rounds of round robin, check have safety on the correct fork
         'RR0-J0 RR0-J1 C0-L0 R'
     )
-    weights = [5, 4.5, 6, 4, 5.25]
+    weights = {0: 5, 1: 4.5, 2: 6, 3: 4, 4: 5.25}
     test_lang_runner(test_string, weights)
