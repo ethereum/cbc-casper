@@ -20,7 +20,7 @@ class TestLangCBC:
         if test_string == '':
             raise Exception("Please pass in a valid test string")
 
-        self.validator_set = ValidatorSet({i: w for i, w in enumerate(val_weights)})
+        self.validator_set = ValidatorSet(val_weights)
         self.test_string = test_string
         self.display = display
         self.network = Network(self.validator_set)
@@ -45,16 +45,30 @@ class TestLangCBC:
         self.handlers['R'] = self.report
 
     def _validate_validator(self, validator):
-        if validator not in self.network.validator_set:
-            raise Exception('Validator {} does not exist'.format(validator))
+        if validator not in self.validator_set:
+            raise ValueError('Validator {} does not exist'.format(validator))
 
     def _validate_block_exists(self, block_name):
         if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+            raise ValueError('Block {} does not exist'.format(block_name))
 
     def _validate_block_does_not_exist(self, block_name):
         if block_name in self.blocks:
-            raise Exception('Block {} already exists'.format(block_name))
+            raise ValueError('Block {} already exists'.format(block_name))
+
+    def parse(self):
+        """Parse the test_string, and run the test"""
+        for token in self.test_string.split(' '):
+            letter, validator, dash, name = re.match(self.TOKEN_PATTERN, token).groups()
+            if letter+validator+dash+name != token:
+                raise ValueError("Bad token: %s" % token)
+            if validator != '':
+                try:
+                    validator = self.validator_set.get_validator_by_name(int(validator))
+                except KeyError:
+                    raise ValueError("Validator {} does not exist".format(validator))
+
+            self.handlers[letter](validator, name)
 
     def send_block(self, validator, block_name):
         """Send some validator a block."""
@@ -98,7 +112,6 @@ class TestLangCBC:
                 name = block_name
             else:
                 name = r.random()
-
             maker = validators[i]
             receiver = validators[(i + 1) % len(validators)]
 
@@ -115,7 +128,8 @@ class TestLangCBC:
 
         # NOTE: This may fail because the safety_oracle might be a lower bound,
         # so this might be better not as an assert :)
-        assert safe, "Block {0} failed safety assert for validator-{1}".format(block_name, validator.name)
+        assert safe, "Block {0} failed safety assert " \
+                     "for validator-{1}".format(block_name, validator.name)
 
     def no_safety(self, validator, block_name):
         """Check that some validator does not detect safety on a block."""
@@ -139,18 +153,8 @@ class TestLangCBC:
 
         head = validator.view.estimate()
 
-        assert block == head, "Validator {} does not have block {} at head".format(validator, block_name)
-
-    def parse(self):
-        """Parse the test_string, and run the test"""
-        for token in self.test_string.split(' '):
-            letter, validator, dash, name = re.match(self.TOKEN_PATTERN, token).groups()
-            if letter+validator+dash+name != token:
-                raise Exception("Bad token: %s" % token)
-            if validator != '':
-                validator = self.validator_set.get_validator_by_name(int(validator))
-
-            self.handlers[letter](validator, name)
+        assert block == head, "Validator {} does not have " \
+                              "block {} at head".format(validator, block_name)
 
     def report(self, num, name):
         """Display the view graph of the current global_view"""
