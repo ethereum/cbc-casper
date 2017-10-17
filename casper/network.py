@@ -1,42 +1,63 @@
-import casper.settings as s
-
-from casper.validator import Validator
+"""The network module .... """
 from casper.view import View
 import casper.plot_tool as plot_tool
 
 
 class Network:
-    def __init__(self):
-        self.validators = dict()
-        for v in s.VALIDATOR_NAMES:
-            self.validators[v] = Validator(v)
+    """Simulates a network that allows for message passing between validators."""
+    def __init__(self, validator_set):
+        self.validator_set = validator_set
         self.global_view = View()
 
-    def propagate_message_to_validator(self, message, validator_name):
-        assert message in self.global_view.messages, "...expected only to propagate messages from the global view"
-        self.validators[validator_name].receive_messages(set([message]))
+    def propagate_message_to_validator(self, message, validator):
+        """Propagate a message to a validator."""
+        assert message in self.global_view.messages, ("...expected only to propagate messages "
+                                                      "from the global view")
+        assert validator in self.validator_set, "...expected a known validator"
 
-    def get_message_from_validator(self, validator_name):
-        assert validator_name in s.VALIDATOR_NAMES, "...expected a known validator"
+        validator.receive_messages(set([message]))
 
-        new_message = self.validators[validator_name].make_new_message()
+    def get_message_from_validator(self, validator):
+        """Get a message from a validator."""
+        assert validator in self.validator_set, "...expected a known validator"
+
+        new_message = validator.make_new_message()
+        self.global_view.add_messages(set([new_message]))
+
         return new_message
 
-    # def let_validator_push
-
     def view_initialization(self, view):
+        """
+        Initalizes all validators with all messages in some view.
+        NOTE: This method is not currently tested or called anywhere in repo
+        """
         assert isinstance(view, View)
         self.global_view = view.messages
 
         latest = view.latest_messages
 
-        for v in latest:
-            self.validators[v].receive_messages(set([latest[v]]))
+        for validator in latest:
+            validator.receive_messages(set([latest[validator]]))
 
     def random_initialization(self):
-        for v in s.VALIDATOR_NAMES:
-            new_bet = self.get_message_from_validator(v)
+        """Generates starting messages for all validators with None as an estiamte."""
+        for validator in self.validator_set:
+            new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
 
-    def report(self, colored_messages=set(), color_mag=dict(), edges=[]):
-        plot_tool.plot_view(self.global_view, coloured_bets=colored_messages, colour_mag=color_mag, edges=edges)
+    def report(self, colored_messages=None, color_mag=None, edges=None):
+        """Displays a view graph."""
+        if colored_messages is None:
+            colored_messages = set()
+        if color_mag is None:
+            color_mag = {}
+        if edges is None:
+            edges = []
+
+        plot_tool.plot_view(
+            self.global_view,
+            self.validator_set,
+            colored_bets=colored_messages,
+            color_mag=color_mag,
+            edges=edges
+        )

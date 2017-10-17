@@ -1,10 +1,11 @@
-import casper.settings as s
+"""The model utils module ... """
 
 
 def get_estimate_from_latest_messages(latest_bets, default=None):
+    """Picks the highest weight estimate (0 or 1) given some latest bets."""
 
-    zero_weight = sum(s.WEIGHTS[v] for v in latest_bets if latest_bets[v].estimate == 0)
-    one_weight = sum(s.WEIGHTS[v] for v in latest_bets if latest_bets[v].estimate == 1)
+    zero_weight = sum(v.weight for v in latest_bets if latest_bets[v].estimate == 0)
+    one_weight = sum(v.weight for v in latest_bets if latest_bets[v].estimate == 1)
 
     if zero_weight > one_weight:
         return 0

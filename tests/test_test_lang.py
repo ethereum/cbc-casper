@@ -7,74 +7,82 @@ import casper.settings as s
 from casper.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
-TEST_WEIGHT = [i for i in range(5, 0, -1)]
+TEST_WEIGHT = {i: i for i in range(5, 0, -1)}
+
 
 def test_init_non_empty_string():
-    TestLangCBC(TEST_STRING, [1])
+    TestLangCBC(TEST_STRING, {0: 1})
+
 
 def test_init_fail_empty_string():
     test_string = ('')
     with pytest.raises(Exception):
         TestLangCBC(test_string, [1])
 
+
 @pytest.mark.parametrize(
-    'weight_list, num_val, weight_dict, total_weight',
+    'weights, num_val, total_weight',
     [
-        ([i for i in range(10)], 10, {i: i for i in range(10)}, 45),
-        ([i for i in range(9, -1, -1)], 10, {i: 9 - i for i in range(10)}, 45),
-        ([0], 1, {0: 0}, 0),
-        ([], 0, {}, 0),
+        ({i: i for i in range(10)}, 10, 45),
+        ({i: 9 - i for i in range(10)}, 10, 45),
+        ({0: 0}, 1, 0),
+        ({}, 0, 0),
     ]
 )
-def test_init_update_settings(weight_list, num_val, weight_dict, total_weight):
-    TestLangCBC(TEST_STRING, weight_list)
+def test_initialize_validator_set(weights, num_val, total_weight):
+    test_lang = TestLangCBC(TEST_STRING, weights)
+    validator_set = test_lang.validator_set
 
-    assert len(s.WEIGHTS) == num_val
-    assert s.WEIGHTS == weight_dict
-    assert s.TOTAL_WEIGHT == total_weight
+    assert len(validator_set) == num_val
+    assert validator_set.validator_weights() == set(weights.values())
+    assert validator_set.weight() == total_weight
+
 
 def test_init_creates_network():
     test_lang = TestLangCBC(TEST_STRING, TEST_WEIGHT)
 
     assert isinstance(test_lang.network, Network)
 
+
 def test_init_validators_create_blocks():
     test_lang = TestLangCBC(TEST_STRING, TEST_WEIGHT)
 
     assert len(test_lang.network.global_view.messages) == len(TEST_WEIGHT)
 
-    for v in test_lang.network.validators:
-        assert len(test_lang.network.validators[v].view.messages) == 1
-        assert len(test_lang.network.validators[v].view.latest_messages) == 1
-        assert test_lang.network.validators[v].view.latest_messages[v].estimate == None
+    for validator in test_lang.network.validator_set:
+        assert len(validator.view.messages) == 1
+        assert len(validator.view.latest_messages) == 1
+        assert validator.view.latest_messages[validator].estimate is None
+
 
 @pytest.mark.parametrize(
-    'test_string, valid_tokens, error',
+    'test_string, error',
     [
-        ('B0-A', True, None),
-        ('B0-A S1-A', True, None),
-        ('B0-A S1-A U1-A', True, None),
-        ('B0-A S1-A H1-A', True, None),
-        ('B0-A RR0-B RR0-C C0-A', True, None),
-        ('R', True, None),
-        ('A-B', False, KeyError),
-        ('BA0-A, S1-A', False, ValueError),
-        ('BA0-A S1-A', False, KeyError),
-        ('RR0-A-A', False, ValueError),
-        ('B0-A S1-A T1-A', False, KeyError),
-        ('RR0-AB1-A', False, ValueError),
-        ('RRR', False, KeyError),
-        ('A0-A S1-A', False, KeyError),
+        ('B0-A', None),
+        ('B0-A S1-A', None),
+        ('B0-A S1-A U1-A', None),
+        ('B0-A S1-A H1-A', None),
+        ('B0-A RR0-B RR0-C C0-A', None),
+        ('R', None),
+        ('A-B', KeyError),
+        ('BA0-A, S1-A', ValueError),
+        ('BA0-A S1-A', KeyError),
+        ('RR0-A-A', ValueError),
+        ('B0-A S1-A T1-A', KeyError),
+        ('RR0-AB1-A', ValueError),
+        ('RRR', KeyError),
+        ('A0-A S1-A', KeyError),
     ]
 )
-def test_parse_only_valid_tokens(test_string, valid_tokens, error):
+def test_parse_only_valid_tokens(test_string, error):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
 
-    if valid_tokens:
-        test_lang.parse()
-    else:
+    if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
             test_lang.parse()
+        return
+
+    test_lang.parse()
 
 
 @pytest.mark.parametrize(
@@ -101,11 +109,12 @@ def test_parse_only_valid_tokens(test_string, valid_tokens, error):
 def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
     test_lang = TestLangCBC(test_string, val_weights)
 
-    if exception == '':
-        test_lang.parse()
-    else:
-        with pytest.raises(Exception, match=exception):
+    if exception:
+        with pytest.raises(ValueError, match=exception):
             test_lang.parse()
+        return
+
+    test_lang.parse()
 
 
 # NOTE: network.global_view.messages starts with 5 messages from random_initialization
@@ -128,12 +137,13 @@ def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
 def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, exception):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
 
-    if exception == '':
-        test_lang.parse()
-        assert len(test_lang.network.global_view.messages) == num_blocks
-    else:
+    if exception:
         with pytest.raises(Exception, match=exception):
             test_lang.parse()
+        return
+
+    test_lang.parse()
+    assert len(test_lang.network.global_view.messages) == num_blocks
 
 
 # NOTE: None means the block is not named by the testing language
@@ -144,12 +154,18 @@ def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, 
         ('B0-A', {'A': {0: None}}),
         ('B0-A S1-A B1-B', {'B': {0: 'A', 1: None}}),
         ('RR0-A', {'A': {i: None for i in range(5)}}),
-        ('RR0-A B0-B S1-B B1-C', {'C': {0:'B', 1:None, 2:None, 3:None, 4:None}}),
-        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
-            {'E': {0:'A', 1:'B', 2:'C', 3:'D', 4:None}}),
-        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E S0-E B0-F',
-            {'F': {0:'A', 1:'B', 2:'C', 3:'D', 4:'E'}})
-
+        (
+            'RR0-A B0-B S1-B B1-C',
+            {'C': {0: 'B', 1: None, 2: None, 3: None, 4: None}}
+        ),
+        (
+            'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
+            {'E': {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: None}}
+        ),
+        (
+            'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E S0-E B0-F',
+            {'F': {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E'}}
+        ),
     ]
 )
 def test_make_block_builds_on_entire_view(test_string, block_justification):
@@ -159,10 +175,13 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
     for b in block_justification:
         block = test_lang.blocks[b]
         assert len(block.justification.latest_messages) == len(block_justification[b].keys())
-        for v in block_justification[b]:
-            block_in_justification = block_justification[b][v]
+        for validator_name in block_justification[b]:
+            block_in_justification = block_justification[b][validator_name]
+            validator = test_lang.validator_set.get_validator_by_name(validator_name)
+
             if block_in_justification:
-                assert test_lang.blocks[block_in_justification] == block.justification.latest_messages[v]
+                validator_justification_message = block.justification.latest_messages[validator]
+                assert test_lang.blocks[block_in_justification] == validator_justification_message
 
 
 @pytest.mark.parametrize(
@@ -188,45 +207,95 @@ def test_send_block_sends_only_existing_blocks(test_string, exception):
 @pytest.mark.parametrize(
     'test_string, num_messages_per_view, message_keys',
     [
-        ('B0-A S1-A', {0:2, 1:3}, {0: ['A'], 1: ['A']}),
-        ('B0-A S1-A S2-A S3-A S4-A', {0:2, 1:3, 2:3, 3:3, 4:3}, {i: ['A'] for i in range(5)}),
-        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E', {0:2, 1:4, 2:6, 3:8, 4:10},
-            {0: ['A'], 1: ['A', 'B'], 2: ['A', 'B', 'C'], 3: ['A', 'B', 'C', 'D'], 4: ['A', 'B', 'C', 'D', 'E']}),
-        ('B0-A B0-B B0-C B0-D B0-E', {0:6, 1:1, 2:1, 3:1, 4:1},
-            {0: ['A', 'B', 'C', 'D', 'E'], 1:[], 2:[], 3:[], 4:[]}),
+        (
+            'B0-A S1-A',
+            {0: 2, 1: 3},
+            {0: ['A'], 1: ['A']}
+        ),
+        (
+            'B0-A S1-A S2-A S3-A S4-A',
+            {0: 2, 1: 3, 2: 3, 3: 3, 4: 3},
+            {i: ['A'] for i in range(5)}
+        ),
+        (
+            'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
+            {0: 2, 1: 4, 2: 6, 3: 8, 4: 10},
+            {
+                0: ['A'],
+                1: ['A', 'B'],
+                2: ['A', 'B', 'C'],
+                3: ['A', 'B', 'C', 'D'],
+                4: ['A', 'B', 'C', 'D', 'E']
+            }
+        ),
+        (
+            'B0-A B0-B B0-C B0-D B0-E',
+            {0: 6, 1: 1, 2: 1, 3: 1, 4: 1},
+            {0: ['A', 'B', 'C', 'D', 'E'], 1: [], 2: [], 3: [], 4: []}
+        ),
     ]
 )
 def test_send_block_updates_val_view(test_string, num_messages_per_view, message_keys):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
     test_lang.parse()
 
-    for v in num_messages_per_view:
-        assert len(test_lang.network.validators[v].view.messages) == num_messages_per_view[v]
-        for m in message_keys[v]:
-            assert test_lang.blocks[m] in test_lang.network.validators[v].view.messages
+    for validator_name in num_messages_per_view:
+        validator = test_lang.validator_set.get_validator_by_name(validator_name)
+        assert len(validator.view.messages) == num_messages_per_view[validator_name]
+        for message_name in message_keys[validator_name]:
+            assert test_lang.blocks[message_name] in validator.view.messages
 
 
 @pytest.mark.parametrize(
     'test_string, num_messages_per_view, other_val_seen',
     [
-        ('RR0-A', {0:10, 1:4, 2:6, 3:8, 4:10}, {0:[0,1,2,3,4], 1:[0,1], 2:[0,1,2], 3:[0,1,2,3], 4:[0,1,2,3,4]}),
-        ('RR0-A RR0-B', {0:15, 1:12, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in range(5)}),
-        ('B0-A S1-A B1-B RR1-C', {0:12, 1:12, 2:7, 3:9, 4:11},
-            {0:[0,1,2,3,4], 1:[0,1,2,3,4], 2:[0,1,2], 3:[0,1,2,3], 4:[0,1,2,3,4]}),
-        ('RR0-A B0-B S1-B RR1-C', {0:16, 1:16, 2:13, 3:14, 4:15}, {i:[0,1,2,3,4] for i in range(5)}),
+        (
+            'RR0-A',
+            {0: 10, 1: 4, 2: 6, 3: 8, 4: 10},
+            {
+                0: [0, 1, 2, 3, 4],
+                1: [0, 1],
+                2: [0, 1, 2],
+                3: [0, 1, 2, 3],
+                4: [0, 1, 2, 3, 4]
+            }
+        ),
+        (
+            'RR0-A RR0-B',
+            {0: 15, 1: 12, 2: 13, 3: 14, 4: 15},
+            {i: list(range(5)) for i in range(5)}
+        ),
+        (
+            'B0-A S1-A B1-B RR1-C',
+            {0: 12, 1: 12, 2: 7, 3: 9, 4: 11},
+            {
+                0: [0, 1, 2, 3, 4],
+                1: [0, 1, 2, 3, 4],
+                2: [0, 1, 2],
+                3: [0, 1, 2, 3],
+                4: [0, 1, 2, 3, 4]
+            }
+        ),
+        (
+            'RR0-A B0-B S1-B RR1-C',
+            {0: 16, 1: 16, 2: 13, 3: 14, 4: 15},
+            {i: list(range(5)) for i in range(5)}
+        ),
     ]
 )
 def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_val_seen):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
     test_lang.parse()
 
-    for v in num_messages_per_view:
-        assert len(test_lang.network.validators[v].view.messages) == num_messages_per_view[v]
-        assert len(test_lang.network.validators[v].view.latest_messages) == len(other_val_seen[v])
-        for v in other_val_seen[v]:
-            assert v in test_lang.network.validators[v].view.latest_messages
+    for validator_name in num_messages_per_view:
+        validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
+        assert len(validator.view.messages) == num_messages_per_view[validator_name]
+        assert len(validator.view.latest_messages) == len(other_val_seen[validator_name])
+        for other_validator_name in other_val_seen[validator_name]:
+            other_validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
+            assert other_validator in validator.view.latest_messages
 
 
 @pytest.mark.parametrize(
@@ -236,13 +305,17 @@ def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_
         ('RR0-A', {0: 'A'}),
         ('B0-A S1-A S2-A S3-A S4-A H1-A H2-A H3-A H4-A', {i: 'A' for i in range(5)}),
         ('RR0-A RR0-B H0-B', {0: 'B'}),
-        ('B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E H0-A H1-B H2-C H3-D H4-E',
-            {0:'A', 1:'B', 2:'C', 3:'D', 4:'E'})
+        (
+            'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E H0-A H1-B H2-C H3-D H4-E',
+            {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E'}
+        ),
     ]
 )
 def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
     test_lang = TestLangCBC(test_string, TEST_WEIGHT)
     test_lang.parse()
 
-    for v in val_forkchoice:
-        assert test_lang.blocks[val_forkchoice[v]] == test_lang.network.validators[v].estimate()
+    for validator_name in val_forkchoice:
+        validator = test_lang.validator_set.get_validator_by_name(validator_name)
+        block_name = val_forkchoice[validator_name]
+        assert test_lang.blocks[block_name] == validator.estimate()

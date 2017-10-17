@@ -1,14 +1,17 @@
+"""The testing language module ... """
 import re
 import random as r
 
-import casper.settings as s
 from casper.network import Network
 from casper.safety_oracles.clique_oracle import CliqueOracle
+from casper.validator_set import ValidatorSet
 import casper.utils as utils
 
 
 class TestLangCBC:
-    # signal to py.test that TestLangCBC should not be discovered
+    """Allows testing of simulation scenarios with small testing language."""
+
+    # Signal to py.test that TestLangCBC should not be discovered.
     __test__ = False
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
@@ -17,16 +20,12 @@ class TestLangCBC:
         if test_string == '':
             raise Exception("Please pass in a valid test string")
 
-        # update the settings for this test
-        s.update(val_weights)
-
+        self.validator_set = ValidatorSet({i: w for i, w in enumerate(val_weights)})
         self.test_string = test_string
-
         self.display = display
+        self.network = Network(self.validator_set)
 
-        self.network = Network()
-
-        # this seems to be misnamed. Just generates starting blocks.
+        # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
 
         self.blocks = dict()
@@ -35,7 +34,7 @@ class TestLangCBC:
         self.safe_blocks = set()
         self.color_mag = dict()
 
-        # Register token handlers
+        # Register token handlers.
         self.handlers = dict()
         self.handlers['B'] = self.make_block
         self.handlers['S'] = self.send_block
@@ -45,25 +44,40 @@ class TestLangCBC:
         self.handlers['RR'] = self.round_robin
         self.handlers['R'] = self.report
 
-    def parse(self):
-        for token in self.test_string.split(' '):
-            letter, number, d, name = re.match(self.TOKEN_PATTERN, token).groups()
-            if letter+number+d+name != token:
-                raise ValueError("Bad token: %s" % token)
-            if number != '':
-                number = int(number)
+    def _validate_validator(self, validator):
+        if validator not in self.validator_set:
+            raise ValueError('Validator {} does not exist'.format(validator))
 
-            self.handlers[letter](number, name)
+    def _validate_block_exists(self, block_name):
+        if block_name not in self.blocks:
+            raise ValueError('Block {} does not exist'.format(block_name))
+
+    def _validate_block_does_not_exist(self, block_name):
+        if block_name in self.blocks:
+            raise ValueError('Block {} already exists'.format(block_name))
+
+    def parse(self):
+        """Parse the test_string, and run the test"""
+        for token in self.test_string.split(' '):
+            letter, validator, dash, name = re.match(self.TOKEN_PATTERN, token).groups()
+            if letter+validator+dash+name != token:
+                raise ValueError("Bad token: %s" % token)
+            if validator != '':
+                try:
+                    validator = self.validator_set.get_validator_by_name(int(validator))
+                except KeyError:
+                    raise ValueError("Validator {} does not exist".format(validator))
+
+            self.handlers[letter](validator, name)
 
     def send_block(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        """Send some validator a block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
-        if block in self.network.validators[validator].view.messages:
+        if block in validator.view.messages:
             raise Exception(
                 'Validator {} has already seen block {}'
                 .format(validator, block_name)
@@ -71,12 +85,10 @@ class TestLangCBC:
 
         self.network.propagate_message_to_validator(block, validator)
 
-
     def make_block(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name in self.blocks:
-            raise Exception('Block {} already exists'.format(block_name))
+        """Have some validator produce a block."""
+        self._validate_validator(validator)
+        self._validate_block_does_not_exist(block_name)
 
         new_block = self.network.get_message_from_validator(validator)
 
@@ -84,85 +96,81 @@ class TestLangCBC:
             self.blockchain.append([new_block, new_block.estimate])
 
         self.blocks[block_name] = new_block
-        self.network.global_view.add_messages(set([new_block]))
-
 
     def round_robin(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name in self.blocks:
-            raise Exception('Block {} already exists'.format(block_name))
+        """Have each validator create a block in a perfect round robin."""
+        self._validate_validator(validator)
+        self._validate_block_does_not_exist(block_name)
 
-        for i in range(s.NUM_VALIDATORS - 1):
-            rand_name = r.random()
-            self.make_block((validator + i) % s.NUM_VALIDATORS, rand_name)
-            self.send_block((validator + i + 1) % s.NUM_VALIDATORS, rand_name)
+        # start round robin at validator speicied by validator in args
+        validators = self.validator_set.sorted_by_name()
+        start_index = validators.index(validator)
+        validators = validators[start_index:] + validators[:start_index]
 
-        # only the last block of the round robin is named
-        block_maker = (validator + s.NUM_VALIDATORS - 1) % s.NUM_VALIDATORS
-        self.make_block(block_maker, block_name)
-        self.send_block(validator, block_name)
+        for i in range(len(self.validator_set)):
+            if i == len(self.validator_set) - 1:
+                name = block_name
+            else:
+                name = r.random()
+            maker = validators[i]
+            receiver = validators[(i + 1) % len(validators)]
 
+            self.make_block(maker, name)
+            self.send_block(receiver, name)
 
     def check_safety(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        """Check that some validator detects safety on a block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-        safe = self.network.validators[validator].check_estimate_safety(block)
+        safe = validator.check_estimate_safety(block)
 
         # NOTE: This may fail because the safety_oracle might be a lower bound,
-        # so this be better not as an assert :)
-        assert safe, "Block {} failed safety assert".format(block_name)
-
+        # so this might be better not as an assert :)
+        assert safe, "Block {0} failed safety assert " \
+                     "for validator-{1}".format(block_name, validator.name)
 
     def no_safety(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        """Check that some validator does not detect safety on a block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
-        safe = self.network.validators[validator].check_estimate_safety(block)
+        safe = validator.check_estimate_safety(block)
 
         # NOTE: Unlike above, this should never fail.
-        # An oracle should, never detect
-        # safety when there is no safety
+        # An oracle should, never detect safety when there is no safety.
         assert not safe, "Block {} failed no-safety assert".format(block_name)
 
-
     def check_head_equals_block(self, validator, block_name):
-        if validator not in self.network.validators:
-            raise Exception('Validator {} does not exist'.format(validator))
-            # NOTE: Need to add special validator number to check the global forkchoice,
-            # see issue #42 (same with safety and no safety).
-        if block_name not in self.blocks:
-            raise Exception('Block {} does not exist'.format(block_name))
+        """Check some validators forkchoice is the correct block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
 
-        head = self.network.validators[validator].view.estimate()
+        head = validator.view.estimate()
 
-        assert block == head, "Validator {} does not have block {} at head".format(validator, block_name)
-
+        assert block == head, "Validator {} does not have " \
+                              "block {} at head".format(validator, block_name)
 
     def report(self, num, name):
+        """Display the view graph of the current global_view"""
         assert num == name and num == '', "...no validator or number needed to report!"
 
         if not self.display:
             return
 
-        # update the safe blocks!
+        # Update the safe blocks!
         tip = self.network.global_view.estimate()
         while tip:
-            if self.color_mag.get(tip, 0) == s.NUM_VALIDATORS - 1:
+            if self.color_mag.get(tip, 0) == len(self.validator_set) - 1:
                 break
 
             # Clique_Oracle used for display - change?
-            oracle = CliqueOracle(tip, self.network.global_view)
+            oracle = CliqueOracle(tip, self.network.global_view, self.validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
@@ -179,12 +187,12 @@ class TestLangCBC:
         )
         edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
 
-        for i in range(s.NUM_VALIDATORS):
-            v = utils.build_chain(
-                self.network.validators[i].my_latest_message(),
+        for validator in self.validator_set:
+            chain = utils.build_chain(
+                validator.my_latest_message(),
                 None
                 )
-            edgelist.append(self._edge(v, 2, 'blue', 'solid'))
+            edgelist.append(self._edge(chain, 2, 'blue', 'solid'))
 
         edgelist.append(self._edge(self.blockchain, 2, 'grey', 'solid'))
         edgelist.append(self._edge(self.communications, 1, 'black', 'dotted'))

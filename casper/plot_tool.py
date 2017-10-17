@@ -1,19 +1,15 @@
 """The plot tool module ... """
-import copy
+
 from math import pi
 import os
 import networkx as nx
-
-import matplotlib as mpl
-mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import pylab
 import imageio as io
-
 from PIL import Image
+import matplotlib as mpl
+mpl.use('TkAgg')
 
-from casper.block import Block
-import casper.settings as s
 
 
 base = 10000000
@@ -22,8 +18,17 @@ FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
 colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
-def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
-    """Defines the graphs that will be produced."""
+
+def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None):
+    """Creates and displays view graphs."""
+
+    if colored_bets is None:
+        colored_bets = set()
+    if color_mag is None:
+        color_mag = {}
+    if edges is None:
+        edges = []
+
     G = nx.Graph()
 
     nodes = view.messages
@@ -33,59 +38,64 @@ def plot_view(view, coloured_bets=[], colour_mag=dict(), edges=[]):
     fig_size[1] = 20
     plt.rcParams["figure.figsize"] = fig_size
 
-    for b in nodes:
-        G.add_edges_from([(b, b)])
+    for bets in nodes:
+        G.add_edges_from([(bets, bets)])
 
-    e = []
+    edge = []
     if edges == []:
-        for b in nodes:
-            for b2 in b.justification.latest_messages.values():
-                if b2 is not None:
-                    e.append((b2, b))
+        for bets in nodes:
+            for bets2 in bets.justification.latest_messages.values():
+                if bets2 is not None:
+                    edge.append((bets2, bets))
 
-        edges = [{'edges': e, 'width': 3, 'edge_color': 'black', 'style': 'solid'}]
+        edges = [{'edges': edge, 'width': 3, 'edge_color': 'black', 'style': 'solid'}]
 
     positions = dict()
 
-    for b in nodes:
-        positions[b] = (float)(b.sender + 1)/(float)(s.NUM_VALIDATORS + 1), 0.2 + 0.1*b.height
+    sorted_validators = validator_set.sorted_by_name()
+    for bets in nodes:
+        # Index of val in list may have some small performance concerns.
+        positions[bets] = (float)(sorted_validators.index(bets.sender)
+                                  + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*bets.height
 
     node_color_map = {}
-    for b in nodes:
-        if b in coloured_bets:
-            mag = colour_mag[b]
-            node_color_map[b] = colors[int(len(colors) * mag / s.NUM_VALIDATORS)]
-            if mag == s.NUM_VALIDATORS - 1:
-                node_color_map[b] = "Black"
+    for bets in nodes:
+        if bets in colored_bets:
+            mag = color_mag[bets]
+            node_color_map[bets] = colors[int(len(colors) * mag / len(validator_set))]
+            if mag == len(validator_set) - 1:
+                node_color_map[bets] = "Black"
 
         else:
-            node_color_map[b] = 'white'
+            node_color_map[bets] = 'white'
 
     color_values = [node_color_map.get(node) for node in nodes]
 
     labels = {}
 
     node_sizes = []
-    for b in nodes:
-        node_sizes.append(350*pow(s.WEIGHTS[b.sender]/pi, 0.5))
-        labels[b] = b.sequence_number
+    for bets in nodes:
+        node_sizes.append(350*pow(bets.sender.weight/pi, 0.5))
+        labels[bets] = bets.sequence_number
 
-    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes, node_size=node_sizes, edge_color='black')
+    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
+                           node_size=node_sizes, edge_color='black')
 
-    for e in edges:
-        if isinstance(e, dict):
-            nx.draw_networkx_edges(G, positions, edgelist=(e['edges']), width=e['width'], edge_color=e['edge_color'], style=e['style'], alpha=0.5)
+    for edge in edges:
+        if isinstance(edge, dict):
+            nx.draw_networkx_edges(G, positions, edgelist=(edge['edges']), width=edge['width'],
+                                   edge_color=edge['edge_color'], style=edge['style'], alpha=0.5)
         else:
-            assert False, e
+            assert False, edge
     nx.draw_networkx_labels(G, positions, labels=labels)
 
     ax = plt.gca()
     ax.collections[0].set_edgecolor("black")
     ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
-    for v in range(s.NUM_VALIDATORS):
-        xpos = (float)(v + 1)/(float)(s.NUM_VALIDATORS + 1) - 0.01
-        ax.text(xpos, 0.1, (str)((int)(s.WEIGHTS[v])), fontsize=20)
+    for validator in validator_set:
+        xpos = (float)(validator.name + 1)/(float)(len(validator_set) + 1) - 0.01
+        ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
     pylab.show()
     # pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")
@@ -97,36 +107,37 @@ def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
     file_names = sorted([fn for fn in os.listdir(FRAMES) if fn.endswith('.png')])
 
     images = []
-    for fn in file_names:
-        images.append(Image.open(FRAMES+fn))
+    for file_name in file_names:
+        images.append(Image.open(FRAMES+file_name))
         if len(images) == frame_count_limit:
             break
 
-    size = (1000, 1000)
+    size = (xsize, ysize)
     iterator = 0
-    for im in images:
-        im.thumbnail(size, Image.ANTIALIAS)
-        im.save("thumbs/" + str(base + iterator) + "thumbnail.png", "PNG")
+    for image in images:
+        image.thumbnail(size, Image.ANTIALIAS)
+        image.save("thumbs/" + str(base + iterator) + "thumbnail.png", "PNG")
         iterator += 1
         if iterator == frame_count_limit:
             break
 
 
 def make_gif(frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
-    """Make a GIF visualization."""
+    """Make a GIF visualization of view graph."""
 
-    file_names = sorted([fn for fn in os.listdir(THUMBNAILS) if fn.endswith('thumbnail.png')])
+    file_names = sorted([file_name for file_name in os.listdir(THUMBNAILS)
+                         if file_name.endswith('thumbnail.png')])
 
     images = []
-    for fn in file_names:
-        images.append(Image.open(THUMBNAILS + fn))
+    for file_name in file_names:
+        images.append(Image.open(THUMBNAILS + file_name))
         if len(images) == frame_count_limit:
             break
 
     iterator = 0
     with io.get_writer(destination_filename, mode='I', duration=frame_duration) as writer:
-        for filename in file_names:
-            image = io.imread(THUMBNAILS + filename)
+        for file_name in file_names:
+            image = io.imread(THUMBNAILS + file_name)
             writer.append_data(image)
             iterator += 1
             if iterator == frame_count_limit:

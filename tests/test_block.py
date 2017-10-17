@@ -4,11 +4,11 @@ from casper.block import Block
 from casper.justification import Justification
 import casper.settings as s
 from casper.testing_language import TestLangCBC
+from casper.validator import Validator
 
 
-def test_equality_of_copies_off_genesis():
-    s.update([10])  # necessary due to assertions during block creation
-    block = Block(None, Justification(), 0)
+def test_equality_of_copies_off_genesis(validator):
+    block = Block(None, Justification(), validator)
 
     shallow_copy = copy.copy(block)
     deep_copy = copy.deepcopy(block)
@@ -33,9 +33,11 @@ def test_equality_of_copies_of_non_genesis(report):
 
 
 def test_non_equality_of_copies_off_genesis():
-    s.update([10, 11])
-    block_0 = Block(None, Justification(), 0)
-    block_1 = Block(None, Justification(), 1)
+    validator_0 = Validator("v0", 10)
+    validator_1 = Validator("v1", 11)
+
+    block_0 = Block(None, Justification(), validator_0)
+    block_1 = Block(None, Justification(), validator_1)
 
     assert block_0 != block_1
 
@@ -58,9 +60,11 @@ def test_unique_block_creation_in_test_lang(report):
 
 
 def test_is_in_blockchain__separate_genesis():
-    s.update([10, 11])
-    block_0 = Block(None, Justification(), 0)
-    block_1 = Block(None, Justification(), 1)
+    validator_0 = Validator("v0", 10)
+    validator_1 = Validator("v1", 11)
+
+    block_0 = Block(None, Justification(), validator_0)
+    block_1 = Block(None, Justification(), validator_1)
 
     assert not block_0.is_in_blockchain(block_1)
     assert not block_1.is_in_blockchain(block_0)
