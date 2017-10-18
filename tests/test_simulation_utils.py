@@ -1,3 +1,5 @@
+"""Simulation utilities for tests."""
+
 import pytest
 
 from casper.simulation_utils import (
@@ -15,18 +17,18 @@ from casper.simulation_utils import (
     ]
 )
 def test_generate_random_validator_set(
-                                       num_validators,
-                                       mu,
-                                       sigma,
-                                       min_weight
-                                      ):
-    vs = generate_random_validator_set(
+        num_validators,
+        mu,
+        sigma,
+        min_weight
+    ):
+    val_set = generate_random_validator_set(
         num_validators,
         mu,
         sigma,
         min_weight
     )
 
-    assert len(vs.validators) == num_validators
-    assert min(vs.validator_weights()) >= min_weight
-    assert len(set(vs.validator_weights())) == num_validators, "Weights should be unique."
+    assert len(val_set.validators) == num_validators
+    assert min(val_set.validator_weights()) >= min_weight
+    assert len(set(val_set.validator_weights())) == num_validators, "Weights should be unique."

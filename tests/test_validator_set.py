@@ -1,3 +1,5 @@
+"""The validator set testing module ... """
+
 import random as r
 import pytest
 
@@ -12,10 +14,10 @@ from casper.validator_set import ValidatorSet
     ]
 )
 def test_new_validator_set(weights):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
 
-    assert len(vs.validators) == len(weights.keys())
-    assert set(map(lambda v: v.weight, vs.validators)) == set(weights.values())
+    assert len(val_set.validators) == len(weights.keys())
+    assert set(map(lambda v: v.weight, val_set.validators)) == set(weights.values())
 
 
 @pytest.mark.parametrize(
@@ -26,10 +28,10 @@ def test_new_validator_set(weights):
     ]
 )
 def test_in(weights):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
 
-    for validator in vs.validators:
-        assert validator in vs
+    for validator in val_set.validators:
+        assert validator in val_set
 
 
 @pytest.mark.parametrize(
@@ -40,9 +42,9 @@ def test_in(weights):
     ]
 )
 def test_len(weights):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
 
-    assert len(vs) == len(weights)
+    assert len(val_set) == len(weights)
 
 
 @pytest.mark.parametrize(
@@ -57,9 +59,9 @@ def test_len(weights):
     ]
 )
 def test_validator_names(weights, expected_names):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
 
-    assert vs.validator_names() == set(expected_names)
+    assert val_set.validator_names() == set(expected_names)
 
 
 @pytest.mark.parametrize(
@@ -74,9 +76,9 @@ def test_validator_names(weights, expected_names):
     ]
 )
 def test_validator_weights(weights, expected_weights):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
 
-    assert vs.validator_weights() == set(expected_weights)
+    assert val_set.validator_weights() == set(expected_weights)
 
 
 @pytest.mark.parametrize(
@@ -90,16 +92,16 @@ def test_validator_weights(weights, expected_weights):
     ]
 )
 def test_weight(weights, expected_weight, validator_names):
-    vs = ValidatorSet(weights)
+    val_set = ValidatorSet(weights)
     if expected_weight is None:
         expected_weight = sum(weights.values())
 
     if validator_names:
-        validators = vs.get_validators_by_names(validator_names)
+        validators = val_set.get_validators_by_names(validator_names)
     else:
         validators = None
 
-    assert round(vs.weight(validators), 2) == round(expected_weight, 2)
+    assert round(val_set.weight(validators), 2) == round(expected_weight, 2)
 
 
 @pytest.mark.skip(reason="test not yet implemented")
