@@ -44,3 +44,12 @@ def build_chain(tip, base):
         next_block = next_block.estimate
 
     return chain
+
+
+def edge(edges, width, color, style):
+    return {
+        'edges': edges,
+        'width': width,
+        'edge_color': color,
+        'style': style
+    }
