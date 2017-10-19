@@ -7,7 +7,7 @@ mostly for code comprehension Note that not all comments have been marked up in
 this manner, yet... :)
 '''
 
-import sys
+import argparse
 
 import casper.presets as presets
 from casper.simulation_utils import (
@@ -17,18 +17,37 @@ from simulations.simulation_runner import SimulationRunner
 
 
 def main():
-    mode = sys.argv[1]
-    if mode not in ["rand", "rrob", "full", "nofinal"]:
-        print(
-            "\nusage: 'kernprof -l casper.py (rand | rrob | full | nofinal)'\n"
-        )
-        return
-    msg_gen = presets.message_maker(mode)
+    parser = argparse.ArgumentParser(description='Run CasperCBC standard simulations.')
+    parser.add_argument(
+        'mode', metavar='Mode', type=str,
+        choices=presets.MESSAGE_MODES,
+        help='specifies how to generate and propogate new messages'
+    )
+    parser.add_argument(
+        '--validators', type=int, default=5,
+        help='specifies the number of validators in validator set'
+    )
+    parser.add_argument(
+        '--rounds', type=int, default=100,
+        help='specifies the number of rounds to run the simulation'
+    )
+    parser.add_argument(
+        '--report-interval', type=int, default=20,
+        help='specifies the interval in rounds at which to plot results'
+    )
 
-    validator_set = generate_random_validator_set()
-    print("WEIGHTS: {0}".format(validator_set.validator_weights()))
+    args = parser.parse_args()
 
-    simulation_runner = SimulationRunner(validator_set, msg_gen, 100, True)
+    validator_set = generate_random_validator_set(args.validators)
+    msg_gen = presets.message_maker(args.mode)
+
+    simulation_runner = SimulationRunner(
+        validator_set,
+        msg_gen,
+        total_rounds=args.rounds,
+        report_interval=args.report_interval,
+        report=True
+    )
     simulation_runner.run()
 
 

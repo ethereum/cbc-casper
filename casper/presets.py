@@ -4,6 +4,8 @@ import itertools
 
 import casper.settings as s
 
+MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
+
 
 def message_maker(mode):
     """The message maker defines the logic for running each type of simulation."""
