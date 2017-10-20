@@ -1,9 +1,9 @@
 import sys
 import pytest
 
-import casper.presets as presets
 from casper.network import Network
 from simulations.simulation_runner import SimulationRunner
+import simulations.utils as utils
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ from simulations.simulation_runner import SimulationRunner
     ]
 )
 def test_new_simulation_runner(validator_set, mode, rounds):
-    msg_gen = presets.message_maker(mode)
+    msg_gen = utils.message_maker(mode)
     simulation_runner = SimulationRunner(validator_set, msg_gen, rounds)
 
     assert simulation_runner.validator_set == validator_set

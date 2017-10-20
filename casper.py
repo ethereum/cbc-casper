@@ -9,10 +9,11 @@ this manner, yet... :)
 
 import argparse
 
-import casper.presets as presets
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
-    generate_random_validator_set
+    generate_random_validator_set,
+    message_maker,
+    MESSAGE_MODES
 )
 
 
@@ -20,7 +21,7 @@ def main():
     parser = argparse.ArgumentParser(description='Run CasperCBC standard simulations.')
     parser.add_argument(
         'mode', metavar='Mode', type=str,
-        choices=presets.MESSAGE_MODES,
+        choices=MESSAGE_MODES,
         help='specifies how to generate and propogate new messages'
     )
     parser.add_argument(
@@ -39,7 +40,7 @@ def main():
     args = parser.parse_args()
 
     validator_set = generate_random_validator_set(args.validators)
-    msg_gen = presets.message_maker(args.mode)
+    msg_gen = message_maker(args.mode)
 
     simulation_runner = SimulationRunner(
         validator_set,
