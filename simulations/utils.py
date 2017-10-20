@@ -13,11 +13,11 @@ def message_maker(mode):
 
     if mode == "rand":
 
-        def random(validator_set):
+        def random(validator_set, num_messages=s.NUM_MESSAGES_PER_ROUND):
             """Each round, some randomly selected validators propagate their most recent
             message to other randomly selected validators, who then create new messages."""
             pairs = list(itertools.permutations(validator_set, 2))
-            return r.sample(pairs, s.NUM_MESSAGES_PER_ROUND)
+            return r.sample(pairs, num_messages)
 
         return random
 
