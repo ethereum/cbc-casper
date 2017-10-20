@@ -1,6 +1,6 @@
 import pytest
 
-from casper.simulation_utils import (
+from simulations.utils import (
     generate_random_validator_set
 )
 

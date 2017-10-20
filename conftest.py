@@ -1,9 +1,9 @@
 import pytest
 
 from casper.network import Network
-from casper.simulation_utils import generate_random_validator_set
 from casper.testing_language import TestLangCBC
 from casper.validator import Validator
+from simulations.utils import generate_random_validator_set
 
 
 def pytest_addoption(parser):

@@ -10,10 +10,10 @@ this manner, yet... :)
 import argparse
 
 import casper.presets as presets
-from casper.simulation_utils import (
+from simulations.simulation_runner import SimulationRunner
+from simulations.utils import (
     generate_random_validator_set
 )
-from simulations.simulation_runner import SimulationRunner
 
 
 def main():
