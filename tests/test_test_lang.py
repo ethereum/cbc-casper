@@ -1,3 +1,5 @@
+"""The language testing module ... """
+
 import pytest
 
 from casper.network import Network
@@ -321,7 +323,7 @@ def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
 @pytest.mark.parametrize(
     'test_string, error',
     [
-        (('NOFINAL'),''),
+        (('NOFINAL'), ''),
         ('RR0-A RR0-B RR0-C RR0-D RR0-E RR0-F U0-A', 'failed no-safety assert'),
     ]
 )

@@ -2,19 +2,21 @@
 
 from math import pi
 import os
-import networkx as nx
 import matplotlib as mpl
-mpl.use('TkAgg')
-import matplotlib.pyplot as plt
-import pylab
 import imageio as io
 from PIL import Image
+import networkx as nx
 
-base = 10000000
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt  # noqa
+import pylab  # noqa
+
+
+BASE = 10000000
 IMAGE_LIMIT = 75
 FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
-colors = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
+COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 
 def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None):
@@ -27,7 +29,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     if edges is None:
         edges = []
 
-    G = nx.Graph()
+    graph = nx.Graph()
 
     nodes = view.messages
 
@@ -37,7 +39,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     plt.rcParams["figure.figsize"] = fig_size
 
     for bets in nodes:
-        G.add_edges_from([(bets, bets)])
+        graph.add_edges_from([(bets, bets)])
 
     edge = []
     if edges == []:
@@ -60,7 +62,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     for bets in nodes:
         if bets in colored_bets:
             mag = color_mag[bets]
-            node_color_map[bets] = colors[int(len(colors) * mag / len(validator_set))]
+            node_color_map[bets] = COLOURS[int(len(COLOURS) * mag / len(validator_set))]
             if mag == len(validator_set) - 1:
                 node_color_map[bets] = "Black"
 
@@ -76,16 +78,16 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
         node_sizes.append(350*pow(bets.sender.weight/pi, 0.5))
         labels[bets] = bets.sequence_number
 
-    nx.draw_networkx_nodes(G, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
+    nx.draw_networkx_nodes(graph, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
                            node_size=node_sizes, edge_color='black')
 
     for edge in edges:
         if isinstance(edge, dict):
-            nx.draw_networkx_edges(G, positions, edgelist=(edge['edges']), width=edge['width'],
+            nx.draw_networkx_edges(graph, positions, edgelist=(edge['edges']), width=edge['width'],
                                    edge_color=edge['edge_color'], style=edge['style'], alpha=0.5)
         else:
             assert False, edge
-    nx.draw_networkx_labels(G, positions, labels=labels)
+    nx.draw_networkx_labels(graph, positions, labels=labels)
 
     ax = plt.gca()
     ax.collections[0].set_edgecolor("black")
@@ -96,7 +98,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
         ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
     pylab.show()
-    # pylab.savefig(FRAMES + "graph" + str(base + len(nodes)) + ".png")
+    # pylab.savefig(FRAMES + "graph" + str(BASE + len(nodes)) + ".png")
     # plt.close('all')
 
 
@@ -114,7 +116,7 @@ def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
     iterator = 0
     for image in images:
         image.thumbnail(size, Image.ANTIALIAS)
-        image.save("thumbs/" + str(base + iterator) + "thumbnail.png", "PNG")
+        image.save("thumbs/" + str(BASE + iterator) + "thumbnail.png", "PNG")
         iterator += 1
         if iterator == frame_count_limit:
             break

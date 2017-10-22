@@ -1,5 +1,6 @@
-import pytest
+"""The forkchoice testing module ... """
 import random as r
+import pytest
 
 import casper.forkchoice as forkchoice
 
