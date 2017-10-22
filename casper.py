@@ -8,6 +8,7 @@ this manner, yet... :)
 '''
 
 import argparse
+from configparser import ConfigParser
 
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
@@ -17,7 +18,14 @@ from simulations.utils import (
 )
 
 
+def default_configuration():
+    config = ConfigParser()
+    config.read("config.ini")
+    return config["SimulationDefaults"]
+
+
 def main():
+    config = default_configuration()
     parser = argparse.ArgumentParser(description='Run CasperCBC standard simulations.')
     parser.add_argument(
         'mode', metavar='Mode', type=str,
@@ -25,15 +33,15 @@ def main():
         help='specifies how to generate and propogate new messages'
     )
     parser.add_argument(
-        '--validators', type=int, default=5,
+        '--validators', type=int, default=config.getint("NumValidators"),
         help='specifies the number of validators in validator set'
     )
     parser.add_argument(
-        '--rounds', type=int, default=100,
+        '--rounds', type=int, default=config.getint("NumRounds"),
         help='specifies the number of rounds to run the simulation'
     )
     parser.add_argument(
-        '--report-interval', type=int, default=20,
+        '--report-interval', type=int, default=config.getint("ReportInterval"),
         help='specifies the interval in rounds at which to plot results'
     )
 
