@@ -38,7 +38,7 @@ class View:
         """This method updates a validator's observed latest messages
         (and vicarious latest messages) in response to seeing new messages."""
 
-        if showed_messages is False:
+        if not showed_messages:
             return
 
         #### PART -1 - type check

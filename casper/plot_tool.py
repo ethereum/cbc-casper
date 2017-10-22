@@ -2,13 +2,15 @@
 
 from math import pi
 import os
-import matplotlib.pyplot as plt
-import pylab
+import matplotlib as mpl
 import imageio as io
 from PIL import Image
 import networkx as nx
-import matplotlib as mpl
+
 mpl.use('TkAgg')
+import matplotlib.pyplot as plt  # noqa
+import pylab  # noqa
+
 
 BASE = 10000000
 IMAGE_LIMIT = 75
@@ -27,7 +29,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     if edges is None:
         edges = []
 
-    Graphic = nx.Graph()
+    graph = nx.Graph()
 
     nodes = view.messages
 
@@ -37,7 +39,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     plt.rcParams["figure.figsize"] = fig_size
 
     for bets in nodes:
-        Graphic.add_edges_from([(bets, bets)])
+        graph.add_edges_from([(bets, bets)])
 
     edge = []
     if edges == []:
@@ -76,16 +78,16 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
         node_sizes.append(350*pow(bets.sender.weight/pi, 0.5))
         labels[bets] = bets.sequence_number
 
-    nx.draw_networkx_nodes(Graphic, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
+    nx.draw_networkx_nodes(graph, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
                            node_size=node_sizes, edge_color='black')
 
     for edge in edges:
         if isinstance(edge, dict):
-            nx.draw_networkx_edges(Graphic, positions, edgelist=(edge['edges']), width=edge['width'],
+            nx.draw_networkx_edges(graph, positions, edgelist=(edge['edges']), width=edge['width'],
                                    edge_color=edge['edge_color'], style=edge['style'], alpha=0.5)
         else:
             assert False, edge
-    nx.draw_networkx_labels(Graphic, positions, labels=labels)
+    nx.draw_networkx_labels(graph, positions, labels=labels)
 
     ax = plt.gca()
     ax.collections[0].set_edgecolor("black")

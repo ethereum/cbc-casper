@@ -8,13 +8,13 @@ from casper.network import Network
 def test_new_network(validator_set):
     network = Network(validator_set)
     assert network.validator_set == validator_set
-    assert network.global_view.messages is False
+    assert not network.global_view.messages
 
 
 def test_random_initialization(validator_set):
     network = Network(validator_set)
 
-    assert network.global_view.messages is False
+    assert not network.global_view.messages
     network.random_initialization()
     assert len(network.global_view.messages) == len(validator_set)
 
