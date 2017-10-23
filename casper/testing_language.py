@@ -16,12 +16,9 @@ class TestLangCBC:
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
-    def __init__(self, test_string, val_weights, display=False):
-        if test_string == '':
-            raise Exception("Please pass in a valid test string")
+    def __init__(self, val_weights, display=False):
 
         self.validator_set = ValidatorSet(val_weights)
-        self.test_string = test_string
         self.display = display
         self.network = Network(self.validator_set)
 
@@ -56,9 +53,9 @@ class TestLangCBC:
         if block_name in self.blocks:
             raise ValueError('Block {} already exists'.format(block_name))
 
-    def parse(self):
+    def parse(self, test_string):
         """Parse the test_string, and run the test"""
-        for token in self.test_string.split(' '):
+        for token in test_string.split(' '):
             letter, validator, dash, name = re.match(self.TOKEN_PATTERN, token).groups()
             if letter+validator+dash+name != token:
                 raise ValueError("Bad token: %s" % token)
