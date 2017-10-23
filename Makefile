@@ -17,14 +17,14 @@ lint:
 	venv/bin/pylint casper/
 
 run-rand:
-	venv/bin/kernprof -l casper.py rand
+	venv/bin/python casper.py rand
 
 run-rrob:
-	venv/bin/kernprof -l casper.py rrob
+	venv/bin/python casper.py rrob
 
 run-full:
-	venv/bin/kernprof -l casper.py full
+	venv/bin/python casper.py full
 
 run-nofinal:
-	venv/bin/kernprof -l casper.py nofinal
+	venv/bin/python casper.py nofinal
 
