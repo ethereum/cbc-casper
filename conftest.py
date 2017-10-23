@@ -12,11 +12,11 @@ def pytest_addoption(parser):
 
 
 def run_test_lang_with_reports(test_string, weights):
-    TestLangCBC(test_string, weights, True).parse()
+    TestLangCBC(weights, True).parse(test_string)
 
 
 def run_test_lang_without_reports(test_string, weights):
-    TestLangCBC(test_string, weights, False).parse()
+    TestLangCBC(weights, False).parse(test_string)
 
 
 @pytest.fixture
