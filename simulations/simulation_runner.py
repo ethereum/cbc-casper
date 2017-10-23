@@ -46,7 +46,6 @@ class SimulationRunner:
         self.round += 1
         message_paths = self.msg_gen(self.validator_set)
 
-        sending_validators = {i for i, j in message_paths}
         affected_validators = {j for i, j in message_paths}
 
         sent_messages = self._send_messages_along_paths(message_paths)
@@ -135,4 +134,3 @@ class SimulationRunner:
                 self.node_ft[tip] = num_node_ft
 
             tip = tip.estimate
-
