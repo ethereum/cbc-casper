@@ -21,7 +21,8 @@ make install
 ```
 
 ## Run Simulations
-This code is marked up for use as follows:
+### Standard
+Standard similuations are marked up for use as follows:
 ```
 make run-[rand | rrob | full | nofinal]
 ```
@@ -36,6 +37,26 @@ make run-[rand | rrob | full | nofinal]
 
 The number of validators, the number of messages that propagate per round, and the report interval can be edited in `casper/settings.py`.
 
+### Advanced
+Advanced simulations can be run with a little command line wizardy.
+- First ensure that you are using the virtual environment via: `. venv/bin/activate`
+- Simulations can then be run via `casper.py`. The following are example usages:
+```
+# run a simulation with 100 validators and random message propogation
+python casper.py rand --validators 100
+
+# run a simulation with 20 validators and 1000 rounds of round robin message propogation,
+# reporting every 100 rounds
+python casper.py rrob --validators 6 --rounds 300 --report-interval 100
+
+# get help and all options for casper.py
+python casper.py --help
+```
+
+## Write Simulations
+Simulations can be created/managed by `SimulationRunner`. See `casper.py` for sample usage.
+
+More sample simulations with data collection will be added soon.
 
 ## Run Tests
 To run all tests:
