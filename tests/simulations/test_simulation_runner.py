@@ -22,10 +22,10 @@ def test_new_simulation_runner(validator_set, mode, rounds):
     assert simulation_runner.round == 0
     assert isinstance(simulation_runner.network, Network)
 
-    if rounds is None:
-        assert simulation_runner.total_rounds == sys.maxsize
-    else:
+    if rounds:
         assert simulation_runner.total_rounds == rounds
+    else:
+        assert simulation_runner.total_rounds == sys.maxsize
 
 
 @pytest.mark.parametrize(

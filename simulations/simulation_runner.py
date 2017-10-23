@@ -10,7 +10,7 @@ class SimulationRunner:
             self,
             validator_set,
             msg_gen,
-            total_rounds=None,
+            total_rounds,
             report=False,
             report_interval=20
     ):
@@ -20,10 +20,10 @@ class SimulationRunner:
         self.report_interval = report_interval
 
         self.round = 0
-        if total_rounds is None:
-            self.total_rounds = sys.maxsize
-        else:
+        if total_rounds:
             self.total_rounds = total_rounds
+        else:
+            self.total_rounds = sys.maxsize
 
         self.blockchain = []
         self.communications = []
@@ -51,10 +51,11 @@ class SimulationRunner:
 
         sent_messages = self._send_messages_along_paths(message_paths)
         new_messages = self._make_new_messages(affected_validators)
+        self._check_messages_for_safety(new_messages)
 
         self._update_communications(message_paths, sent_messages, new_messages)
         self._update_safe_messages()
-        if self.report and self.round % self.report_interval == 0:
+        if self.report and self.round % self.report_interval == self.report_interval - 1:
             self.plot()
 
     def plot(self):
@@ -101,6 +102,12 @@ class SimulationRunner:
             if message.estimate is not None:
                 self.blockchain.append([message, message.estimate])
 
+        return messages
+
+    def _check_messages_for_safety(self, messages):
+        for validator in messages:
+            message = messages[validator]
+
             # Have validators try to find newly finalized blocks
             curr = message
             last_finalized_block = validator.view.last_finalized_block
@@ -108,8 +115,6 @@ class SimulationRunner:
                 if validator.check_estimate_safety(curr):
                     break
                 curr = curr.estimate
-
-        return messages
 
     def _update_communications(self, message_paths, sent_messages, new_messages):
         for sender, receiver in message_paths:
