@@ -1,5 +1,7 @@
-import pytest
+"""The testing utils module ... """
+
 import random as r
+import pytest
 
 from casper.validator_set import ValidatorSet
 import casper.utils as utils

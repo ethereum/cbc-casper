@@ -1,3 +1,5 @@
+"""The validator testing module ... """
+
 import pytest
 
 from casper.block import Block
