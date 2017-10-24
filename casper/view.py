@@ -41,35 +41,20 @@ class View:
         if not showed_messages:
             return
 
-        #### PART -1 - type check
-
-#        for b in showed_messages:
-#            assert isinstance(b, Block), "expected only to add messages"
-
-        #### PART 0 - finding newly discovered messages
-
+        # PART 0 - finding newly discovered messages
         newly_discovered_messages = self.get_new_messages(showed_messages)
 
-        #### PART 1 - updating the set of viewed messages
-
+        # PART 1 - updating the set of viewed messages
         self.messages.update(newly_discovered_messages)
 
-        #### PART 2 - updating latest messages
-
-        # Updating latest messages...
+        # PART 2 - updating latest messages
         for bet in newly_discovered_messages:
             if bet.sender not in self.latest_messages:
                 self.latest_messages[bet.sender] = bet
-                continue
-            if self.latest_messages[bet.sender].sequence_number < bet.sequence_number:
+            elif self.latest_messages[bet.sender].sequence_number < bet.sequence_number:
                 self.latest_messages[bet.sender] = bet
-                continue
-#            assert (bet == self.latest_messages[bet.sender] or
-#                    bet.is_dependency_from_same_validator(self.latest_messages[bet.sender])),
-#                   "did not expect any equivocating nodes!"
 
-        #### PART 3 - updating children
-
+        # PART 3 - updating children
         for bet in newly_discovered_messages:
             if bet.estimate not in self.children:
                 self.children[bet.estimate] = set()

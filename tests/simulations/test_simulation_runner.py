@@ -2,6 +2,7 @@ import sys
 import pytest
 
 from casper.network import Network
+import casper.settings as settings
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
 
@@ -53,3 +54,23 @@ def test_simulation_runner_step(simulation_runner):
         simulation_runner.step()
 
     assert simulation_runner.round == 6
+
+
+@pytest.mark.parametrize(
+    'mode, messages_generated_per_round',
+    [
+        ('rand', settings.NUM_MESSAGES_PER_ROUND),
+        ('rrob', 1),
+        ('full', 5),
+        ('nofinal', 2),
+    ]
+)
+def test_simulation_runner_send_messages(validator_set, mode, messages_generated_per_round):
+    msg_gen = utils.message_maker(mode)
+    simulation_runner = SimulationRunner(validator_set, msg_gen, 100)
+
+    assert len(simulation_runner.blockchain) == 0
+
+    for i in range(10):
+        simulation_runner.step()
+        assert len(simulation_runner.blockchain) == (i + 1) * messages_generated_per_round

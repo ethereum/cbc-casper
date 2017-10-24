@@ -1,5 +1,6 @@
 """The forkchoice module implements the estimator function a blockchain"""
 
+
 def get_max_weight_indexes(scores):
     """Returns the keys that map to the max value in a dict.
     The max value must be greater than zero."""
@@ -8,7 +9,7 @@ def get_max_weight_indexes(scores):
 
     assert max_score != 0, "max_score of a block should never be zero"
 
-    max_weight_estimates = {e for e in scores.keys() if scores[e] == max_score}
+    max_weight_estimates = {e for e in scores if scores[e] == max_score}
 
     return max_weight_estimates
 
@@ -27,7 +28,7 @@ def get_fork_choice(last_finalized_block, children, latest_messages):
             current_block = current_block.estimate
 
     best_block = last_finalized_block
-    while best_block in children.keys():
+    while best_block in children:
         curr_scores = dict()
         max_score = 0
         for child in children[best_block]:
