@@ -1,0 +1,15 @@
+{
+    "msg_mode": "rand",
+    "num_simulations": 5,
+    "rounds_per_sim": 100,
+    "report_interval": 2,
+    "validator_info": {
+        "gen_type": "weights",
+        "weights": {"0": 15, "1": 18, "2": 21, "3": 24, "4": 27}
+    },
+    "data": [
+        "orphan_rate",
+        "num_messages",
+        "num_safe_messages"
+    ]
+}

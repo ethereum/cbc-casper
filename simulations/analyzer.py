@@ -12,17 +12,20 @@ class Analyzer:
     def num_unsafe_messages(self):
         return len(self.unsafe_messages())
 
+    def safe_tip(self):
+        if not self.simulation.safe_blocks:
+            return None
+
+        return self.simulation.safe_blocks[-1]
+
     def messages(self):
         return self.global_view.messages
 
     def safe_messages(self):
         return set(self.simulation.safe_blocks)
 
-    def safe_tip(self):
-        if not self.simulation.safe_blocks:
-            return None
-
-        return self.simulation.safe_blocks[-1]
+    def questionable_messages(self):
+        return self.messages() - self.safe_messages() - self.unsafe_messages()
 
     def unsafe_messages(self):
         potential = self.messages() - self.safe_messages()
@@ -32,7 +35,7 @@ class Analyzer:
 
         return {
             message for message in potential
-            if not self.safe_tip().is_in_blockchain(message)
+            if message.height <= self.safe_tip().height
         }
 
     def orphan_rate(self):

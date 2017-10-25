@@ -7,5 +7,6 @@ venv*
 results.txt
 notes.txt
 
+out/
 .cache/
 .tox/

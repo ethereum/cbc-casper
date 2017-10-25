@@ -86,3 +86,28 @@ def generate_random_validator_set(
     }
 
     return ValidatorSet(weights)
+
+
+def validator_generator(config):
+    if config['gen_type'] == 'rand':
+
+        def rand_generator():
+            return generate_random_validator_set(
+                config['num_validators'],
+                config['mu'],
+                config['sigma'],
+                config['min_weight']
+            )
+
+        return rand_generator
+
+    if config['gen_type'] == 'weights':
+        jitter_weights = {
+            name: config['weights'][name] + r.random()
+            for name in config['weights']
+        }
+
+        def weights_generator():
+            return ValidatorSet(jitter_weights)
+
+        return weights_generator

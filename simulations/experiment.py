@@ -23,8 +23,7 @@ class Experiment:
         self.sim_report_interval = sim_report_interval
 
         self.sim_number = 0
-        self.analyzer_data = {}
-        self.final_data = {}
+        self.analyzer_data = {'simulation_data': {}}
 
     def run(self):
         print("Running", end='')
@@ -35,8 +34,8 @@ class Experiment:
 
         print(" complete!")
 
-        self._collect_final_data()
-
+        self._aggregate_data()
+        print(self.analyzer_data)
 
     def run_sim(self, sim_id):
         validator_set = self.validator_set_generator()
@@ -51,27 +50,31 @@ class Experiment:
                 runner.step()
 
             self._collect_data(runner, sim_id, interval)
-
         self._collect_data(runner, sim_id, "final")
 
-    def aggregate_data_about_interval(self, interval):
+    def _aggregate_data(self):
+        aggregated = {
+            interval: self._aggregate_interval_data(interval)
+            for interval in range(int(self.sim_rounds / self.sim_report_interval))
+        }
+        aggregated["final"] = self._aggregate_interval_data("final")
+        self.analyzer_data["aggregated"] = aggregated
+
+    def _aggregate_interval_data(self, interval):
         return {
             d: [
-                self.analyzer_data[sim_id][interval][d]
-                for sim_id in self.analyzer_data
+                self.analyzer_data['simulation_data'][sim_id][interval][d]
+                for sim_id in self.analyzer_data['simulation_data']
             ]
             for d in self.data
         }
 
     def _collect_data(self, runner, sim_id, interval):
-        if sim_id not in self.analyzer_data:
-            self.analyzer_data[sim_id] = {}
+        if sim_id not in self.analyzer_data["simulation_data"]:
+            self.analyzer_data['simulation_data'][sim_id] = {}
 
         analyzer = Analyzer(runner)
-        self.analyzer_data[sim_id][interval] = {
+        self.analyzer_data['simulation_data'][sim_id][interval] = {
             d: getattr(analyzer, d)()
             for d in self.data
         }
-
-    def _collect_final_data(self):
-        self.final_data = self.aggregate_data_about_interval("final")
