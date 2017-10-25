@@ -1,28 +1,24 @@
 import argparse
+import random
 
 from numpy import mean
 
+from casper.validator_set import ValidatorSet
 from simulations.experiment import Experiment
 from simulations.utils import (
-    generate_random_validator_set,
     MESSAGE_MODES
 )
 
 
-def random_validator_set_generator(
-    num_validators,
-    mu,
-    sigma,
-    min_weight
-):
+def constant_validator_set_generator(weights):
+    # ensure no ties
+    jitter_weights = {
+        name: weights[name] + random.random()
+        for name in weights
+    }
 
     def generator():
-        return generate_random_validator_set(
-            num_validators,
-            mu,
-            sigma,
-            min_weight
-        )
+        return ValidatorSet(jitter_weights)
 
     return generator
 
@@ -37,14 +33,11 @@ def main():
 
     args = parser.parse_args()
 
-    num_simulations = 5
+    num_simulations = 20
     rounds_per_sim = 100
     report_interval = 20
 
-    num_validators = 5
-    mu = 100
-    sigma = 20
-    min_weight = 20
+    validator_weights = {0: 15, 1: 18, 2: 21, 3: 24, 4: 27}
 
     data = [
         "orphan_rate",
@@ -55,7 +48,7 @@ def main():
     experiment = Experiment(
         data,
         num_simulations,
-        random_validator_set_generator(num_validators, mu, sigma, min_weight),
+        constant_validator_set_generator(validator_weights),
         args.mode,
         rounds_per_sim,
         report_interval
