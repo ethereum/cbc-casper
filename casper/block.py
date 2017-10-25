@@ -35,7 +35,14 @@ class Block:
         else:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
-        # The "heights" of bets are used for visualization of views.
+        # height is the traditional block height - number of blocks back to genesis block
+        if estimate:
+            self.height = estimate.height + 1
+        else:
+            self.height = 1
+
+
+        # The "display_height" of bets are used for visualization of views.
         if not any(self.justification.latest_messages):
             self.display_height = 0
         else:
