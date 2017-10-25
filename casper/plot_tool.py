@@ -56,7 +56,7 @@ def plot_view(view, validator_set, colored_bets=None, color_mag=None, edges=None
     for bets in nodes:
         # Index of val in list may have some small performance concerns.
         positions[bets] = (float)(sorted_validators.index(bets.sender)
-                                  + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*bets.height
+                                  + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*bets.display_height
 
     node_color_map = {}
     for bets in nodes:
