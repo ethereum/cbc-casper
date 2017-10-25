@@ -1,6 +1,6 @@
 """The network module .... """
 from casper.view import View
-import casper.plot_tool as plot_tool
+from casper.plot_tool as PlotTool
 
 
 class Network:
@@ -8,6 +8,7 @@ class Network:
     def __init__(self, validator_set):
         self.validator_set = validator_set
         self.global_view = View()
+        self.plot_tool = PlotTool()
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
@@ -55,7 +56,7 @@ class Network:
             edges = []
 
 
-        plot_tool.display_viewgraph(
+        self.plot_tool.display_viewgraph(
             self.global_view,
             self.validator_set,
             message_colors=message_colors,
