@@ -36,15 +36,13 @@ class Block:
             self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
 
         # The "heights" of bets are used for visualization of views.
-        if self.justification.is_null():
+        if not any(self.justification.latest_messages):
             self.height = 0
         else:
-            candidate_max = 0
-            for validator in self.justification.latest_messages:
-                if self.justification.latest_messages[validator].height > candidate_max:
-                    candidate_max = self.justification.latest_messages[validator].height
+            max_height = max(self.justification.latest_messages[validator].height \
+                                for validator in self.justification.latest_messages)
 
-            self.height = candidate_max + 1
+            self.height = max_height + 1
 
         self.hash = self.__hash__()
 
