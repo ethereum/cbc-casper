@@ -55,7 +55,7 @@ class Network:
             edges = []
 
 
-        plot_tool.plot_view(
+        plot_tool.display_viewgraph(
             self.global_view,
             self.validator_set,
             message_colors=message_colors,

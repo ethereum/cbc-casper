@@ -19,7 +19,7 @@ THUMBNAILS = "thumbs/"
 COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 
-def plot_view(view, validator_set, message_colors=None, message_lables=None, edges=None):
+def build_viewgraph(view, validator_set, message_colors=None, message_lables=None, edges=None):
     """Creates and displays view graphs."""
 
     if message_colors is None:
@@ -95,9 +95,28 @@ def plot_view(view, validator_set, message_colors=None, message_lables=None, edg
         xpos = (float)(validator.name + 1)/(float)(len(validator_set) + 1) - 0.01
         ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
+
+def display_viewgraph(view, validator_set, message_colors, message_lables, edges):
+    build_viewgraph(
+        view,
+        validator_set,
+        message_colors=message_colors,
+        message_lables=message_lables,
+        edges=edges
+    )
     pylab.show()
-    #pylab.savefig(FRAMES + "graph" + str(BASE + len(nodes)) + ".png")
-    #plt.close('all')
+
+def save_viewgraph(view, validator_set, message_colors, message_lables, edges):
+    build_viewgraph(
+        view,
+        validator_set,
+        message_colors=message_colors,
+        message_lables=message_lables,
+        edges=edges
+    )
+    pylab.savefig(FRAMES + "graph" + str(BASE + len(view.messages)) + ".png")
+    plt.close('all')
+
 
 
 def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
