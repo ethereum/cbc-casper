@@ -6,7 +6,3 @@ class Justification:
         self.latest_messages = dict()
         for validator in latest_messages:
             self.latest_messages[validator] = latest_messages[validator]
-
-    def is_null(self):
-        """Returns True if latest messages equal dict."""
-        return self.latest_messages == dict()
