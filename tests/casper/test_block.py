@@ -1,6 +1,8 @@
 """The block testing module ..."""
 import copy
 
+import pytest
+
 from casper.block import Block
 from casper.justification import Justification
 from casper.testing_language import TestLangCBC
@@ -82,3 +84,32 @@ def test_is_in_blockchain__test_lang(report):
         assert not block.is_in_blockchain(prev)
 
         prev = block
+
+
+@pytest.mark.parametrize(
+    'test_string, weights, block_heights',
+    [
+        (
+            "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D",
+            {0: 11, 1: 10},
+            {"A": 1, "B": 2, "C": 3, "D": 4}
+        ),
+        (
+            "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D",
+            {0: 1, 1: 10},
+            {"A": 1, "B": 1, "C": 2, "D": 3}
+        ),
+        (
+            "B0-A S1-A B0-B S1-B B1-C S0-C S2-C B2-D S0-D B0-E B1-F S0-F H0-E",
+            {0: 11, 1: 10, 2: 500},
+            {"A": 1, "B": 2, "C": 3, "D": 1, "E": 2, "F": 4}
+        ),
+    ]
+)
+def test_block_height(report, test_string, weights, block_heights):
+    test_lang = TestLangCBC(weights, report)
+    test_lang.parse(test_string)
+
+    for block_name in block_heights:
+        block = test_lang.blocks[block_name]
+        assert block.height == block_heights[block_name]

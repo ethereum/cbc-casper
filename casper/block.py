@@ -39,7 +39,7 @@ class Block:
         if estimate:
             self.height = estimate.height + 1
         else:
-            self.height = 1
+            self.height = 0
 
 
         # The "display_height" of bets are used for visualization of views.
