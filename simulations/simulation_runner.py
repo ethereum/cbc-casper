@@ -27,8 +27,7 @@ class SimulationRunner:
 
         self.blockchain = []
         self.communications = []
-        self.safe_blocks = set()
-        self.node_ft = {}
+        self.block_fault_tolerance = {}
 
         self.network = Network(validator_set)
         self.network.random_initialization()
@@ -76,10 +75,14 @@ class SimulationRunner:
         for chains in vals_chain:
             edgelist.append(utils.edge(chains, 2, 'blue', 'solid'))
 
+        message_lables = {}
+        for block in self.network.global_view.messages:
+            message_lables[block] = block.sequence_number
+
         self.network.report(
             edges=edgelist,
-            colored_messages=self.safe_blocks,
-            color_mag=self.node_ft
+            message_colors=self.block_fault_tolerance,
+            message_lables=message_lables
         )
 
     def _send_messages_along_paths(self, message_paths):
@@ -122,7 +125,7 @@ class SimulationRunner:
     def _update_safe_messages(self):
         # Display the fault tolerance in the global view
         tip = self.network.global_view.estimate()
-        while tip and self.node_ft.get(tip, 0) != len(self.validator_set) - 1:
+        while tip and self.block_fault_tolerance.get(tip, 0) != len(self.validator_set) - 1:
             # TODO: decide which oracle to use when displaying global ft.
             # When refactoring visualizations, could give options to switch
             # between different oracles while displaying a view!
@@ -130,7 +133,6 @@ class SimulationRunner:
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
-                self.safe_blocks.add(tip)
-                self.node_ft[tip] = num_node_ft
+                self.block_fault_tolerance[tip] = num_node_ft
 
             tip = tip.estimate
