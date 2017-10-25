@@ -8,7 +8,6 @@ flake8==3.4.1
 imageio==2.2.0
 ipython==5.5.0
 ipython-genutils==0.2.0
-line-profiler==2.0
 matplotlib==2.1.0
 mccabe==0.6.1
 networkx==2.0
@@ -30,7 +29,6 @@ pylint==1.7.4
 pytest==3.2.3
 python-dateutil==2.6.1
 pytz==2017.2
-scandir==1.6
 simplegeneric==0.8.1
 six==1.11.0
 tox==2.9.1

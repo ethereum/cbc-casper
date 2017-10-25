@@ -9,7 +9,7 @@ develop   | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/de
 
 ## Requirements
 * Python 3
-* ubuntu/debian: `sudo apt-get install python3-dev python3-venv`
+* ubuntu/debian: `sudo apt-get install python3-dev python3-venv python3-tk`
 * OSX via Homebrew: `brew install python3`
 
 
