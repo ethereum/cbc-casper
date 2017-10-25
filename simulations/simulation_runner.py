@@ -27,7 +27,7 @@ class SimulationRunner:
 
         self.blockchain = []
         self.communications = []
-        self.safe_blocks = set()
+        self.safe_blocks = []
         self.node_ft = {}
 
         self.network = Network(validator_set)
@@ -130,7 +130,7 @@ class SimulationRunner:
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
-                self.safe_blocks.add(tip)
+                self.safe_blocks.append(tip)
                 self.node_ft[tip] = num_node_ft
 
             tip = tip.estimate

@@ -41,9 +41,6 @@ class AdversaryOracle(AbstractOracle):
                 viewables[validator] = dict()
 
             else:
-                # Sanity check!
-                assert not utils.are_conflicting_estimates(self.candidate_estimate, self.view.latest_messages[validator])
-
                 # These are the validators who are voting with the candidate_estimate.
                 recent_messages[validator] = ModelBet(AdversaryOracle.CAN_ESTIMATE, validator)
                 viewables[validator] = dict()
