@@ -51,13 +51,13 @@ class PlotTool:
             # if it's the last report interval, we have to somehow let this jawn known
             # in that case, we make a gif
 
-    def build_viewgraph(self, view, validator_set, message_colors=None, message_lables=None, edges=None):
+    def build_viewgraph(self, view, validator_set, message_colors=None, message_labels=None, edges=None):
         """Creates and displays view graphs."""
 
         if message_colors is None:
             message_colors = {}
-        if message_lables is None:
-            message_lables = {}
+        if message_labels is None:
+            message_labels = {}
 
         graph = nx.Graph()
 
@@ -106,7 +106,7 @@ class PlotTool:
         node_sizes = []
         for message in nodes:
             node_sizes.append(350 * pow(message.sender.weight / pi, 0.5))
-            labels[message] = message_lables.get(message, '')
+            labels[message] = message_labels.get(message, '')
 
         nx.draw_networkx_nodes(graph, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
                                node_size=node_sizes, edge_color='black')
@@ -128,7 +128,7 @@ class PlotTool:
             ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
 
-    def next_viewgraph(self, view, validator_set, message_colors, message_lables, edges):
+    def next_viewgraph(self, view, validator_set, message_colors, message_labels, edges):
         self.report_number += 1
 
         # TODO: if we save and plot the graph, we currently build it twice
@@ -138,7 +138,7 @@ class PlotTool:
                 view,
                 validator_set,
                 message_colors=message_colors,
-                message_lables=message_lables,
+                message_labels=message_labels,
                 edges=edges
             )
 
@@ -150,7 +150,7 @@ class PlotTool:
                 view,
                 validator_set,
                 message_colors=message_colors,
-                message_lables=message_lables,
+                message_labels=message_labels,
                 edges=edges
             )
 

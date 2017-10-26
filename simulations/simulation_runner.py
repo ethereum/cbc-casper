@@ -75,14 +75,14 @@ class SimulationRunner:
         for chains in vals_chain:
             edgelist.append(utils.edge(chains, 2, 'blue', 'solid'))
 
-        message_lables = {}
+        message_labels = {}
         for block in self.network.global_view.messages:
-            message_lables[block] = block.sequence_number
+            message_labels[block] = block.sequence_number
 
         self.network.report(
             edges=edgelist,
             message_colors=self.block_fault_tolerance,
-            message_lables=message_lables
+            message_labels=message_labels
         )
 
     def _send_messages_along_paths(self, message_paths):

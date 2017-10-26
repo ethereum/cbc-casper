@@ -46,12 +46,12 @@ class Network:
             new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
 
-    def report(self, message_colors=None, message_lables=None, edges=None):
+    def report(self, message_colors=None, message_labels=None, edges=None):
         """Displays a view graph."""
         if message_colors is None:
             message_colors = {}
-        if message_lables is None:
-            message_lables = {}
+        if message_labels is None:
+            message_labels = {}
         if edges is None:
             edges = []
 
@@ -60,6 +60,6 @@ class Network:
             self.global_view,
             self.validator_set,
             message_colors=message_colors,
-            message_lables=message_lables,
+            message_labels=message_labels,
             edges=edges
         )
