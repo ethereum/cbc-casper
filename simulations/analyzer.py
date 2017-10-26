@@ -12,6 +12,47 @@ class Analyzer:
     def num_unsafe_messages(self):
         return len(self.unsafe_messages())
 
+    def num_questionable_messages(self):
+        return len(self.questionable_messages())
+
+    def safe_to_tip_length(self):
+        return self.global_view.estimate().height - self.safe_tip_height()
+
+    def safe_tip_height(self):
+        if self.safe_tip():
+            return self.safe_tip().height
+        # Not sure I'm happy with -1 here
+        return -1
+
+    def questionable_message_depth(self):
+        max_height = max(map(lambda m: m.height, self.questionable_messages()))
+        return max_height - self.safe_tip_height()
+
+    def questionable_message_branching_factor(self):
+        to_check = set(self.questionable_messages())
+        if self.safe_tip():
+            to_check.add(self.safe_tip())
+
+        check = to_check.pop()
+        branches = 0
+        num_checked = 0
+        while check:
+            if check in self.global_view.children:
+                branches += len(self.global_view.children[check])
+                num_checked += 1
+            if not to_check:
+                break
+            check = to_check.pop()
+
+        if num_checked == 0:
+            return 0
+        return branches / num_checked
+
+    def questionable_message_branching_factor_estimate(self):
+        ''' Estimate formula taken from
+        http://ozark.hendrix.edu/~ferrer/courses/335/f11/lectures/effective-branching.html '''
+        return self.num_questionable_messages() ** (1 / float(self.questionable_message_depth()))
+
     def safe_tip(self):
         if not self.simulation.safe_blocks:
             return None

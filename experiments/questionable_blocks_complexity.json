@@ -1,0 +1,20 @@
+{
+    "msg_mode": "full",
+    "num_simulations": 10,
+    "rounds_per_sim": 30,
+    "report_interval": 10,
+    "validator_info": {
+        "gen_type": "rand",
+        "num_validators": 10,
+        "mu": 100,
+        "sigma": 20,
+        "min_weight": 20
+    },
+    "data": [
+        "num_safe_messages",
+        "safe_to_tip_length",
+        "questionable_message_depth",
+        "questionable_message_branching_factor",
+        "questionable_message_branching_factor_estimate"
+    ]
+}
