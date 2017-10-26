@@ -28,8 +28,7 @@ class TestLangCBC:
         self.blocks = dict()
         self.blockchain = []
         self.communications = []
-        self.safe_blocks = set()
-        self.color_mag = dict()
+        self.block_fault_tolerance = dict()
 
         # Register token handlers.
         self.handlers = dict()
@@ -162,17 +161,12 @@ class TestLangCBC:
 
         # Update the safe blocks!
         tip = self.network.global_view.estimate()
-        while tip:
-            if self.color_mag.get(tip, 0) == len(self.validator_set) - 1:
-                break
-
-            # Clique_Oracle used for display - change?
+        while tip and self.block_fault_tolerance.get(tip, 0) != len(self.validator_set) - 1:
             oracle = CliqueOracle(tip, self.network.global_view, self.validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
-                self.safe_blocks.add(tip)
-                self.color_mag[tip] = num_node_ft
+                self.block_fault_tolerance[tip] = num_node_ft
 
             tip = tip.estimate
 
@@ -194,10 +188,14 @@ class TestLangCBC:
         edgelist.append(self._edge(self.blockchain, 2, 'grey', 'solid'))
         edgelist.append(self._edge(self.communications, 1, 'black', 'dotted'))
 
+        message_labels = {}
+        for block in self.network.global_view.messages:
+            message_labels[block] = block.sequence_number
+
         self.network.report(
-            colored_messages=self.safe_blocks,
-            color_mag=self.color_mag,
-            edges=edgelist
+            edges=edgelist,
+            message_colors=self.block_fault_tolerance,
+            message_labels=message_labels
         )
 
     def _edge(self, edges, width, color, style):
