@@ -21,10 +21,37 @@ COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Bl
 
 class PlotTool:
 
-    def __init__(self):
-        return
+    def __init__(self, display, save):
+        self.display = display
+        self.save = save
 
-    def build_viewgraph(view, validator_set, message_colors=None, message_lables=None, edges=None):
+        if save:
+            graph_path = os.path.dirname(os.path.abspath(__file__)) + '/..' +'/graphs/'
+            # if there isn't a graph folder, make one!
+            if not os.path.isdir(graph_path):
+                os.makedirs(graph_path)
+
+            # find the next name for the next plot!
+            graph_num = 0
+            while True:
+                new_plot = graph_path + '/graph_num_' + str(graph_num)
+                graph_num += 1
+                if not os.path.isdir(new_plot):
+                    os.makedirs(new_plot)
+                    break
+
+            self.plot_path = new_plot
+
+        self.report_number = 0
+
+        # if there isn't a graph folder, make one!
+        # find what graph number we are!
+        # set self.report_number = 0
+            # this increments each time we build a build a review graph, and/or
+            # if it's the last report interval, we have to somehow let this jawn known
+            # in that case, we make a gif
+
+    def build_viewgraph(self, view, validator_set, message_colors=None, message_lables=None, edges=None):
         """Creates and displays view graphs."""
 
         if message_colors is None:
@@ -101,30 +128,35 @@ class PlotTool:
             ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
 
-    def display_viewgraph(view, validator_set, message_colors, message_lables, edges):
-        build_viewgraph(
-            view,
-            validator_set,
-            message_colors=message_colors,
-            message_lables=message_lables,
-            edges=edges
-        )
-        pylab.show()
+    def next_viewgraph(self, view, validator_set, message_colors, message_lables, edges):
+        self.report_number += 1
 
-    def save_viewgraph(view, validator_set, message_colors, message_lables, edges):
-        build_viewgraph(
-            view,
-            validator_set,
-            message_colors=message_colors,
-            message_lables=message_lables,
-            edges=edges
-        )
-        pylab.savefig(FRAMES + "graph" + str(BASE + len(view.messages)) + ".png")
-        plt.close('all')
+        # TODO: if we save and plot the graph, we currently build it twice
+        # issues as pyplot clears the graph otherwise, should try to fix this
+        if self.save:
+            self.build_viewgraph(
+                view,
+                validator_set,
+                message_colors=message_colors,
+                message_lables=message_lables,
+                edges=edges
+            )
 
+            plt.savefig(self.plot_path + '/' + str(1000 + self.report_number) + ".JPEG")
+            plt.close('all')
 
+        if self.display:
+            self.build_viewgraph(
+                view,
+                validator_set,
+                message_colors=message_colors,
+                message_lables=message_lables,
+                edges=edges
+            )
 
-    def make_thumbnails(frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
+            plt.show()
+
+    def make_thumbnails(self, frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
         """Make thumbnail images in PNG format."""
         file_names = sorted([fn for fn in os.listdir(FRAMES) if fn.endswith('.png')])
 
@@ -144,7 +176,7 @@ class PlotTool:
                 break
 
 
-    def make_gif(frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
+    def make_gif(self, frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
         """Make a GIF visualization of view graph."""
 
         file_names = sorted([file_name for file_name in os.listdir(THUMBNAILS)
