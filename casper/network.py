@@ -5,7 +5,7 @@ from casper.plot_tool import PlotTool
 
 class Network:
     """Simulates a network that allows for message passing between validators."""
-    def __init__(self, validator_set, display=True, save=False):
+    def __init__(self, validator_set):
         self.validator_set = validator_set
         self.global_view = View()
 
@@ -44,4 +44,3 @@ class Network:
         for validator in self.validator_set:
             new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
-
