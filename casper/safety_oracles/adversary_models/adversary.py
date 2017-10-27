@@ -22,8 +22,12 @@ class Adversary:
 
         self.validator_models = dict()
         for validator in validator_set:
-            self.validator_models[validator] = ModelValidator(validator, latest_bets[validator],
-                                                              viewables[validator], self.target_estimate)
+            self.validator_models[validator] = ModelValidator(
+                validator,
+                latest_bets[validator],
+                viewables[validator],
+                self.target_estimate
+            )
 
         self.voting_against_attacker = set()
         self.voting_with_attacker = set()
@@ -37,12 +41,20 @@ class Adversary:
             else:
                 self.voting_against_attacker.add(validator)
 
-        # The attacker will also keep a close eye on the weights of the victim and target estimates:
-        self.weight_of_victim_estimate = sum(validator.weight for validator in self.voting_against_attacker)
-        self.weight_of_target_estimate = sum(validator.weight for validator in self.voting_with_attacker)
+        # The attacker tracks the weights of the victim and target estimates:
+        self.weight_of_victim_estimate = sum(
+            validator.weight
+            for validator in self.voting_against_attacker
+        )
+        self.weight_of_target_estimate = sum(
+            validator.weight
+            for validator in self.voting_with_attacker
+        )
 
-        assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == len(validator_set)
-        assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == round(validator_set.weight(), 2)
+        assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == \
+            len(validator_set)
+        assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == \
+            round(validator_set.weight(), 2)
 
         # The attacker produces a log of the bets added during the attack.
         self.operations_log = []
@@ -92,8 +104,10 @@ class Adversary:
                 self.weight_of_target_estimate += validator.weight
 
                 # Add a log of our operations.
-                self.operations_log.append(["added valid bet for a validator voting against the attacker",
-                                            hash(new_bet)])
+                self.operations_log.append([
+                    "added valid bet for a validator voting against the attacker",
+                    hash(new_bet)
+                ])
                 # Update the attack view.
                 self.attack_view.add(new_bet)
 

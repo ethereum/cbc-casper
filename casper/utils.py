@@ -47,6 +47,7 @@ def build_chain(tip, base):
 
 
 def edge(edges, width, color, style):
+    ''' Build edge in plottable format '''
     return {
         'edges': edges,
         'width': width,
