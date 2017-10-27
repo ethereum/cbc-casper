@@ -77,9 +77,9 @@ class CliqueOracle(AbstractOracle):
             return set(), 0
 
         edges = self._collect_edges()
-        G = nx.Graph()
-        G.add_edges_from(edges)
-        cliques = nx.find_cliques(G)
+        graph = nx.Graph()
+        graph.add_edges_from(edges)
+        cliques = nx.find_cliques(graph)
 
         max_clique = []
         max_weight = 0
@@ -99,18 +99,17 @@ class CliqueOracle(AbstractOracle):
         # Minumum amount of weight that has to equivocate.
         fault_tolerance = 2 * clique_weight - self.validator_set.weight()
 
-        if fault_tolerance > 0:
-            clique_weights = {v.weight for v in biggest_clique}
-
-            # Minimum number of validators that need to equivocate.
-            equivocating = set()
-
-            # Round to stop issues w/ floating point rounding.
-            while round(sum(equivocating), 2) < round(fault_tolerance, 2):
-                equivocating.add(max(clique_weights.difference(equivocating)))
-
-            # Return the number of faults we can tolerate, which is one less
-            # than the number that need to equivocate.
-            return fault_tolerance, len(equivocating) - 1
-        else:
+        if fault_tolerance <= 0:
             return 0, 0
+
+        # Minimum number of validators that need to equivocate.
+        equivocating = set()
+        clique_weights = {v.weight for v in biggest_clique}
+
+        # Round to stop issues w/ floating point rounding.
+        while round(sum(equivocating), 2) < round(fault_tolerance, 2):
+            equivocating.add(max(clique_weights.difference(equivocating)))
+
+        # Return the number of faults we can tolerate, which is one less
+        # than the number that need to equivocate.
+        return fault_tolerance, len(equivocating) - 1

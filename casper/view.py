@@ -5,7 +5,9 @@ import casper.forkchoice as forkchoice
 
 class View:
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    def __init__(self, messages=set()):
+    def __init__(self, messages=None):
+        if messages is None:
+            messages = set()
 
         # now for some assignment...
         self.messages = set()

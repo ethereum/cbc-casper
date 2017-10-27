@@ -182,23 +182,20 @@ class TestLangCBC:
             self.network.global_view.estimate(),
             None
         )
-        edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
+        edgelist.append(utils.edge(best_chain, 5, 'red', 'solid'))
 
         for validator in self.validator_set:
             chain = utils.build_chain(
                 validator.my_latest_message(),
                 None
                 )
-            edgelist.append(self._edge(chain, 2, 'blue', 'solid'))
+            edgelist.append(utils.edge(chain, 2, 'blue', 'solid'))
 
-        edgelist.append(self._edge(self.blockchain, 2, 'grey', 'solid'))
-        edgelist.append(self._edge(self.communications, 1, 'black', 'dotted'))
+        edgelist.append(utils.edge(self.blockchain, 2, 'grey', 'solid'))
+        edgelist.append(utils.edge(self.communications, 1, 'black', 'dotted'))
 
         self.network.report(
             colored_messages=self.safe_blocks,
             color_mag=self.color_mag,
             edges=edgelist
         )
-
-    def _edge(self, edges, width, color, style):
-        return utils.edge(edges, width, color, style)
