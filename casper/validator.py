@@ -3,7 +3,7 @@ import copy
 import numbers
 import random as r
 
-from casper.block import Block
+from casper.blockchain.block import Block
 from casper.blockchain.blockchain_view import BlockchainView
 from casper.safety_oracles.clique_oracle import CliqueOracle
 

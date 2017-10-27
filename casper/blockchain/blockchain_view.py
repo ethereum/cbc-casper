@@ -2,7 +2,7 @@
 from casper.justification import Justification
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.block import Block
+from casper.blockchain.block import Block
 import casper.forkchoice as forkchoice
 
 
@@ -77,6 +77,6 @@ class BlockchainView(AbstractView):
                 if prev_last_finalized_block:
                     assert prev_last_finalized_block.is_in_blockchain(self.last_finalized_block)
 
-                return 
+                return
 
             tip = tip.estimate
