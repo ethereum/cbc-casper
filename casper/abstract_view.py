@@ -1,7 +1,5 @@
 """The view module ... """
 from casper.justification import Justification
-import casper.forkchoice as forkchoice
-
 
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""

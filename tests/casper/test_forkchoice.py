@@ -2,7 +2,7 @@
 import random as r
 import pytest
 
-import casper.forkchoice as forkchoice
+import casper.blockchain.forkchoice as forkchoice
 
 
 def test_single_validator_correct_forkchoice(test_lang_runner):

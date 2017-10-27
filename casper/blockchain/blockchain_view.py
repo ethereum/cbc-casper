@@ -3,7 +3,7 @@ from casper.justification import Justification
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 from casper.blockchain.block import Block
-import casper.forkchoice as forkchoice
+import casper.blockchain.forkchoice as forkchoice
 
 
 class BlockchainView(AbstractView):
