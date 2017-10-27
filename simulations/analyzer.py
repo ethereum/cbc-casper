@@ -15,6 +15,9 @@ class Analyzer:
     def num_questionable_messages(self):
         return len(self.questionable_messages())
 
+    def prop_safe_messages(self):
+        return float(self.num_safe_messages()) / self.num_messages()
+
     def safe_to_tip_length(self):
         return self.global_view.estimate().height - self.safe_tip_height()
 

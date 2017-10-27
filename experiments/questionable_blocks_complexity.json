@@ -1,7 +1,7 @@
 {
-    "msg_mode": "full",
+    "msg_mode": "nofinal",
     "num_simulations": 10,
-    "rounds_per_sim": 30,
+    "rounds_per_sim": 100,
     "report_interval": 10,
     "validator_info": {
         "gen_type": "rand",
@@ -12,6 +12,7 @@
     },
     "data": [
         "num_safe_messages",
+        "prop_safe_messages",
         "safe_to_tip_length",
         "questionable_message_depth",
         "questionable_message_branching_factor",
