@@ -19,7 +19,7 @@ THUMBNAILS = "thumbs/"
 COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
 
 
-class PlotTool:
+class PlotTool(object):
 
     def __init__(self, display, save):
         self.display = display
