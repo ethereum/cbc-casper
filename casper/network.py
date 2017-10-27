@@ -8,7 +8,6 @@ class Network:
     def __init__(self, validator_set, display=True, save=False):
         self.validator_set = validator_set
         self.global_view = View()
-        self.plot_tool = PlotTool(display, save)
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
@@ -46,20 +45,3 @@ class Network:
             new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
 
-    def report(self, message_colors=None, message_labels=None, edges=None):
-        """Displays a view graph."""
-        if message_colors is None:
-            message_colors = {}
-        if message_labels is None:
-            message_labels = {}
-        if edges is None:
-            edges = []
-
-
-        self.plot_tool.next_viewgraph(
-            self.global_view,
-            self.validator_set,
-            message_colors=message_colors,
-            message_labels=message_labels,
-            edges=edges
-        )

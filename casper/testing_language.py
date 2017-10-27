@@ -5,6 +5,7 @@ import random as r
 from casper.network import Network
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
+from casper.plot_tool import PlotTool
 import casper.utils as utils
 
 
@@ -25,6 +26,7 @@ class TestLangCBC:
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
 
+        self.plot_tool = PlotTool(display, False)
         self.blocks = dict()
         self.blockchain = []
         self.communications = []
@@ -192,7 +194,9 @@ class TestLangCBC:
         for block in self.network.global_view.messages:
             message_labels[block] = block.sequence_number
 
-        self.network.report(
+        self.plot_tool.next_viewgraph(
+            self.network.global_view,
+            self.validator_set,
             edges=edgelist,
             message_colors=self.block_fault_tolerance,
             message_labels=message_labels

@@ -2,6 +2,7 @@ import sys
 
 import casper.utils as utils
 from casper.network import Network
+from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 
@@ -29,10 +30,14 @@ class SimulationRunner:
         self.communications = []
         self.block_fault_tolerance = {}
 
+        self.plot_tool = PlotTool(True, False)
         self.network = Network(validator_set)
         self.network.random_initialization()
         if self.report:
-            self.network.report()
+            self.plot_tool.next_viewgraph(
+                self.network.global_view,
+                self.validator_set
+            )
 
     def run(self):
         """ run simulation total_rounds if specified
@@ -79,11 +84,14 @@ class SimulationRunner:
         for block in self.network.global_view.messages:
             message_labels[block] = block.sequence_number
 
-        self.network.report(
+        self.plot_tool.next_viewgraph(
+            self.network.global_view,
+            self.validator_set,
             edges=edgelist,
             message_colors=self.block_fault_tolerance,
             message_labels=message_labels
         )
+        
 
     def _send_messages_along_paths(self, message_paths):
         sent_messages = {}

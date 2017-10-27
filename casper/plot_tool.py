@@ -51,13 +51,8 @@ class PlotTool:
             # if it's the last report interval, we have to somehow let this jawn known
             # in that case, we make a gif
 
-    def build_viewgraph(self, view, validator_set, message_colors=None, message_labels=None, edges=None):
+    def build_viewgraph(self, view, validator_set, message_colors, message_labels, edges):
         """Creates and displays view graphs."""
-
-        if message_colors is None:
-            message_colors = {}
-        if message_labels is None:
-            message_labels = {}
 
         graph = nx.Graph()
 
@@ -128,7 +123,15 @@ class PlotTool:
             ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
 
-    def next_viewgraph(self, view, validator_set, message_colors, message_labels, edges):
+    def next_viewgraph(self, view, validator_set, message_colors=None, message_labels=None, edges=None):
+
+        if message_colors is None:
+            message_colors = {}
+        if message_labels is None:
+            message_labels = {}
+        if edges is None:
+            edges = []
+
         self.report_number += 1
 
         # TODO: if we save and plot the graph, we currently build it twice
