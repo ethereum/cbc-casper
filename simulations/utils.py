@@ -2,7 +2,6 @@
 import itertools
 import random as r
 
-import casper.settings as s
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
@@ -13,7 +12,7 @@ def message_maker(mode):
 
     if mode == "rand":
 
-        def random(validator_set, num_messages=s.NUM_MESSAGES_PER_ROUND):
+        def random(validator_set, num_messages=1):
             """Each round, some randomly selected validators propagate their most recent
             message to other randomly selected validators, who then create new messages."""
             pairs = list(itertools.permutations(validator_set, 2))

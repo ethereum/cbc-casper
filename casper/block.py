@@ -33,7 +33,8 @@ class Block:
         if self.sender not in self.justification.latest_messages:
             self.sequence_number = 0
         else:
-            self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
+            latest_message = self.justification.latest_messages[self.sender]
+            self.sequence_number = latest_message.sequence_number + 1
 
         # height is the traditional block height - number of blocks back to genesis block
         if estimate:
@@ -41,13 +42,14 @@ class Block:
         else:
             self.height = 0
 
-
         # The "display_height" of bets are used for visualization of views.
         if not any(self.justification.latest_messages):
             self.display_height = 0
         else:
-            max_height = max(self.justification.latest_messages[validator].display_height \
-                            for validator in self.justification.latest_messages)
+            max_height = max(
+                self.justification.latest_messages[validator].display_height
+                for validator in self.justification.latest_messages
+            )
 
             self.display_height = max_height + 1
 
@@ -55,9 +57,10 @@ class Block:
 
     def __hash__(self):
         if self.estimate is None:
-            return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
+            estimate_hash = 123123124124
         else:
-            return hash(str(self.sequence_number) + str(self.estimate.hash) + str(self.sender.name))
+            estimate_hash = self.estimate.hash
+        return hash(str(self.sequence_number) + str(estimate_hash) + str(self.sender.name))
 
     def is_in_blockchain(self, block):
         """Returns True if self is an ancestor of block."""
