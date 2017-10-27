@@ -4,7 +4,7 @@ import numbers
 import random as r
 
 from casper.block import Block
-from casper.view import View
+from casper.blockchain_view import BlockchainView
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 r.seed()
@@ -23,7 +23,7 @@ class Validator:
 
         self.name = name
         self.weight = weight
-        self.view = View(set())
+        self.view = BlockchainView(set())
         self.validator_set = validator_set
 
     def receive_messages(self, messages):
@@ -42,24 +42,9 @@ class Validator:
         else:
             assert False
 
-    def check_estimate_safety(self, estimate):
+    def update_safe_estimates(self):
         """The validator checks estimate safety on some estimate with some safety oracle."""
-        assert isinstance(estimate, Block), "..expected estimate to be a Block"
-
-        if self.validator_set is None:
-            raise AttributeError("Validator must have a validator_set to check estimate safety.")
-
-        oracle = CliqueOracle(estimate, self.view, self.validator_set)
-        fault_tolerance, _ = oracle.check_estimate_safety()
-
-        if fault_tolerance > 0:
-            if self.view.last_finalized_block:
-                assert self.view.last_finalized_block.is_in_blockchain(estimate)
-
-            self.view.last_finalized_block = estimate
-            return True
-
-        return False
+        self.view.update_safe_estimates(self.validator_set)
 
     def make_new_message(self):
         """This function produces a new latest message for the validator.
