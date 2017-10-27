@@ -19,6 +19,7 @@ class SimulationRunner:
         self.validator_set = validator_set
         self.msg_gen = msg_gen
         self.report_interval = report_interval
+        self.save = save
 
         self.round = 0
         if total_rounds:
@@ -37,6 +38,9 @@ class SimulationRunner:
             otherwise, run indefinitely """
         while self.round < self.total_rounds:
             self.step()
+
+        if self.save:
+            self.plot_tool.make_gif()
 
     def step(self):
         """ run one round of the simulation """

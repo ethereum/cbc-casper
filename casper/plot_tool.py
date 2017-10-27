@@ -13,7 +13,7 @@ import pylab  # noqa
 
 
 BASE = 10000000
-IMAGE_LIMIT = 75
+IMAGE_LIMIT = 500
 FRAMES = "graphs/"
 THUMBNAILS = "thumbs/"
 COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Black"]
@@ -26,7 +26,7 @@ class PlotTool(object):
         self.save = save
 
         if save:
-            graph_path = os.path.dirname(os.path.abspath(__file__)) + '/..' +'/graphs/'
+            graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
             # if there isn't a graph folder, make one!
             if not os.path.isdir(graph_path):
                 os.makedirs(graph_path)
@@ -34,13 +34,15 @@ class PlotTool(object):
             # find the next name for the next plot!
             graph_num = 0
             while True:
-                new_plot = graph_path + '/graph_num_' + str(graph_num)
+                new_plot = graph_path + 'graph_num_' + str(graph_num)
                 graph_num += 1
                 if not os.path.isdir(new_plot):
                     os.makedirs(new_plot)
                     break
 
-            self.plot_path = new_plot
+            self.graph_path = new_plot + "/"
+            self.thumbnail_path = self.graph_path + "thumbnails/"
+            os.makedirs(self.thumbnail_path)
 
         self.report_number = 0
 
@@ -145,7 +147,7 @@ class PlotTool(object):
                 edges=edges
             )
 
-            plt.savefig(self.plot_path + '/' + str(1000 + self.report_number) + ".JPEG")
+            plt.savefig(self.graph_path + '/' + str(1000 + self.report_number) + ".png")
             plt.close('all')
 
         if self.display:
@@ -161,43 +163,44 @@ class PlotTool(object):
 
     def make_thumbnails(self, frame_count_limit=IMAGE_LIMIT, xsize=1000, ysize=1000):
         """Make thumbnail images in PNG format."""
-        file_names = sorted([fn for fn in os.listdir(FRAMES) if fn.endswith('.png')])
+
+        file_names = sorted([fn for fn in os.listdir(self.graph_path) if fn.endswith('.png')])
+
+        if len(file_names) >= frame_count_limit:
+            raise Exception("To many frames!")
 
         images = []
         for file_name in file_names:
-            images.append(Image.open(FRAMES+file_name))
-            if len(images) == frame_count_limit:
-                break
+            images.append(Image.open(self.graph_path + file_name))
+
 
         size = (xsize, ysize)
         iterator = 0
         for image in images:
             image.thumbnail(size, Image.ANTIALIAS)
-            image.save("thumbs/" + str(BASE + iterator) + "thumbnail.png", "PNG")
+            image.save(self.thumbnail_path + str(1000 + iterator) + "thumbnail.png", "PNG")
             iterator += 1
-            if iterator == frame_count_limit:
-                break
 
 
-    def make_gif(self, frame_count_limit=IMAGE_LIMIT, destination_filename="mygif.gif", frame_duration=0.2):
+    def make_gif(self, frame_count_limit=IMAGE_LIMIT, gif_name="mygif.gif", frame_duration=0.2):
         """Make a GIF visualization of view graph."""
 
-        file_names = sorted([file_name for file_name in os.listdir(THUMBNAILS)
+        self.make_thumbnails()
+
+        file_names = sorted([file_name for file_name in os.listdir(self.thumbnail_path)
                              if file_name.endswith('thumbnail.png')])
 
         images = []
         for file_name in file_names:
-            images.append(Image.open(THUMBNAILS + file_name))
-            if len(images) == frame_count_limit:
-                break
+            images.append(Image.open(self.thumbnail_path + file_name))
+
+        destination_filename = self.graph_path + gif_name
 
         iterator = 0
         with io.get_writer(destination_filename, mode='I', duration=frame_duration) as writer:
             for file_name in file_names:
-                image = io.imread(THUMBNAILS + file_name)
+                image = io.imread(self.thumbnail_path + file_name)
                 writer.append_data(image)
                 iterator += 1
-                if iterator == frame_count_limit:
-                    break
 
         writer.close()
