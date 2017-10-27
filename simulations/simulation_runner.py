@@ -2,7 +2,7 @@ import sys
 
 import casper.utils as utils
 from casper.network import Network
-from casper.blockchain_plot_tool import BlockchainPlotTool
+from casper.blockchain.blockchain_plot_tool import BlockchainPlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 

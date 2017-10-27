@@ -1,5 +1,5 @@
 """The network module .... """
-from casper.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.plot_tool import PlotTool
 
 

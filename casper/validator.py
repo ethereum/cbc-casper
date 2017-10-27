@@ -4,7 +4,7 @@ import numbers
 import random as r
 
 from casper.block import Block
-from casper.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 r.seed()
