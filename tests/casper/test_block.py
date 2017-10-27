@@ -3,7 +3,7 @@ import copy
 
 import pytest
 
-from casper.block import Block
+from casper.blockchain.block import Block
 from casper.justification import Justification
 from casper.testing_language import TestLangCBC
 from casper.validator import Validator
