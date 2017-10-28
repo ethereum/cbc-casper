@@ -27,6 +27,7 @@ def get_weight(val_set):
 
 
 def edge(edges, width, color, style):
+    """Builds an edge to display"""
     return {
         'edges': edges,
         'width': width,

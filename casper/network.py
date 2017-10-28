@@ -1,7 +1,11 @@
 """The network module .... """
+<<<<<<< HEAD
 from casper.blockchain.blockchain_view import BlockchainView
 from casper.plot_tool import PlotTool
 
+=======
+from casper.view import View
+>>>>>>> chore/plot_tool_cleanup
 
 class Network:
     """Simulates a network that allows for message passing between validators."""

@@ -6,6 +6,7 @@ import casper.utils as utils
 
 
 class BlockchainPlotTool(PlotTool):
+    """The module uses functions for implementing """
 
     def __init__(self, display, save, view, validator_set):
         super().__init__(display, save)
@@ -20,6 +21,7 @@ class BlockchainPlotTool(PlotTool):
 
 
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
+        """Updates displayable items with new messages and paths  """
         if message_paths is None:
             message_paths = []
         if sent_messages is None:
@@ -33,7 +35,7 @@ class BlockchainPlotTool(PlotTool):
         self._update_message_labels(new_messages)
 
     def plot(self):
-
+        """Builds relevant edges to display and creates next viegraph using them"""
         best_chain_edge = self.get_best_chain()
 
         validator_chain_edges = self.get_validator_chains()
@@ -55,11 +57,13 @@ class BlockchainPlotTool(PlotTool):
 
 
     def get_best_chain(self):
+        """Returns an edge made of the global forkchoice to genesis"""
         best_message = self.view.estimate()
         best_chain = utils.build_chain(best_message, None)
         return utils.edge(best_chain, 5, 'red', 'solid')
 
     def get_validator_chains(self):
+        """Returns a list of edges main from validators current forkchoice to genesis"""
         vals_chain_edges = []
         for validator in self.validator_set:
             chain = utils.build_chain(validator.my_latest_message(), None)
