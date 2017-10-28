@@ -63,7 +63,7 @@ def message_maker(mode):
     return None
 
 
-def generate_random_validator_set(
+def generate_random_gaussian_validator_set(
         num_validators=5,
         mu=60,
         sigma=40,
@@ -89,17 +89,17 @@ def generate_random_validator_set(
 
 
 def validator_generator(config):
-    if config['gen_type'] == 'rand':
+    if config['gen_type'] == 'gauss':
 
-        def rand_generator():
-            return generate_random_validator_set(
+        def gauss_generator():
+            return generate_random_gaussian_validator_set(
                 config['num_validators'],
                 config['mu'],
                 config['sigma'],
                 config['min_weight']
             )
 
-        return rand_generator
+        return gauss_generator
 
     if config['gen_type'] == 'weights':
         jitter_weights = {

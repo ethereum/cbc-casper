@@ -2,7 +2,7 @@ import pytest
 
 from casper.validator_set import ValidatorSet
 from simulations.utils import (
-    generate_random_validator_set,
+    generate_random_gaussian_validator_set,
     message_maker
 )
 
@@ -16,13 +16,13 @@ from simulations.utils import (
         (40, 50, 0, 10),
     ]
 )
-def test_generate_random_validator_set(
+def test_generate_random_gaussian_validator_set(
         num_validators,
         mu,
         sigma,
         min_weight
         ):
-    vs = generate_random_validator_set(
+    vs = generate_random_gaussian_validator_set(
         num_validators,
         mu,
         sigma,

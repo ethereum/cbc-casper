@@ -1,8 +1,8 @@
 {
     "msg_mode": "rand",
-    "num_simulations": 50,
-    "rounds_per_sim": 500,
-    "report_interval": 20,
+    "num_simulations": 3,
+    "rounds_per_sim": 40,
+    "report_interval": 10,
     "validator_info": {
         "gen_type": "gauss",
         "num_validators": 5,

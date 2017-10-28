@@ -3,7 +3,7 @@ import pytest
 from casper.network import Network
 from casper.testing_language import TestLangCBC
 from casper.validator import Validator
-from simulations.utils import generate_random_validator_set
+from simulations.utils import generate_random_gaussian_validator_set
 
 
 def pytest_addoption(parser):
@@ -34,7 +34,7 @@ def test_lang_runner(report):
 
 @pytest.fixture
 def validator_set():
-    return generate_random_validator_set()
+    return generate_random_gaussian_validator_set()
 
 
 @pytest.fixture

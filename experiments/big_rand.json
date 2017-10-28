@@ -4,7 +4,7 @@
     "rounds_per_sim": 500,
     "report_interval": 20,
     "validator_info": {
-        "gen_type": "rand",
+        "gen_type": "gauss",
         "num_validators": 5,
         "mu": 100,
         "sigma": 20,

@@ -45,7 +45,6 @@ class Experiment:
         print(" complete!")
 
         self._aggregate_data()
-        print(self.analyzer_data)
         self._output()
 
     def run_sim(self, sim_id):
