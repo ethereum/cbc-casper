@@ -26,32 +26,29 @@ class PlotTool(object):
         self.save = save
 
         if save:
-            graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
-            # if there isn't a graph folder, make one!
-            if not os.path.isdir(graph_path):
-                os.makedirs(graph_path)
-
-            # find the next name for the next plot!
-            graph_num = 0
-            while True:
-                new_plot = graph_path + 'graph_num_' + str(graph_num)
-                graph_num += 1
-                if not os.path.isdir(new_plot):
-                    os.makedirs(new_plot)
-                    break
-
-            self.graph_path = new_plot + "/"
-            self.thumbnail_path = self.graph_path + "thumbnails/"
-            os.makedirs(self.thumbnail_path)
+            self._create_graph_folder()
 
         self.report_number = 0
 
+
+    def _create_graph_folder(self):
+        graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
         # if there isn't a graph folder, make one!
-        # find what graph number we are!
-        # set self.report_number = 0
-            # this increments each time we build a build a review graph, and/or
-            # if it's the last report interval, we have to somehow let this jawn known
-            # in that case, we make a gif
+        if not os.path.isdir(graph_path):
+            os.makedirs(graph_path)
+
+        # find the next name for the next plot!
+        graph_num = 0
+        while True:
+            new_plot = graph_path + 'graph_num_' + str(graph_num)
+            graph_num += 1
+            if not os.path.isdir(new_plot):
+                os.makedirs(new_plot)
+                break
+
+        self.graph_path = new_plot + "/"
+        self.thumbnail_path = self.graph_path + "thumbnails/"
+        os.makedirs(self.thumbnail_path)
 
     def build_viewgraph(self, view, validator_set, message_colors, message_labels, edges):
         """Creates and displays view graphs."""
@@ -82,18 +79,18 @@ class PlotTool(object):
         sorted_validators = validator_set.sorted_by_name()
         for message in nodes:
             # Index of val in list may have some small performance concerns.
-            positions[message] = (float)(sorted_validators.index(message.sender)
-                                 + 1)/(float)(len(validator_set) + 1), 0.2 + 0.1*message.display_height
+            positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
+                                 (float)(len(validator_set) + 1), 0.2 + 0.1*message.display_height
 
         node_color_map = {}
         for message in nodes:
             if message not in message_colors:
                 node_color_map[message] = 'white'
+            elif message_colors[message] == len(validator_set) - 1:
+                node_color_map[message] = "Black"
             else:
-                if message_colors[message] == len(validator_set) - 1:
-                    node_color_map[message] = "Black"
-                else:
-                    node_color_map[message] = COLOURS[int(len(COLOURS) * message_colors[message] / len(validator_set))]
+                node_color_map[message] = COLOURS[int(len(COLOURS) * message_colors[message] / \
+                                          len(validator_set))]
 
 
         color_values = [node_color_map.get(node) for node in nodes]
@@ -110,8 +107,15 @@ class PlotTool(object):
 
         for edge in edges:
             if isinstance(edge, dict):
-                nx.draw_networkx_edges(graph, positions, edgelist=(edge['edges']), width=edge['width'],
-                                       edge_color=edge['edge_color'], style=edge['style'], alpha=0.5)
+                nx.draw_networkx_edges(
+                    graph,
+                    positions,
+                    edgelist=(edge['edges']),
+                    width=edge['width'],
+                    edge_color=edge['edge_color'],
+                    style=edge['style'],
+                    alpha=0.5
+                )
             else:
                 assert False, edge
         nx.draw_networkx_labels(graph, positions, labels=labels)
@@ -125,8 +129,15 @@ class PlotTool(object):
             ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
 
 
-    def next_viewgraph(self, view, validator_set, message_colors=None, message_labels=None, edges=None):
-
+    def next_viewgraph(
+            self,
+            view,
+            validator_set,
+            message_colors=None,
+            message_labels=None,
+            edges=None
+        ):
+        """Generates the next viewgraph, and saves and/or displays it"""
         if message_colors is None:
             message_colors = {}
         if message_labels is None:
@@ -182,10 +193,10 @@ class PlotTool(object):
             iterator += 1
 
 
-    def make_gif(self, frame_count_limit=IMAGE_LIMIT, gif_name="mygif.gif", frame_duration=0.2):
+    def make_gif(self, frame_count_limit=IMAGE_LIMIT, gif_name="mygif.gif", frame_duration=0.4):
         """Make a GIF visualization of view graph."""
 
-        self.make_thumbnails()
+        self.make_thumbnails(frame_count_limit=frame_count_limit)
 
         file_names = sorted([file_name for file_name in os.listdir(self.thumbnail_path)
                              if file_name.endswith('thumbnail.png')])
