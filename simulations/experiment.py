@@ -1,3 +1,6 @@
+import csv
+import json
+import os
 import statistics
 
 from simulations.analyzer import Analyzer
@@ -12,6 +15,7 @@ class Experiment:
 
     def __init__(
         self,
+        name,
         data,
         num_simulations,
         validator_set_generator,
@@ -19,6 +23,7 @@ class Experiment:
         sim_rounds,
         sim_report_interval
     ):
+        self.name = name
         self.data = data
         self.num_simulations = num_simulations
         self.validator_set_generator = validator_set_generator
@@ -41,6 +46,7 @@ class Experiment:
 
         self._aggregate_data()
         print(self.analyzer_data)
+        self._output()
 
     def run_sim(self, sim_id):
         validator_set = self.validator_set_generator()
@@ -87,3 +93,29 @@ class Experiment:
             for d in self.data
 
         }
+
+    def _output(self):
+        if not os.path.exists("out"):
+            os.makedirs("out")
+        if not os.path.exists("out/{}".format(self.name)):
+            os.makedirs("out/{}".format(self.name))
+
+        self._output_json()
+        self._output_csv()
+
+    def _output_json(self):
+        with open("{}/{}.json".format(self.output_dir, self.name), 'w') as f:
+            json.dump(self.analyzer_data, f, indent=4)
+
+    def _output_csv(self):
+        with open("{}/{}.csv".format(self.output_dir, self.name), 'w') as csvfile:
+            aggregated_data = self.analyzer_data["aggregated"]
+            writer = csv.DictWriter(csvfile, fieldnames=aggregated_data[0].keys())
+
+            writer.writeheader()
+            for interval in aggregated_data:
+                writer.writerow(aggregated_data[interval])
+
+    @property
+    def output_dir(self):
+        return "out/{}".format(self.name)
