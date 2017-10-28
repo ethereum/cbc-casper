@@ -1,3 +1,5 @@
+import statistics
+
 from simulations.analyzer import Analyzer
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
@@ -6,6 +8,8 @@ from simulations.utils import (
 
 
 class Experiment:
+    INTERVAL_STATS = ["mean", "stdev"]
+
     def __init__(
         self,
         data,
@@ -21,6 +25,7 @@ class Experiment:
         self.msg_mode = msg_mode
         self.sim_rounds = sim_rounds
         self.sim_report_interval = sim_report_interval
+        self.intervals = int(self.sim_rounds / self.sim_report_interval)
 
         self.sim_number = 0
         self.analyzer_data = {'simulation_data': {}}
@@ -45,29 +50,32 @@ class Experiment:
             total_rounds=self.sim_rounds,
             report_interval=self.sim_report_interval
         )
-        for interval in range(int(runner.total_rounds / runner.report_interval)):
+        for interval in range(self.intervals):
             for step in range(runner.report_interval):
                 runner.step()
 
             self._collect_data(runner, sim_id, interval)
-        self._collect_data(runner, sim_id, "final")
 
     def _aggregate_data(self):
         aggregated = {
             interval: self._aggregate_interval_data(interval)
-            for interval in range(int(self.sim_rounds / self.sim_report_interval))
+            for interval in range(self.intervals)
         }
-        aggregated["final"] = self._aggregate_interval_data("final")
         self.analyzer_data["aggregated"] = aggregated
 
     def _aggregate_interval_data(self, interval):
-        return {
-            d: [
+        aggregated_interval = {}
+        for d in self.data:
+            interval_list = [
                 self.analyzer_data['simulation_data'][sim_id][interval][d]
                 for sim_id in self.analyzer_data['simulation_data']
             ]
-            for d in self.data
-        }
+            for stat in self.INTERVAL_STATS:
+                key = "{}-{}".format(d, stat)
+                aggregated_interval[key] = getattr(statistics, stat)(interval_list)
+
+        aggregated_interval['interval'] = interval
+        return aggregated_interval
 
     def _collect_data(self, runner, sim_id, interval):
         if sim_id not in self.analyzer_data["simulation_data"]:
@@ -77,4 +85,5 @@ class Experiment:
         self.analyzer_data['simulation_data'][sim_id][interval] = {
             d: getattr(analyzer, d)()
             for d in self.data
+
         }

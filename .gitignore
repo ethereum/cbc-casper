@@ -10,3 +10,5 @@ notes.txt
 out/
 .cache/
 .tox/
+
+.DS_Store

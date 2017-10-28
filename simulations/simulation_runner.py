@@ -29,11 +29,17 @@ class SimulationRunner:
         self.communications = []
         self.safe_blocks = []
         self.node_ft = {}
+        self.message_data = {}
 
         self.network = Network(validator_set)
         self.network.random_initialization()
         if self.report:
             self.network.report()
+
+        # track data about each initial message created by validators
+        for message in self.network.global_view.messages:
+            self.message_data[message] = {}
+            self.message_data[message]['number'] = 0
 
     def run(self):
         """ run simulation total_rounds if specified
@@ -101,6 +107,10 @@ class SimulationRunner:
             if message.estimate is not None:
                 self.blockchain.append([message, message.estimate])
 
+            # cache info on message for reporting
+            self.message_data[message] = {}
+            self.message_data[message]['number'] = len(self.message_data)
+
         return messages
 
     def _check_messages_for_safety(self, messages):
@@ -132,5 +142,7 @@ class SimulationRunner:
             if fault_tolerance > 0:
                 self.safe_blocks.append(tip)
                 self.node_ft[tip] = num_node_ft
+                self.message_data[tip]['safe_number'] = len(self.message_data)
+
 
             tip = tip.estimate

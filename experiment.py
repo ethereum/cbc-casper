@@ -1,13 +1,38 @@
 import argparse
+import csv
 import json
 import os
 
-from numpy import mean
+from statistics import mean, stdev
 
 from simulations.experiment import Experiment
 from simulations.utils import (
     validator_generator
 )
+
+
+def create_output_dir():
+    if not os.path.exists("out"):
+        os.makedirs("out")
+
+
+def write_to_json(experiment, file_path):
+    create_output_dir()
+    with open("out/{}".format(os.path.basename(file_path)), 'w') as f:
+        json.dump(experiment.analyzer_data, f, indent=4)
+
+
+def write_to_csv(experiment, file_path):
+    create_output_dir()
+    base_name = os.path.basename(file_path)
+    file_name = os.path.splitext(base_name)[0]
+    with open("out/{}.csv".format(file_name), 'w') as csvfile:
+        aggregated_data = experiment.analyzer_data["aggregated"]
+        writer = csv.DictWriter(csvfile, fieldnames=aggregated_data[0].keys())
+
+        writer.writeheader()
+        for interval in aggregated_data:
+            writer.writerow(aggregated_data[interval])
 
 
 def main():
@@ -33,15 +58,14 @@ def main():
 
     experiment.run()
 
-    if not os.path.exists("out"):
-        os.makedirs("out")
+    write_to_json(experiment, args.json_file)
+    write_to_csv(experiment, args.json_file)
 
-    with open("out/{}".format(os.path.basename(args.json_file)), 'w') as f:
-        json.dump(experiment.analyzer_data, f, indent=4)
-
-    final_data = experiment.analyzer_data["aggregated"]["final"]
+    final_data = experiment.analyzer_data["aggregated"][experiment.intervals - 1]
     for data in final_data:
-        print("avg {}:\t{}".format(data, mean(final_data[data])))
+        if "interval" in data:
+            continue
+        print("{}:\t{}".format(data, final_data[data]))
 
 
 if __name__ == '__main__':

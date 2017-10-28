@@ -1,7 +1,7 @@
 {
     "msg_mode": "rand",
-    "num_simulations": 5,
-    "rounds_per_sim": 100,
+    "num_simulations": 50,
+    "rounds_per_sim": 500,
     "report_interval": 20,
     "validator_info": {
         "gen_type": "rand",

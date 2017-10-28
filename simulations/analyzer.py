@@ -1,3 +1,6 @@
+import statistics
+
+
 class Analyzer:
     def __init__(self, simulation):
         self.simulation = simulation
@@ -12,8 +15,8 @@ class Analyzer:
     def num_unsafe_messages(self):
         return len(self.unsafe_messages())
 
-    def num_questionable_messages(self):
-        return len(self.questionable_messages())
+    def num_bivalent_messages(self):
+        return len(self.bivalent_messages())
 
     def prop_safe_messages(self):
         return float(self.num_safe_messages()) / self.num_messages()
@@ -27,12 +30,12 @@ class Analyzer:
         # Not sure I'm happy with -1 here
         return -1
 
-    def questionable_message_depth(self):
-        max_height = max(map(lambda m: m.height, self.questionable_messages()))
+    def bivalent_message_depth(self):
+        max_height = max(map(lambda m: m.height, self.bivalent_messages()))
         return max_height - self.safe_tip_height()
 
-    def questionable_message_branching_factor(self):
-        to_check = set(self.questionable_messages())
+    def bivalent_message_branching_factor(self):
+        to_check = set(self.bivalent_messages())
         if self.safe_tip():
             to_check.add(self.safe_tip())
 
@@ -51,10 +54,10 @@ class Analyzer:
             return 0
         return branches / num_checked
 
-    def questionable_message_branching_factor_estimate(self):
+    def bivalent_message_branching_factor_estimate(self):
         ''' Estimate formula taken from
         http://ozark.hendrix.edu/~ferrer/courses/335/f11/lectures/effective-branching.html '''
-        return self.num_questionable_messages() ** (1 / float(self.questionable_message_depth()))
+        return self.num_bivalent_messages() ** (1 / float(self.bivalent_message_depth()))
 
     def safe_tip(self):
         if not self.simulation.safe_blocks:
@@ -68,7 +71,7 @@ class Analyzer:
     def safe_messages(self):
         return set(self.simulation.safe_blocks)
 
-    def questionable_messages(self):
+    def bivalent_messages(self):
         return self.messages() - self.safe_messages() - self.unsafe_messages()
 
     def unsafe_messages(self):
@@ -81,6 +84,19 @@ class Analyzer:
             message for message in potential
             if message.height <= self.safe_tip().height
         }
+
+    def latency_to_finality(self):
+        message_data = self.simulation.message_data
+
+        if not self.simulation.safe_blocks:
+            return len(message_data)
+
+        individual_latency = [
+            message_data[message]['safe_number'] - message_data[message]['number']
+            for message in self.simulation.safe_blocks
+        ]
+
+        return statistics.mean(individual_latency)
 
     def orphan_rate(self):
         # does not take into account that some messages exist
