@@ -26,14 +26,6 @@ class Block(Message):
         return not self.is_in_blockchain(other_message)
 
 
-
-    def is_conflicting_estimate(self, possibly_conflicting_message):
-        """Returns True if self is not ancestor of possibly_conflicting_message."""
-        assert isinstance(possibly_conflicting_message, Block), "...expected a block"
-
-        return not self.is_in_blockchain(possibly_conflicting_message)
-
-
     def is_in_blockchain(self, block):
         """Returns True if self is an ancestor of block."""
         assert isinstance(block, Block), "...expected a block"
