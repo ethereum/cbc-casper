@@ -42,13 +42,14 @@ class Block:
         else:
             self.height = 0
 
-
         # The "display_height" of bets are used for visualization of views.
         if not any(self.justification.latest_messages):
             self.display_height = 0
         else:
-            max_height = max(self.justification.latest_messages[validator].display_height \
-                            for validator in self.justification.latest_messages)
+            max_height = max(
+                self.justification.latest_messages[validator].display_height
+                for validator in self.justification.latest_messages
+            )
 
             self.display_height = max_height + 1
 

@@ -7,6 +7,7 @@ from casper.block import Block
 from casper.view import View
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
+
 r.seed()
 REPORT = True
 

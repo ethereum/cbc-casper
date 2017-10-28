@@ -1,4 +1,6 @@
 """The justification module ..."""
+
+
 class Justification:
     """The justification class ..."""
     def __init__(self, last_finalized_block=None, latest_messages=None):
