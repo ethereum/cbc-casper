@@ -1,7 +1,5 @@
 """The network module .... """
 from casper.view import View
-from casper.plot_tool import PlotTool
-
 
 class Network:
     """Simulates a network that allows for message passing between validators."""
