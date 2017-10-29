@@ -1,11 +1,12 @@
 """The validator set module ... """
 from casper.validator import Validator
+from casper.blockchain.blockchain_view import BlockchainView
 
 
 class ValidatorSet:
     """Defines the validator set."""
-    def __init__(self, weights):
-        self.validators = {Validator(name, weights[name], self) for name in weights}
+    def __init__(self, weights, view_class=BlockchainView):
+        self.validators = {Validator(name, weights[name], view_class, self) for name in weights}
 
     def __len__(self):
         return len(self.validators)

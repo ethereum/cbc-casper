@@ -1,4 +1,4 @@
-"""The plot tool module ... """
+"""The blockchain plot tool implements functions for plotting blockchain data structures"""
 
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
@@ -6,7 +6,7 @@ import casper.utils as utils
 
 
 class BlockchainPlotTool(PlotTool):
-    """The module contains functions for plotting blockchain data structure """
+    """The module contains functions for plotting a blockchain data structure"""
 
     def __init__(self, display, save, view, validator_set):
         super().__init__(display, save)

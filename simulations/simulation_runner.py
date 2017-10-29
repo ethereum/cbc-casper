@@ -2,7 +2,7 @@ import sys
 
 import casper.utils as utils
 from casper.network import Network
-from casper.blockchain_plot_tool import BlockchainPlotTool
+from casper.blockchain.blockchain_plot_tool import BlockchainPlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 
 
@@ -51,7 +51,7 @@ class SimulationRunner:
 
         sent_messages = self._send_messages_along_paths(message_paths)
         new_messages = self._make_new_messages(affected_validators)
-        self._check_messages_for_safety(new_messages)
+        self._check_for_new_safety(affected_validators)
 
         self.plot_tool.update(message_paths, sent_messages, new_messages)
         if self.round % self.report_interval == self.report_interval - 1:
@@ -76,14 +76,6 @@ class SimulationRunner:
 
         return messages
 
-    def _check_messages_for_safety(self, messages):
-        for validator in messages:
-            message = messages[validator]
-
-            # Have validators try to find newly finalized blocks
-            curr = message
-            last_finalized_block = validator.view.last_finalized_block
-            while curr != last_finalized_block:
-                if validator.check_estimate_safety(curr):
-                    break
-                curr = curr.estimate
+    def _check_for_new_safety(self, affected_validators):
+        for validator in affected_validators:
+            validator.update_safe_estimates()

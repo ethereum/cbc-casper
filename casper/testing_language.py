@@ -2,14 +2,15 @@
 import re
 import random as r
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.network import Network
+from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
-from casper.plot_tool import PlotTool
 import casper.utils as utils
 
 
-class TestLangCBC:
+class TestLangCBC(object):
     """Allows testing of simulation scenarios with small testing language."""
 
     # Signal to py.test that TestLangCBC should not be discovered.
@@ -17,11 +18,11 @@ class TestLangCBC:
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
-    def __init__(self, val_weights, display=False):
+    def __init__(self, val_weights, view_class=BlockchainView, display=False):
 
-        self.validator_set = ValidatorSet(val_weights)
+        self.validator_set = ValidatorSet(val_weights, view_class)
         self.display = display
-        self.network = Network(self.validator_set)
+        self.network = Network(self.validator_set, view_class)
 
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
@@ -122,12 +123,11 @@ class TestLangCBC:
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-        safe = validator.check_estimate_safety(block)
+        validator.update_safe_estimates()
 
-        # NOTE: This may fail because the safety_oracle might be a lower bound,
-        # so this might be better not as an assert :)
-        assert safe, "Block {0} failed safety assert " \
-                     "for validator-{1}".format(block_name, validator.name)
+        assert validator.view.last_finalized_block is None or \
+            not block.conflicts_with(validator.view.last_finalized_block), \
+            "Block {0} failed safety assert for validator-{1}".format(block_name, validator.name)
 
     def no_safety(self, validator, block_name):
         """Check that some validator does not detect safety on a block."""
@@ -135,12 +135,12 @@ class TestLangCBC:
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
+        validator.update_safe_estimates()
 
-        safe = validator.check_estimate_safety(block)
-
-        # NOTE: Unlike above, this should never fail.
-        # An oracle should, never detect safety when there is no safety.
-        assert not safe, "Block {} failed no-safety assert".format(block_name)
+        #NOTE: This should never fail
+        assert validator.view.last_finalized_block is None or \
+            block.conflicts_with(validator.view.last_finalized_block), \
+            "Block {} failed no-safety assert".format(block_name)
 
     def check_head_equals_block(self, validator, block_name):
         """Check some validators forkchoice is the correct block."""

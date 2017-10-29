@@ -1,5 +1,6 @@
 import pytest
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.network import Network
 from casper.testing_language import TestLangCBC
 from casper.validator import Validator
@@ -12,11 +13,11 @@ def pytest_addoption(parser):
 
 
 def run_test_lang_with_reports(test_string, weights):
-    TestLangCBC(weights, True).parse(test_string)
+    TestLangCBC(weights, BlockchainView, True).parse(test_string)
 
 
 def run_test_lang_without_reports(test_string, weights):
-    TestLangCBC(weights, False).parse(test_string)
+    TestLangCBC(weights, BlockchainView, False).parse(test_string)
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def test_lang_runner(report):
 
 @pytest.fixture
 def validator_set():
-    return generate_random_validator_set()
+    return generate_random_validator_set(BlockchainView)
 
 
 @pytest.fixture

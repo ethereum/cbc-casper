@@ -4,7 +4,7 @@ from casper.safety_oracles.adversary_models.model_validator import (
 )
 
 
-class Adversary:
+class Adversary(object):
     """Simulates a lower bound, side-effects free adversary."""
 
     def __init__(self, victim_estimate, latest_bets, viewables, validator_set):
@@ -60,12 +60,13 @@ class Adversary:
         self.operations_log = []
 
     def is_attack_complete(self):
-        """If the target has more weight than the victim estimate, attack has succeeded."""
+        """Return true if the target has more weight than the victim estimate"""
         return self.weight_of_target_estimate > self.weight_of_victim_estimate
 
     def ideal_network_attack(self):
-        """This method implements an ideal network attack;
-        it returns the tuple (was_attack_successful, operation_log, attack_view)."""
+        """Implements an ideal network attack.
+
+        Returns the triple (was_attack_successful, operation_log, attack_view)."""
 
         # As work is offloaded somewhat into the get_recent_messages_and_viewables,
         # the attack may be complete already.

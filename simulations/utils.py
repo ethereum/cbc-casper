@@ -16,7 +16,7 @@ def message_maker(mode):
             """Each round, some randomly selected validators propagate their most recent
             message to other randomly selected validators, who then create new messages."""
             pairs = list(itertools.permutations(validator_set, 2))
-            return r.sample(pairs, num_messages)
+            return r.sample(pairs, 1)
 
         return random
 
@@ -63,6 +63,7 @@ def message_maker(mode):
 
 
 def generate_random_validator_set(
+        view_class,
         num_validators=5,
         mu=60,
         sigma=40,
@@ -84,4 +85,4 @@ def generate_random_validator_set(
         for i in names
     }
 
-    return ValidatorSet(weights)
+    return ValidatorSet(weights, view_class)
