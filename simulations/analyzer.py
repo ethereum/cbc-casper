@@ -101,7 +101,6 @@ class Analyzer:
         if not safe_messages:
             return len(message_data)
 
-        print(message_data)
         individual_latency = [
             message_data[message]['safe_number'] - message_data[message]['number']
             for message in safe_messages

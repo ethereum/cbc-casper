@@ -93,7 +93,7 @@ class BlockchainPlotTool(PlotTool):
 
             if fault_tolerance > 0:
                 self.block_fault_tolerance[tip] = num_node_ft
-                if 'safe_number' not in self.message_data[tip]:
+                if num_node_ft == len(self.validator_set) - 1:
                     self.message_data[tip]['safe_number'] = len(self.message_data)
 
             tip = tip.estimate
