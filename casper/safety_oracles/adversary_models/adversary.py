@@ -4,7 +4,7 @@ from casper.safety_oracles.adversary_models.model_validator import (
 )
 
 
-class Adversary:
+class Adversary(object):
     """Simulates a lower bound, side-effects free adversary."""
 
     def __init__(self, victim_estimate, latest_bets, viewables, validator_set):
@@ -22,8 +22,12 @@ class Adversary:
 
         self.validator_models = dict()
         for validator in validator_set:
-            self.validator_models[validator] = ModelValidator(validator, latest_bets[validator],
-                                                              viewables[validator], self.target_estimate)
+            self.validator_models[validator] = ModelValidator(
+                validator,
+                latest_bets[validator],
+                viewables[validator],
+                self.target_estimate
+            )
 
         self.voting_against_attacker = set()
         self.voting_with_attacker = set()
@@ -38,22 +42,30 @@ class Adversary:
                 self.voting_against_attacker.add(validator)
 
         # The attacker will also keep a close eye on the weights of the victim and target estimates:
-        self.weight_of_victim_estimate = sum(validator.weight for validator in self.voting_against_attacker)
-        self.weight_of_target_estimate = sum(validator.weight for validator in self.voting_with_attacker)
+        self.weight_of_victim_estimate = sum(
+            validator.weight for validator in self.voting_against_attacker
+        )
+        self.weight_of_target_estimate = sum(
+            validator.weight for validator in self.voting_with_attacker
+        )
 
-        assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == len(validator_set)
-        assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == round(validator_set.weight(), 2)
+        # sanity checks!
+        assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == \
+            len(validator_set)
+        assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == \
+            round(validator_set.weight(), 2)
 
         # The attacker produces a log of the bets added during the attack.
         self.operations_log = []
 
     def is_attack_complete(self):
-        """If the target has more weight than the victim estimate, attack has succeeded."""
+        """Return true if the target has more weight than the victim estimate"""
         return self.weight_of_target_estimate > self.weight_of_victim_estimate
 
     def ideal_network_attack(self):
-        """This method implements an ideal network attack;
-        it returns the tuple (was_attack_successful, operation_log, attack_view)."""
+        """Implements an ideal network attack.
+
+        Returns the triple (was_attack_successful, operation_log, attack_view)."""
 
         # As work is offloaded somewhat into the get_recent_messages_and_viewables,
         # the attack may be complete already.
@@ -92,8 +104,10 @@ class Adversary:
                 self.weight_of_target_estimate += validator.weight
 
                 # Add a log of our operations.
-                self.operations_log.append(["added valid bet for a validator voting against the attacker",
-                                            hash(new_bet)])
+                self.operations_log.append(
+                    ["added valid bet for a validator voting against the attacker",
+                     hash(new_bet)]
+                )
                 # Update the attack view.
                 self.attack_view.add(new_bet)
 

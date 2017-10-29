@@ -1,5 +1,4 @@
-"""The block module ... """
-from casper.justification import Justification
+"""The block module implements the message data structure for a blockchain"""
 from casper.message import Message
 
 

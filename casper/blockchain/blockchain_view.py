@@ -1,4 +1,4 @@
-"""The view module ... """
+"""The blockchain view module extends a view for blockchain data structures """
 from casper.justification import Justification
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
@@ -7,7 +7,7 @@ import casper.blockchain.forkchoice as forkchoice
 
 
 class BlockchainView(AbstractView):
-    """A set of seen messages. For performance, also stores a dict of most recent messages."""
+    """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=set()):
         super().__init__(messages)
 
@@ -16,8 +16,7 @@ class BlockchainView(AbstractView):
 
 
     def estimate(self):
-        """The estimate function returns the set of max weight estimates
-        This may not be a single-element set because the validator may have an empty view."""
+        """Returns the current forkchoice in this view"""
         return forkchoice.get_fork_choice(
             self.last_finalized_block,
             self.children,
@@ -25,38 +24,28 @@ class BlockchainView(AbstractView):
         )
 
     def add_messages(self, showed_messages):
-        """This method updates a validator's observed latest messages
-        (and vicarious latest messages) in response to seeing new messages."""
+        """Updates views latest_messages and children based on new messages"""
 
         if not showed_messages:
             return
 
-        #### PART -1 - type check
-
         for message in showed_messages:
             assert isinstance(message, Block), "expected only to add a block!"
 
-        #### PART 0 - finding newly discovered messages
-
+        # find any not-seen messages
         newly_discovered_messages = self.get_new_messages(showed_messages)
 
-        #### PART 1 - updating the set of viewed messages
-
+        # add these new messages to the messages in view
         self.messages.update(newly_discovered_messages)
 
-        #### PART 2 - updating latest messages
+        # update views most recently seen messages
+        for message in newly_discovered_messages:
+            if message.sender not in self.latest_messages:
+                self.latest_messages[message.sender] = message
+            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
+                self.latest_messages[message.sender] = message
 
-        # Updating latest messages...
-        for bet in newly_discovered_messages:
-            if bet.sender not in self.latest_messages:
-                self.latest_messages[bet.sender] = bet
-                continue
-            if self.latest_messages[bet.sender].sequence_number < bet.sequence_number:
-                self.latest_messages[bet.sender] = bet
-                continue
-
-        #### PART 3 - updating children
-
+        # update the children dictonary with the new message
         for bet in newly_discovered_messages:
             if bet.estimate not in self.children:
                 self.children[bet.estimate] = set()
@@ -64,16 +53,18 @@ class BlockchainView(AbstractView):
 
 
     def update_safe_estimates(self, validator_set):
+        """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
         tip = self.estimate()
 
         prev_last_finalized_block = self.last_finalized_block
 
         while tip and tip != prev_last_finalized_block:
             oracle = CliqueOracle(tip, self, validator_set)
-            fault_tolerance, num_node_ft = oracle.check_estimate_safety()
+            fault_tolerance, _ = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
                 self.last_finalized_block = tip
+                # then, a sanity check!
                 if prev_last_finalized_block:
                     assert prev_last_finalized_block.is_in_blockchain(self.last_finalized_block)
 

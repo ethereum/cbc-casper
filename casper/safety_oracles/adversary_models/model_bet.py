@@ -1,7 +1,7 @@
 """The model bet module ... """
 
 
-class ModelBet:
+class ModelBet(object):
     """Simple bet structure for binary consensus for side effect free adversary"""
 
     def __init__(self, estimate, sender):
