@@ -41,15 +41,16 @@ class Adversary(object):
             else:
                 self.voting_against_attacker.add(validator)
 
-        # The attacker will also keep a close eye on the weights of the victim and target estimates:
+        # The attacker tracks the weights of the victim and target estimates:
         self.weight_of_victim_estimate = sum(
-            validator.weight for validator in self.voting_against_attacker
+            validator.weight
+            for validator in self.voting_against_attacker
         )
         self.weight_of_target_estimate = sum(
-            validator.weight for validator in self.voting_with_attacker
+            validator.weight
+            for validator in self.voting_with_attacker
         )
 
-        # sanity checks!
         assert len(self.voting_with_attacker) + len(self.voting_against_attacker) == \
             len(validator_set)
         assert round(self.weight_of_victim_estimate + self.weight_of_target_estimate, 2) == \
@@ -104,10 +105,10 @@ class Adversary(object):
                 self.weight_of_target_estimate += validator.weight
 
                 # Add a log of our operations.
-                self.operations_log.append(
-                    ["added valid bet for a validator voting against the attacker",
-                     hash(new_bet)]
-                )
+                self.operations_log.append([
+                    "added valid bet for a validator voting against the attacker",
+                    hash(new_bet)
+                ])
                 # Update the attack view.
                 self.attack_view.add(new_bet)
 

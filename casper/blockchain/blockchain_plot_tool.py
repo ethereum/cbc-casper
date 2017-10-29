@@ -6,7 +6,7 @@ import casper.utils as utils
 
 
 class BlockchainPlotTool(PlotTool):
-    """The module uses functions for implementing """
+    """The module contains functions for plotting a blockchain data structure"""
 
     def __init__(self, display, save, view, validator_set):
         super().__init__(display, save)
@@ -21,7 +21,7 @@ class BlockchainPlotTool(PlotTool):
 
 
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
-        """Updates displayable items with new messages and paths  """
+        """Updates displayable items with new messages and paths"""
         if message_paths is None:
             message_paths = []
         if sent_messages is None:
@@ -45,7 +45,6 @@ class BlockchainPlotTool(PlotTool):
         edgelist.append(utils.edge(self.communications, 1, 'black', 'dotted'))
         edgelist.append(best_chain_edge)
         edgelist.extend(validator_chain_edges)
-
 
         self.next_viewgraph(
             self.view,
