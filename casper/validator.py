@@ -3,7 +3,6 @@ import copy
 import numbers
 import random as r
 
-from casper.blockchain.block import Block
 from casper.blockchain.blockchain_view import BlockchainView
 
 r.seed()
@@ -48,12 +47,4 @@ class Validator(object):
     def make_new_message(self):
         """This function produces a new latest message for the validator.
         It updates the validator's latest message, estimate, view, and latest observed messages."""
-
-        justification = self.view.justification()
-        estimate = copy.copy(self.view.estimate())
-
-        new_message = Block(estimate, justification, self)
-
-        self.view.add_messages(set([new_message]))
-
-        return new_message
+        return self.view.make_new_message(self)

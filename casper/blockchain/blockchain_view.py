@@ -8,8 +8,11 @@ import casper.blockchain.forkchoice as forkchoice
 
 class BlockchainView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
-    def __init__(self, messages=set()):
+    def __init__(self, messages=None):
         super().__init__()
+
+        if messages is None:
+            messages = set()
 
         self.add_messages(messages)
         self.children = dict()
@@ -51,6 +54,15 @@ class BlockchainView(AbstractView):
             if bet.estimate not in self.children:
                 self.children[bet.estimate] = set()
             self.children[bet.estimate].add(bet)
+
+    def make_new_message(self, validator):
+        justification = self.justification()
+        estimate = self.estimate()
+
+        new_message = Block(estimate, justification, validator)
+        self.add_messages(set([new_message]))
+
+        return new_message
 
 
     def update_safe_estimates(self, validator_set):
