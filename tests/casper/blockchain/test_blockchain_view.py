@@ -2,7 +2,7 @@
 import pytest
 
 from casper.blockchain.blockchain_view import BlockchainView
-from casper.testing_language import TestLangCBC
+from simulations.testing_language import TestLangCBC
 
 
 @pytest.mark.parametrize(

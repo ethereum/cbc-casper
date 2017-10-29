@@ -3,7 +3,7 @@
 import pytest
 
 from casper.network import Network
-from casper.testing_language import TestLangCBC
+from simulations.testing_language import TestLangCBC
 
 TEST_STRING = 'B0-A'
 TEST_WEIGHT = {i: 5 - i for i in range(5)}

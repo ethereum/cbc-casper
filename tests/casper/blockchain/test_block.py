@@ -6,8 +6,9 @@ import pytest
 from casper.blockchain.block import Block
 from casper.blockchain.blockchain_view import BlockchainView
 from casper.justification import Justification
-from casper.testing_language import TestLangCBC
 from casper.validator import Validator
+
+from simulations.testing_language import TestLangCBC
 
 
 def test_equality_of_copies_off_genesis(validator):

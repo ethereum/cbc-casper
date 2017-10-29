@@ -2,8 +2,9 @@ import pytest
 
 from casper.blockchain.blockchain_view import BlockchainView
 from casper.network import Network
-from casper.testing_language import TestLangCBC
 from casper.validator import Validator
+
+from simulations.testing_language import TestLangCBC
 from simulations.utils import generate_random_gaussian_validator_set
 
 
