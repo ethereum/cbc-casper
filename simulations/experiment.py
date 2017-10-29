@@ -14,14 +14,14 @@ class Experiment:
     INTERVAL_STATS = ["mean", "stdev"]
 
     def __init__(
-        self,
-        name,
-        data,
-        num_simulations,
-        validator_set_generator,
-        msg_mode,
-        sim_rounds,
-        sim_report_interval
+            self,
+            name,
+            data,
+            num_simulations,
+            validator_set_generator,
+            msg_mode,
+            sim_rounds,
+            sim_report_interval
     ):
         self.name = name
         self.data = data
@@ -71,13 +71,13 @@ class Experiment:
 
     def _aggregate_interval_data(self, interval):
         aggregated_interval = {}
-        for d in self.data:
+        for data in self.data:
             interval_list = [
-                self.analyzer_data['simulation_data'][sim_id][interval][d]
+                self.analyzer_data['simulation_data'][sim_id][interval][data]
                 for sim_id in self.analyzer_data['simulation_data']
             ]
             for stat in self.INTERVAL_STATS:
-                key = "{}-{}".format(d, stat)
+                key = "{}-{}".format(data, stat)
                 aggregated_interval[key] = getattr(statistics, stat)(interval_list)
 
         aggregated_interval['interval'] = interval

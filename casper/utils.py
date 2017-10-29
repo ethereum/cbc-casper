@@ -1,5 +1,6 @@
 """The utils module ..."""
 
+
 def exists_free_message(estimate, val, sequence_num, view):
     """Returns whether there exists a free message.
     A free message is a message later than the sequence number from some val,
@@ -17,6 +18,7 @@ def exists_free_message(estimate, val, sequence_num, view):
         curr_message = curr_message.justification.latest_messages[val]
 
     return False
+
 
 def get_weight(val_set):
     """Returns the weights of some set of validator names."""
@@ -42,7 +44,7 @@ def build_chain(tip, base):
 
     chain = []
     next_block = tip
-    while next_block != base and next_block.estimate:
+    while next_block != base:
         chain.append((next_block, next_block.estimate))
         next_block = next_block.estimate
 

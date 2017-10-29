@@ -32,12 +32,7 @@ class SimulationRunner:
         self.network = Network(validator_set)
         self.network.random_initialization()
 
-        self.message_data = {}
-        for message in self.network.global_view.messages:
-            self.message_data[message] = {}
-            self.message_data[message]['number'] = 0
-
-        self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set, self.message_data)
+        self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()
 
     def run(self):
@@ -80,12 +75,10 @@ class SimulationRunner:
             message = self.network.get_message_from_validator(validator)
             messages[validator] = message
 
-            # cache info on message for reporting
-            self.message_data[message] = {}
-            self.message_data[message]['number'] = len(self.message_data)
-
         return messages
 
     def _check_for_new_safety(self, affected_validators):
         for validator in affected_validators:
             validator.update_safe_estimates()
+
+        self.network.global_view.update_safe_estimates(self.validator_set)

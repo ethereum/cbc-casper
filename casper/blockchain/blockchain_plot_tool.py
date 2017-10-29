@@ -8,7 +8,7 @@ import casper.utils as utils
 class BlockchainPlotTool(PlotTool):
     """The module contains functions for plotting a blockchain data structure"""
 
-    def __init__(self, display, save, view, validator_set, message_data):
+    def __init__(self, display, save, view, validator_set):
         super().__init__(display, save)
         self.view = view
         self.validator_set = validator_set
@@ -18,9 +18,6 @@ class BlockchainPlotTool(PlotTool):
         self.communications = []
         self.block_fault_tolerance = {}
         self.message_labels = {}
-
-        # track data about each initial message created by validators
-        self.message_data = message_data
 
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
         """Updates displayable items with new messages and paths"""
@@ -93,7 +90,5 @@ class BlockchainPlotTool(PlotTool):
 
             if fault_tolerance > 0:
                 self.block_fault_tolerance[tip] = num_node_ft
-                if num_node_ft == len(self.validator_set) - 1:
-                    self.message_data[tip]['safe_number'] = len(self.message_data)
 
             tip = tip.estimate

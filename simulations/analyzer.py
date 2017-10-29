@@ -72,11 +72,15 @@ class Analyzer:
         return self.global_view.messages
 
     def safe_messages(self):
-        # return set(
-            # utils.build_chain(self.global_view.last_finalized_block, None)
-        # )
-        message_data = self.simulation.message_data
-        return {message for message in message_data if 'safe_number' in message_data[message]}
+        if not self.global_view.last_finalized_block:
+            return set()
+
+        return set(
+            map(
+                lambda link: link[0],
+                utils.build_chain(self.global_view.last_finalized_block, None)
+            )
+        )
 
     def bivalent_messages(self):
         return self.messages() - self.safe_messages() - self.unsafe_messages()
@@ -93,24 +97,22 @@ class Analyzer:
         }
 
     def latency_to_finality(self):
-        message_data = self.simulation.message_data
+        safe_messages = self.safe_messages()
+
         # This can kind of throw off data.
         # Really just shouldn't report anything if no finality
         # But I didn't want to handle the reprecussions of returning None or something
-        safe_messages = self.safe_messages()
         if not safe_messages:
-            return len(message_data)
+            return len(self.global_view.messages)
 
         individual_latency = [
-            message_data[message]['safe_number'] - message_data[message]['number']
+            self.global_view.when_finalized[message] - self.global_view.when_added[message]
             for message in safe_messages
         ]
 
         return statistics.mean(individual_latency)
 
     def orphan_rate(self):
-        # does not take into account that some messages exist
-        # with sequence number greater than last finalized message
         num_unsafe_messages = self.num_unsafe_messages()
         num_safe_messages = self.num_safe_messages()
         if num_unsafe_messages + num_safe_messages == 0:
