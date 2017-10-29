@@ -5,7 +5,7 @@ from casper.safety_oracles.adversary_models.model_bet import (
 )
 
 
-class ModelValidator:
+class ModelValidator(object):
     """Simulates a model validator."""
 
     def __init__(self, validator, my_latest_bet, latest_bets, target_estimate):

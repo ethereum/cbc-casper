@@ -1,6 +1,13 @@
 # Casper CBC
 A python implementation of Vlad Zamfir's Correct by Construction Casper.
 
+### Warning -- Codebase subject to substantial changes
+This pre v1.0 implementation is under active development and experimentation
+and might experience _significant_ organizational and substantive changes.
+If you use components of this codebase, _expect_ breaking changes to be
+introduced.
+
+That said, we will try to detail any breaking changes in subsequent releases.
 
 Branch    | Tests
 ----------|------

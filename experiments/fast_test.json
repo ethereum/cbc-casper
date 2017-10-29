@@ -11,8 +11,17 @@
         "min_weight": 20
     },
     "data": [
-        "orphan_rate",
         "num_messages",
-        "num_safe_messages"
+        "num_safe_messages",
+        "num_unsafe_messages",
+        "num_bivalent_messages",
+        "prop_safe_messages",
+        "safe_to_tip_length",
+        "safe_tip_height",
+        "bivalent_message_depth",
+        "bivalent_message_branching_factor",
+        "bivalent_message_branching_factor_estimate",
+        "latency_to_finality",
+        "orphan_rate"
     ]
 }

@@ -20,7 +20,7 @@ class AdversaryOracle(AbstractOracle):
         self.view = view
         self.validator_set = validator_set
 
-    def get_recent_messages_and_viewables(self):
+    def get_messages_and_viewables(self):
         """Converts some current view to binary to make reasoning about viewables easier."""
 
         recent_messages = dict()
@@ -33,31 +33,39 @@ class AdversaryOracle(AbstractOracle):
                 recent_messages[validator] = ModelBet(AdversaryOracle.ADV_ESTIMATE, validator)
                 viewables[validator] = dict()
 
-            # ... or if their most recent messages conflicts w/ estimate,
+            # If their most recent messages conflicts w/ estimate,
             # again working with adversary.
-            elif utils.are_conflicting_estimates(self.candidate_estimate,
-                                                 self.view.latest_messages[validator]):
+            elif self.candidate_estimate.conflicts_with(self.view.latest_messages[validator]):
                 recent_messages[validator] = ModelBet(AdversaryOracle.ADV_ESTIMATE, validator)
                 viewables[validator] = dict()
 
+            # Else, they are currently voting on the candidate estimate
             else:
                 # These are the validators who are voting with the candidate_estimate.
                 recent_messages[validator] = ModelBet(AdversaryOracle.CAN_ESTIMATE, validator)
+
+                # Now, build their viewables
                 viewables[validator] = dict()
+
+                validator_latest_justification = self.view.latest_messages[validator].justification
                 # now construct the messages that they can see from other validators
                 for val2 in self.validator_set:
                     # if they have seen nothing from some validator, assume the worst
                     # NOTE: This may not be necessary, might be possible to do a free
                     # block check here? see issue #44
-                    if val2 not in self.view.latest_messages[validator].justification.latest_messages:
+                    if val2 not in validator_latest_justification.latest_messages:
                         viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                         continue
 
                     # If they have seen something from other validators, do a free block check
                     # If there is a free block, assume they will see that (side-effects free!)
-                    val2_msg_in_v_view = self.view.latest_messages[validator].justification.latest_messages[val2]
-                    if utils.exists_free_message(self.candidate_estimate,
-                                                 val2, val2_msg_in_v_view.sequence_number, self.view):
+                    val2_msg_in_v_view = validator_latest_justification.latest_messages[val2]
+                    if utils.exists_free_message(
+                            self.candidate_estimate,
+                            val2,
+                            val2_msg_in_v_view.sequence_number,
+                            self.view
+                    ):
                         viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                     else:
                         viewables[validator][val2] = ModelBet(AdversaryOracle.CAN_ESTIMATE, val2)
@@ -67,15 +75,14 @@ class AdversaryOracle(AbstractOracle):
     def check_estimate_safety(self):
         """Check the safety of the estimate."""
 
-        recent_messages, viewables = self.get_recent_messages_and_viewables()
+        recent_messages, viewables = self.get_messages_and_viewables()
 
         adversary = Adversary(self.CAN_ESTIMATE, recent_messages, viewables, self.validator_set)
-
         attack_success, _, _ = adversary.ideal_network_attack()
 
-        if not attack_success:
-            # Because the adversary tells us nothing about validators that need to equivocate,
-            # assume the worst.
-            return min(self.validator_set.validator_weights()), 1
-        else:
+        if attack_success:
             return 0, 0
+
+        # Because the adversary tells us nothing about validators that need to equivocate,
+        # assume the worst.
+        return min(self.validator_set.validator_weights()), 1

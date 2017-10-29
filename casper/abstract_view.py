@@ -1,19 +1,12 @@
 """The view module ... """
 from casper.justification import Justification
-import casper.forkchoice as forkchoice
 
-
-class View:
+class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    def __init__(self, messages=set()):
-
+    def __init__(self):
         # now for some assignment...
         self.messages = set()
         self.latest_messages = dict()
-        self.children = dict()
-        self.last_finalized_block = None
-
-        self.add_messages(messages)
 
     def __str__(self):
         output = "View: \n"
@@ -21,44 +14,9 @@ class View:
             output += str(bet) + "\n"
         return output
 
-    def estimate(self):
-        """The estimate function returns the set of max weight estimates
-        This may not be a single-element set because the validator may have an empty view."""
-        return forkchoice.get_fork_choice(
-            self.last_finalized_block,
-            self.children,
-            self.latest_messages
-        )
-
     def justification(self):
         """Returns the latest messages seen from other validators, to justify estimate."""
-        return Justification(self.last_finalized_block, self.latest_messages)
-
-    def add_messages(self, showed_messages):
-        """This method updates a validator's observed latest messages
-        (and vicarious latest messages) in response to seeing new messages."""
-
-        if not showed_messages:
-            return
-
-        # PART 0 - finding newly discovered messages
-        newly_discovered_messages = self.get_new_messages(showed_messages)
-
-        # PART 1 - updating the set of viewed messages
-        self.messages.update(newly_discovered_messages)
-
-        # PART 2 - updating latest messages
-        for bet in newly_discovered_messages:
-            if bet.sender not in self.latest_messages:
-                self.latest_messages[bet.sender] = bet
-            elif self.latest_messages[bet.sender].sequence_number < bet.sequence_number:
-                self.latest_messages[bet.sender] = bet
-
-        # PART 3 - updating children
-        for bet in newly_discovered_messages:
-            if bet.estimate not in self.children:
-                self.children[bet.estimate] = set()
-            self.children[bet.estimate].add(bet)
+        return Justification(self.latest_messages)
 
     def get_new_messages(self, showed_messages):
         """This method returns the set of messages out of showed_messages

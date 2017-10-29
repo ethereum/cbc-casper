@@ -1,5 +1,7 @@
 import statistics
 
+import casper.utils as utils
+
 
 class Analyzer:
     def __init__(self, simulation):
@@ -60,16 +62,21 @@ class Analyzer:
         return self.num_bivalent_messages() ** (1 / float(self.bivalent_message_depth()))
 
     def safe_tip(self):
-        if not self.simulation.safe_blocks:
+        safe_messages = self.safe_messages()
+        if not safe_messages:
             return None
-
-        return self.simulation.safe_blocks[-1]
+        return sorted(list(safe_messages), key=lambda m: m.height)[-1]
+        # return self.global_view.last_finalized_block
 
     def messages(self):
         return self.global_view.messages
 
     def safe_messages(self):
-        return set(self.simulation.safe_blocks)
+        # return set(
+            # utils.build_chain(self.global_view.last_finalized_block, None)
+        # )
+        message_data = self.simulation.message_data
+        return {message for message in message_data if 'safe_number' in message_data[message]}
 
     def bivalent_messages(self):
         return self.messages() - self.safe_messages() - self.unsafe_messages()
@@ -87,16 +94,17 @@ class Analyzer:
 
     def latency_to_finality(self):
         message_data = self.simulation.message_data
-
         # This can kind of throw off data.
         # Really just shouldn't report anything if no finality
         # But I didn't want to handle the reprecussions of returning None or something
-        if not self.simulation.safe_blocks:
+        safe_messages = self.safe_messages()
+        if not safe_messages:
             return len(message_data)
 
+        print(message_data)
         individual_latency = [
             message_data[message]['safe_number'] - message_data[message]['number']
-            for message in self.simulation.safe_blocks
+            for message in safe_messages
         ]
 
         return statistics.mean(individual_latency)

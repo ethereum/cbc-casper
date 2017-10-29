@@ -2,13 +2,15 @@
 import re
 import random as r
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.network import Network
+from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
 import casper.utils as utils
 
 
-class TestLangCBC:
+class TestLangCBC(object):
     """Allows testing of simulation scenarios with small testing language."""
 
     # Signal to py.test that TestLangCBC should not be discovered.
@@ -16,20 +18,20 @@ class TestLangCBC:
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
-    def __init__(self, val_weights, display=False):
+    def __init__(self, val_weights, view_class=BlockchainView, display=False):
 
-        self.validator_set = ValidatorSet(val_weights)
+        self.validator_set = ValidatorSet(val_weights, view_class)
         self.display = display
-        self.network = Network(self.validator_set)
+        self.network = Network(self.validator_set, view_class)
 
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
 
+        self.plot_tool = PlotTool(display, False)
         self.blocks = dict()
         self.blockchain = []
         self.communications = []
-        self.safe_blocks = set()
-        self.color_mag = dict()
+        self.block_fault_tolerance = dict()
 
         # Register token handlers.
         self.handlers = dict()
@@ -121,12 +123,11 @@ class TestLangCBC:
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-        safe = validator.check_estimate_safety(block)
+        validator.update_safe_estimates()
 
-        # NOTE: This may fail because the safety_oracle might be a lower bound,
-        # so this might be better not as an assert :)
-        assert safe, "Block {0} failed safety assert " \
-                     "for validator-{1}".format(block_name, validator.name)
+        assert validator.view.last_finalized_block is None or \
+            not block.conflicts_with(validator.view.last_finalized_block), \
+            "Block {0} failed safety assert for validator-{1}".format(block_name, validator.name)
 
     def no_safety(self, validator, block_name):
         """Check that some validator does not detect safety on a block."""
@@ -134,12 +135,12 @@ class TestLangCBC:
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
+        validator.update_safe_estimates()
 
-        safe = validator.check_estimate_safety(block)
-
-        # NOTE: Unlike above, this should never fail.
-        # An oracle should, never detect safety when there is no safety.
-        assert not safe, "Block {} failed no-safety assert".format(block_name)
+        #NOTE: This should never fail
+        assert validator.view.last_finalized_block is None or \
+            block.conflicts_with(validator.view.last_finalized_block), \
+            "Block {} failed no-safety assert".format(block_name)
 
     def check_head_equals_block(self, validator, block_name):
         """Check some validators forkchoice is the correct block."""
@@ -162,17 +163,12 @@ class TestLangCBC:
 
         # Update the safe blocks!
         tip = self.network.global_view.estimate()
-        while tip:
-            if self.color_mag.get(tip, 0) == len(self.validator_set) - 1:
-                break
-
-            # Clique_Oracle used for display - change?
+        while tip and self.block_fault_tolerance.get(tip, 0) != len(self.validator_set) - 1:
             oracle = CliqueOracle(tip, self.network.global_view, self.validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
-                self.safe_blocks.add(tip)
-                self.color_mag[tip] = num_node_ft
+                self.block_fault_tolerance[tip] = num_node_ft
 
             tip = tip.estimate
 
@@ -182,23 +178,26 @@ class TestLangCBC:
             self.network.global_view.estimate(),
             None
         )
-        edgelist.append(self._edge(best_chain, 5, 'red', 'solid'))
+        edgelist.append(utils.edge(best_chain, 5, 'red', 'solid'))
 
         for validator in self.validator_set:
             chain = utils.build_chain(
                 validator.my_latest_message(),
                 None
                 )
-            edgelist.append(self._edge(chain, 2, 'blue', 'solid'))
+            edgelist.append(utils.edge(chain, 2, 'blue', 'solid'))
 
-        edgelist.append(self._edge(self.blockchain, 2, 'grey', 'solid'))
-        edgelist.append(self._edge(self.communications, 1, 'black', 'dotted'))
+        edgelist.append(utils.edge(self.blockchain, 2, 'grey', 'solid'))
+        edgelist.append(utils.edge(self.communications, 1, 'black', 'dotted'))
 
-        self.network.report(
-            colored_messages=self.safe_blocks,
-            color_mag=self.color_mag,
-            edges=edgelist
+        message_labels = {}
+        for block in self.network.global_view.messages:
+            message_labels[block] = block.sequence_number
+
+        self.plot_tool.next_viewgraph(
+            self.network.global_view,
+            self.validator_set,
+            edges=edgelist,
+            message_colors=self.block_fault_tolerance,
+            message_labels=message_labels
         )
-
-    def _edge(self, edges, width, color, style):
-        return utils.edge(edges, width, color, style)

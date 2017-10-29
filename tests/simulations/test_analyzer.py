@@ -1,8 +1,5 @@
-import random
-
 import pytest
 
-import casper.settings as settings
 from simulations.analyzer import Analyzer
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
@@ -11,7 +8,7 @@ import simulations.utils as utils
 @pytest.mark.parametrize(
     'mode, messages_generated_per_round',
     [
-        ('rand', settings.NUM_MESSAGES_PER_ROUND),
+        ('rand', 1),
         ('rrob', 1),
         ('full', 5),
         ('nofinal', 2),
@@ -19,7 +16,7 @@ import simulations.utils as utils
 )
 def test_num_messages(validator_set, mode, messages_generated_per_round):
     msg_gen = utils.message_maker(mode)
-    simulation_runner = SimulationRunner(validator_set, msg_gen, 100)
+    simulation_runner = SimulationRunner(validator_set, msg_gen, 100, 20, False, False)
     analyzer = Analyzer(simulation_runner)
 
     # due to random_initialization

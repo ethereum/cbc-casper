@@ -1,5 +1,6 @@
 import pytest
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.validator_set import ValidatorSet
 from simulations.utils import (
     generate_random_gaussian_validator_set,
@@ -23,6 +24,7 @@ def test_generate_random_gaussian_validator_set(
         min_weight
         ):
     vs = generate_random_gaussian_validator_set(
+        BlockchainView,
         num_validators,
         mu,
         sigma,
@@ -34,23 +36,16 @@ def test_generate_random_gaussian_validator_set(
     assert len(set(vs.validator_weights())) == num_validators, "Weights should be unique."
 
 
-@pytest.mark.parametrize(
-    'num_messages',
-    [
-        (2),
-        (5),
-        (10),
-    ]
-)
-def test_random_message_maker(validator_set, num_messages):
+def test_random_message_maker(validator_set):
     msg_gen = message_maker("rand")
 
-    message_paths = msg_gen(validator_set, num_messages)
-    assert len(message_paths) == num_messages
-    for message_path in message_paths:
-        assert len(message_path) == 2
-        for validator in message_path:
-            assert validator in validator_set
+    for i in range(20):
+        message_paths = msg_gen(validator_set)
+        assert len(message_paths) == 1
+        for message_path in message_paths:
+            assert len(message_path) == 2
+            for validator in message_path:
+                assert validator in validator_set
 
 
 def test_round_robin_message_maker(validator_set):

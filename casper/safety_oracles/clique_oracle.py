@@ -19,10 +19,7 @@ class CliqueOracle(AbstractOracle):
         # Only consider validators whose messages are compatable w/ candidate_estimate.
         self.with_candidate = {
             v for v in self.validator_set if v in self.view.latest_messages and
-            not utils.are_conflicting_estimates(
-                self.candidate_estimate,
-                self.view.latest_messages[v]
-            )
+            not self.candidate_estimate.conflicts_with(self.view.latest_messages[v])
         }
 
     def _collect_edges(self):
@@ -35,7 +32,7 @@ class CliqueOracle(AbstractOracle):
                 continue
 
             v2_msg_in_v1_view = v1_msg.justification.latest_messages[val2]
-            if utils.are_conflicting_estimates(self.candidate_estimate, v2_msg_in_v1_view):
+            if self.candidate_estimate.conflicts_with(v2_msg_in_v1_view):
                 continue
 
             # the latest block val2 has seen from val1 is on the candidate estimate
@@ -44,7 +41,7 @@ class CliqueOracle(AbstractOracle):
                 continue
 
             v1_msg_in_v2_view = v2_msg.justification.latest_messages[val1]
-            if utils.are_conflicting_estimates(self.candidate_estimate, v1_msg_in_v2_view):
+            if self.candidate_estimate.conflicts_with(v1_msg_in_v2_view):
                 continue
 
             # there are no blocks from val2, that val1 has not seen;
@@ -77,9 +74,9 @@ class CliqueOracle(AbstractOracle):
             return set(), 0
 
         edges = self._collect_edges()
-        G = nx.Graph()
-        G.add_edges_from(edges)
-        cliques = nx.find_cliques(G)
+        graph = nx.Graph()
+        graph.add_edges_from(edges)
+        cliques = nx.find_cliques(graph)
 
         max_clique = []
         max_weight = 0
@@ -99,18 +96,17 @@ class CliqueOracle(AbstractOracle):
         # Minumum amount of weight that has to equivocate.
         fault_tolerance = 2 * clique_weight - self.validator_set.weight()
 
-        if fault_tolerance > 0:
-            clique_weights = {v.weight for v in biggest_clique}
-
-            # Minimum number of validators that need to equivocate.
-            equivocating = set()
-
-            # Round to stop issues w/ floating point rounding.
-            while round(sum(equivocating), 2) < round(fault_tolerance, 2):
-                equivocating.add(max(clique_weights.difference(equivocating)))
-
-            # Return the number of faults we can tolerate, which is one less
-            # than the number that need to equivocate.
-            return fault_tolerance, len(equivocating) - 1
-        else:
+        if fault_tolerance <= 0:
             return 0, 0
+
+        # Minimum number of validators that need to equivocate.
+        equivocating = set()
+        clique_weights = {v.weight for v in biggest_clique}
+
+        # Round to stop issues w/ floating point rounding.
+        while round(sum(equivocating), 2) < round(fault_tolerance, 2):
+            equivocating.add(max(clique_weights.difference(equivocating)))
+
+        # Return the number of faults we can tolerate, which is one less
+        # than the number that need to equivocate.
+        return fault_tolerance, len(equivocating) - 1

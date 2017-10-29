@@ -1,11 +1,5 @@
 """The utils module ..."""
 
-
-def are_conflicting_estimates(estimate, possibly_conflicting_estimate):
-    """Returns whether or there are conflicting estimates."""
-    return not estimate.is_in_blockchain(possibly_conflicting_estimate)
-
-
 def exists_free_message(estimate, val, sequence_num, view):
     """Returns whether there exists a free message.
     A free message is a message later than the sequence number from some val,
@@ -14,7 +8,7 @@ def exists_free_message(estimate, val, sequence_num, view):
     curr_message = view.latest_messages[val]
 
     while curr_message.sequence_number >= sequence_num:
-        if are_conflicting_estimates(estimate, curr_message):
+        if estimate.conflicts_with(curr_message):
             return True
 
         if curr_message.sequence_number == 0:
@@ -24,13 +18,22 @@ def exists_free_message(estimate, val, sequence_num, view):
 
     return False
 
-
 def get_weight(val_set):
     """Returns the weights of some set of validator names."""
     if not val_set:
         return 0
 
     return sum(v.weight for v in val_set)
+
+
+def edge(edges, width, color, style):
+    """Builds an edge to display"""
+    return {
+        'edges': edges,
+        'width': width,
+        'edge_color': color,
+        'style': style
+    }
 
 
 def build_chain(tip, base):
@@ -44,12 +47,3 @@ def build_chain(tip, base):
         next_block = next_block.estimate
 
     return chain
-
-
-def edge(edges, width, color, style):
-    return {
-        'edges': edges,
-        'width': width,
-        'edge_color': color,
-        'style': style
-    }

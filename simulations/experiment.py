@@ -52,7 +52,9 @@ class Experiment:
             validator_set,
             message_maker(self.msg_mode),
             total_rounds=self.sim_rounds,
-            report_interval=self.sim_report_interval
+            report_interval=self.sim_report_interval,
+            display=False,
+            save=False
         )
         for interval in range(self.intervals):
             for step in range(runner.report_interval):

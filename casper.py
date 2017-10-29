@@ -17,6 +17,8 @@ from simulations.utils import (
     MESSAGE_MODES
 )
 
+from casper.blockchain.blockchain_view import BlockchainView
+
 
 def default_configuration():
     config = ConfigParser()
@@ -44,18 +46,29 @@ def main():
         '--report-interval', type=int, default=config.getint("ReportInterval"),
         help='specifies the interval in rounds at which to plot results'
     )
+    parser.add_argument(
+        '--hide-display', help='hide simulation display', action='store_true'
+    )
+    parser.add_argument(
+        '--save', help='hide simulation display', action='store_true'
+    )
 
     args = parser.parse_args()
 
-    validator_set = generate_random_gaussian_validator_set(args.validators)
+    validator_set = generate_random_gaussian_validator_set(
+        BlockchainView,
+        args.validators
+    )
     msg_gen = message_maker(args.mode)
+    display = not args.hide_display
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         total_rounds=args.rounds,
         report_interval=args.report_interval,
-        report=True
+        display=display,
+        save=args.save,
     )
     simulation_runner.run()
 
