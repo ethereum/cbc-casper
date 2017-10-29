@@ -80,9 +80,9 @@ def test_simulation_runner_send_messages(validator_set, mode, messages_generated
     msg_gen = utils.message_maker(mode)
     simulation_runner = SimulationRunner(validator_set, msg_gen, 100, 20, False, False)
 
-    assert len(simulation_runner.message_data) == len(validator_set)
+    assert len(simulation_runner.network.global_view.messages) == len(validator_set)
 
     for i in range(10):
         simulation_runner.step()
-        assert len(simulation_runner.message_data) == \
+        assert len(simulation_runner.network.global_view.messages) == \
             (i + 1) * messages_generated_per_round + len(validator_set)
