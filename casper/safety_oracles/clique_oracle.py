@@ -112,7 +112,4 @@ class CliqueOracle(AbstractOracle):
 
             # Return the number of faults we can tolerate, which is one less
             # than the number that need to equivocate.
-            return fault_tolerance, len(equivocating) - 1
-
-        return 0, 0
-
+        return fault_tolerance, len(equivocating) - 1

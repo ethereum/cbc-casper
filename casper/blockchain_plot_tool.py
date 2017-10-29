@@ -46,6 +46,7 @@ class BlockchainPlotTool(PlotTool):
         edgelist.append(best_chain_edge)
         edgelist.extend(validator_chain_edges)
 
+        print(self.block_fault_tolerance)
 
         self.next_viewgraph(
             self.view,
