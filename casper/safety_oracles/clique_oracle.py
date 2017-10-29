@@ -110,6 +110,6 @@ class CliqueOracle(AbstractOracle):
         while round(sum(equivocating), 2) < round(fault_tolerance, 2):
             equivocating.add(max(clique_weights.difference(equivocating)))
 
-            # Return the number of faults we can tolerate, which is one less
-            # than the number that need to equivocate.
+        # Return the number of faults we can tolerate, which is one less
+        # than the number that need to equivocate.
         return fault_tolerance, len(equivocating) - 1
