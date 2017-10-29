@@ -3,12 +3,10 @@ from casper.justification import Justification
 
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    def __init__(self, messages=set()):
+    def __init__(self):
         # now for some assignment...
         self.messages = set()
         self.latest_messages = dict()
-
-        self.add_messages(messages)
 
     def __str__(self):
         output = "View: \n"

@@ -24,7 +24,8 @@ class Message(object):
         if self.sender not in self.justification.latest_messages:
             self.sequence_number = 0
         else:
-            self.sequence_number = self.justification.latest_messages[self.sender].sequence_number + 1
+            latest_message = self.justification.latest_messages[self.sender]
+            self.sequence_number = latest_message.sequence_number + 1
 
         # The "display_height" of bets are used for visualization of views
         if not any(self.justification.latest_messages):

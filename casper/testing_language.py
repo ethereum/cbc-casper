@@ -9,7 +9,7 @@ from casper.plot_tool import PlotTool
 import casper.utils as utils
 
 
-class TestLangCBC:
+class TestLangCBC(object):
     """Allows testing of simulation scenarios with small testing language."""
 
     # Signal to py.test that TestLangCBC should not be discovered.
