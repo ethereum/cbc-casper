@@ -11,7 +11,7 @@ REPORT = True
 
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
-    def __init__(self, name, weight, validator_set=None):
+    def __init__(self, name, weight, validator_set=None, view_class=BlockchainView):
         if name is None:
             raise ValueError("Validator name must be defined.")
         if not isinstance(weight, numbers.Number):
@@ -21,7 +21,7 @@ class Validator(object):
 
         self.name = name
         self.weight = weight
-        self.view = BlockchainView(set())
+        self.view = view_class(set())
         self.validator_set = validator_set
 
     def receive_messages(self, messages):
