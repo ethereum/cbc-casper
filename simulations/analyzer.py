@@ -88,6 +88,9 @@ class Analyzer:
     def latency_to_finality(self):
         message_data = self.simulation.message_data
 
+        # This can kind of throw off data.
+        # Really just shouldn't report anything if no finality
+        # But I didn't want to handle the reprecussions of returning None or something
         if not self.simulation.safe_blocks:
             return len(message_data)
 
