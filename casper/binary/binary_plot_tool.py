@@ -55,9 +55,15 @@ class BinaryPlotTool(PlotTool):
             self.message_labels[message] = message.estimate
 
     def _update_message_fault_tolerance(self):
-        for bet in self.view.values():
-            oracle = CliqueOracle(bet, self.view, self.validator_set)
+        for validator in self.view.latest_messages:
+
+            latest_message = self.view.latest_messages[validator]
+
+            if latest_message in self.bet_fault_tolerance:
+                continue
+
+            oracle = CliqueOracle(latest_message, validator.view, self.validator_set)
             fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
             if fault_tolerance > 0:
-                self.bet_fault_tolerance[bet] = num_node_ft
+                self.bet_fault_tolerance[latest_message] = num_node_ft

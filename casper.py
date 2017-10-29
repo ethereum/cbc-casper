@@ -17,7 +17,7 @@ from simulations.utils import (
     MESSAGE_MODES
 )
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.binary.binary_view import BinaryView
 
 
 def default_configuration():
@@ -55,7 +55,7 @@ def main():
 
     args = parser.parse_args()
 
-    validator_set = generate_random_validator_set(BlockchainView, args.validators)
+    validator_set = generate_random_validator_set(BinaryView, args.validators)
     msg_gen = message_maker(args.mode)
     display = not args.hide_display
 

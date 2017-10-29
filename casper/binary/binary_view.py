@@ -4,6 +4,8 @@ from casper.abstract_view import AbstractView
 from casper.binary.bet import Bet
 import casper.binary.binary_estimator as estimator
 
+import random as r
+
 
 class BinaryView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
@@ -50,6 +52,8 @@ class BinaryView(AbstractView):
         """Make a new bet!"""
         justification = self.justification()
         estimate = self.estimate()
+        if estimate is None:
+            estimate = r.randint(0, 1)
 
         new_message = Bet(estimate, justification, validator)
         self.add_messages(set([new_message]))
