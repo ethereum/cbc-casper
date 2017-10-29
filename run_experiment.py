@@ -44,6 +44,8 @@ def main():
     )
 
     experiment.run()
+    experiment.output_results()
+    experiment.store_copy_config(config)
 
     final_data = experiment.analyzer_data["aggregated"][experiment.intervals - 1]
     for data in final_data:

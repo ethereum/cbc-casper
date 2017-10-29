@@ -97,20 +97,20 @@ set for each simulation.
 `validator_info.gen_type` (string): Specifies the type of validator generation
 scheme. The available schemes are "gauss" and "weights".
 
-`validator_info.num_validators` (number): [Only relevant to "gauss" `gen_type`]
+`validator_info.num_validators` (number): [*only "gauss" `gen_type`*]
 Specifies the number of validators per validator set.
 
-`validator_info.mu` (number): [Only relevant to "gauss" `gen_type`]
+`validator_info.mu` (number): [*only "gauss" `gen_type`*]
 Specifies the mean of the gaussian distribution used to generate validator weights.
 
-`validator_info.sigma` (number): [Only relevant to "gauss" `gen_type`]
+`validator_info.sigma` (number): [*only "gauss" `gen_type`*]
 Specifies the standard deviation of the gaussian distribution used to generate validator weights.
 
-`validator_info.min_weight` (number): [Only relevant to "gauss" `gen_type`]
+`validator_info.min_weight` (number): [*only "gauss" `gen_type`*]
 Specifies the absolute minimum validator weight can result from the "gauss"
 `gen_type`
 
-`validator_info.weights` (object): [Only relevant to "weights" `gen_type`]
+`validator_info.weights` (object): [*only "weights" `gen_type`*]
 Specifies an explicit set of validator weights to be used in each simulation.
 It is formatted as a json object with strings as keys and positive numbers as
 values.

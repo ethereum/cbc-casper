@@ -45,7 +45,6 @@ class Experiment:
         print(" complete!")
 
         self._aggregate_data()
-        self._output()
 
     def run_sim(self, sim_id):
         validator_set = self.validator_set_generator()
@@ -93,21 +92,28 @@ class Experiment:
 
         }
 
-    def _output(self):
-        if not os.path.exists("out"):
-            os.makedirs("out")
-        if not os.path.exists("out/{}".format(self.name)):
-            os.makedirs("out/{}".format(self.name))
+    def output_results(self):
+        self._make_output_dir()
 
         self._output_json()
         self._output_csv()
 
+    def store_copy_config(self, config):
+        self._make_output_dir()
+
+        with open("{}/config.json".format(self.output_dir), 'w') as f:
+            json.dump(config, f, indent=4)
+
+    def _make_output_dir(self):
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
     def _output_json(self):
-        with open("{}/{}.json".format(self.output_dir, self.name), 'w') as f:
+        with open("{}/out.json".format(self.output_dir), 'w') as f:
             json.dump(self.analyzer_data, f, indent=4)
 
     def _output_csv(self):
-        with open("{}/{}.csv".format(self.output_dir, self.name), 'w') as csvfile:
+        with open("{}/out.csv".format(self.output_dir), 'w') as csvfile:
             aggregated_data = self.analyzer_data["aggregated"]
             writer = csv.DictWriter(csvfile, fieldnames=aggregated_data[0].keys())
 
