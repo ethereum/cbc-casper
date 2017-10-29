@@ -1,11 +1,12 @@
 """The network module .... """
 from casper.blockchain.blockchain_view import BlockchainView
 
+
 class Network:
     """Simulates a network that allows for message passing between validators."""
-    def __init__(self, validator_set):
+    def __init__(self, validator_set, view_class=BlockchainView):
         self.validator_set = validator_set
-        self.global_view = BlockchainView()
+        self.global_view = view_class()
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""

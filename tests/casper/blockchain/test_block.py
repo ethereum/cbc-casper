@@ -4,6 +4,7 @@ import copy
 import pytest
 
 from casper.blockchain.block import Block
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.justification import Justification
 from casper.testing_language import TestLangCBC
 from casper.validator import Validator
@@ -22,7 +23,7 @@ def test_equality_of_copies_off_genesis(validator):
 
 def test_equality_of_copies_of_non_genesis(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    test_lang = TestLangCBC({0: 10, 1: 11}, report)
+    test_lang = TestLangCBC({0: 10, 1: 11}, BlockchainView, report)
     test_lang.parse(test_string)
 
     for block in test_lang.blocks:
@@ -46,7 +47,7 @@ def test_non_equality_of_copies_off_genesis():
 
 def test_unique_block_creation_in_test_lang(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    test_lang = TestLangCBC({0: 10, 1: 11}, report)
+    test_lang = TestLangCBC({0: 10, 1: 11}, BlockchainView, report)
     test_lang.parse(test_string)
 
     num_equal = 0
@@ -74,7 +75,7 @@ def test_is_in_blockchain__separate_genesis():
 
 def test_is_in_blockchain__test_lang(report):
     test_string = "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D"
-    test_lang = TestLangCBC({0: 11, 1: 10}, report)
+    test_lang = TestLangCBC({0: 11, 1: 10}, BlockchainView, report)
     test_lang.parse(test_string)
 
     prev = test_lang.blocks['A']
@@ -107,7 +108,7 @@ def test_is_in_blockchain__test_lang(report):
     ]
 )
 def test_block_height(report, test_string, weights, block_heights):
-    test_lang = TestLangCBC(weights, report)
+    test_lang = TestLangCBC(weights, BlockchainView, report)
     test_lang.parse(test_string)
 
     for block_name in block_heights:

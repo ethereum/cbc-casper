@@ -1,5 +1,6 @@
 import pytest
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.validator_set import ValidatorSet
 from simulations.utils import (
     generate_random_validator_set,
@@ -23,6 +24,7 @@ def test_generate_random_validator_set(
         min_weight
         ):
     vs = generate_random_validator_set(
+        BlockchainView,
         num_validators,
         mu,
         sigma,
@@ -32,7 +34,6 @@ def test_generate_random_validator_set(
     assert len(vs.validators) == num_validators
     assert min(vs.validator_weights()) >= min_weight
     assert len(set(vs.validator_weights())) == num_validators, "Weights should be unique."
-
 
 
 def test_random_message_maker(validator_set):

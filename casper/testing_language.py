@@ -2,10 +2,11 @@
 import re
 import random as r
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.network import Network
+from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
-from casper.plot_tool import PlotTool
 import casper.utils as utils
 
 
@@ -17,11 +18,11 @@ class TestLangCBC(object):
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)'
 
-    def __init__(self, val_weights, display=False):
+    def __init__(self, val_weights, view_class=BlockchainView, display=False):
 
-        self.validator_set = ValidatorSet(val_weights)
+        self.validator_set = ValidatorSet(val_weights, view_class)
         self.display = display
-        self.network = Network(self.validator_set)
+        self.network = Network(self.validator_set, view_class)
 
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
