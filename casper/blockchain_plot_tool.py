@@ -45,9 +45,7 @@ class BlockchainPlotTool(PlotTool):
         edgelist.append(utils.edge(self.communications, 1, 'black', 'dotted'))
         edgelist.append(best_chain_edge)
         edgelist.extend(validator_chain_edges)
-
-        print(self.block_fault_tolerance)
-
+        
         self.next_viewgraph(
             self.view,
             self.validator_set,
