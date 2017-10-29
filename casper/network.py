@@ -1,7 +1,5 @@
 """The network module .... """
 from casper.view import View
-import casper.plot_tool as plot_tool
-
 
 class Network:
     """Simulates a network that allows for message passing between validators."""
@@ -44,20 +42,3 @@ class Network:
         for validator in self.validator_set:
             new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
-
-    def report(self, colored_messages=None, color_mag=None, edges=None):
-        """Displays a view graph."""
-        if colored_messages is None:
-            colored_messages = set()
-        if color_mag is None:
-            color_mag = {}
-        if edges is None:
-            edges = []
-
-        plot_tool.plot_view(
-            self.global_view,
-            self.validator_set,
-            colored_bets=colored_messages,
-            color_mag=color_mag,
-            edges=edges
-        )

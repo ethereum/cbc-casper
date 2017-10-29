@@ -15,7 +15,7 @@ import simulations.utils as utils
 )
 def test_new_simulation_runner(validator_set, mode, rounds):
     msg_gen = utils.message_maker(mode)
-    simulation_runner = SimulationRunner(validator_set, msg_gen, rounds)
+    simulation_runner = SimulationRunner(validator_set, msg_gen, rounds, False, False)
 
     assert simulation_runner.validator_set == validator_set
     assert simulation_runner.msg_gen == msg_gen

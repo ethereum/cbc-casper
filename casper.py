@@ -44,18 +44,26 @@ def main():
         '--report-interval', type=int, default=config.getint("ReportInterval"),
         help='specifies the interval in rounds at which to plot results'
     )
+    parser.add_argument(
+        '--hide-display', help='hide simulation display', action='store_true'
+    )
+    parser.add_argument(
+        '--save', help='hide simulation display', action='store_true'
+    )
 
     args = parser.parse_args()
 
     validator_set = generate_random_validator_set(args.validators)
     msg_gen = message_maker(args.mode)
+    display = not args.hide_display
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         total_rounds=args.rounds,
-        report_interval=args.report_interval,
-        report=True
+        dispay=display,
+        save=args.save,
+        report_interval=args.report_interval
     )
     simulation_runner.run()
 

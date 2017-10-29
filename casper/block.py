@@ -57,10 +57,9 @@ class Block:
 
     def __hash__(self):
         if self.estimate is None:
-            estimate_hash = 123123124124
-        else:
-            estimate_hash = self.estimate.hash
-        return hash(str(self.sequence_number) + str(estimate_hash) + str(self.sender.name))
+            return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
+
+        return hash(str(self.sequence_number) + str(self.estimate.hash) + str(self.sender.name))
 
     def is_in_blockchain(self, block):
         """Returns True if self is an ancestor of block."""

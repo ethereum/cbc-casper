@@ -12,7 +12,7 @@ r.seed()
 REPORT = True
 
 
-class Validator:
+class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
     def __init__(self, name, weight, validator_set=None):
         if name is None:
