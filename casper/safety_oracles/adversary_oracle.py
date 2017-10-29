@@ -41,25 +41,21 @@ class AdversaryOracle(AbstractOracle):
 
             # Else, they are currently voting on the candidate estimate
             else:
-                # These are the validators who are voting with the candidate_estimate.
                 recent_messages[validator] = ModelBet(AdversaryOracle.CAN_ESTIMATE, validator)
 
+                val_latest_message = self.view.latest_messages[validator]
                 # Now, build their viewables
                 viewables[validator] = dict()
 
-                validator_latest_justification = self.view.latest_messages[validator].justification
-                # now construct the messages that they can see from other validators
                 for val2 in self.validator_set:
                     # if they have seen nothing from some validator, assume the worst
-                    # NOTE: This may not be necessary, might be possible to do a free
-                    # block check here? see issue #44
-                    if val2 not in validator_latest_justification.latest_messages:
+                    if val2 not in val_latest_message.justification.latest_messages:
                         viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                         continue
 
                     # If they have seen something from other validators, do a free block check
                     # If there is a free block, assume they will see that (side-effects free!)
-                    val2_msg_in_v_view = validator_latest_justification.latest_messages[val2]
+                    val2_msg_in_v_view = val_latest_message.justification.latest_messages[val2]
                     if utils.exists_free_message(
                             self.candidate_estimate,
                             val2,
