@@ -8,19 +8,15 @@ import casper.blockchain.forkchoice as forkchoice
 class BlockchainView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None):
-        super().__init__()
+        super().__init__(messages)
 
-        if messages is None:
-            messages = set()
-
-        self.add_messages(messages)
         self.children = dict()
         self.last_finalized_block = None
 
         # cache info about message events
         self.when_added = {}
-        for message in messages:
-            self.when_added = 0
+        for message in self.messages:
+            self.when_added[message] = 0
         self.when_finalized = {}
 
     def estimate(self):

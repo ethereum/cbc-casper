@@ -1,10 +1,16 @@
 """The view module ... """
 from casper.justification import Justification
 
+
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    def __init__(self):
+    def __init__(self, messages=None):
         # now for some assignment...
+        if messages is None:
+            messages = set()
+
+        self.add_messages(messages)
+
         self.messages = set()
         self.latest_messages = dict()
 
@@ -51,3 +57,20 @@ class AbstractView(object):
 
         # After the loop is done, we return a set of new messages.
         return new_messages
+
+    def estimate(self):
+        '''Must be defined in child class.
+        Returns estimate based on current messages in the view'''
+        pass
+
+    def add_messages(self, showed_messages):
+        '''Must be defined in child class.'''
+        pass
+
+    def make_new_message(self, validator):
+        '''Must be defined in child class.'''
+        pass
+
+    def update_safe_estimates(self, validator_set):
+        '''Must be defined in child class.'''
+        pass
