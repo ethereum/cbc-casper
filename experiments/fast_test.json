@@ -1,6 +1,6 @@
 {
     "msg_mode": "rand",
-    "num_simulations": 3,
+    "num_simulations": 5,
     "rounds_per_sim": 40,
     "report_interval": 10,
     "validator_info": {
