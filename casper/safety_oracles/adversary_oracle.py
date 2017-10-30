@@ -46,6 +46,7 @@ class AdversaryOracle(AbstractOracle):
                 val_latest_message = self.view.latest_messages[validator]
                 # Now, build their viewables
                 viewables[validator] = dict()
+
                 for val2 in self.validator_set:
                     # if they have seen nothing from some validator, assume the worst
                     if val2 not in val_latest_message.justification.latest_messages:

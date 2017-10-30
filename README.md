@@ -65,6 +65,62 @@ Simulations can be created/managed by `SimulationRunner`. See `casper.py` for sa
 
 More sample simulations with data collection will be added soon.
 
+## Run Experiments
+An Experiment runs a type of simulation some number of times, collects some
+specified data on on each simulation and on aggregate of the simulations and
+outputs the results in `.json` and `.csv ` formats for further analysis and visualizations.
+Experimental output is written to `out/{experiment_name-timestamp}/`
+
+The parameters of an experiment are specified via a `.json` file and are run
+using the python script, `run_experiment.py`. For example:
+
+```
+python run_experiment.py experiments/orphan_rate.json
+```
+
+The following are the fields that make up an experiment to be defined in a `.json` file:
+
+`msg_mode` (string): Specifies the message generation/propogation scheme. The
+available schemes are "rand", "rrob", "full", and "nofinal".
+
+`num_simulations` (number): Specifies the number of simulations to run. Each
+simulation starts with a fresh setup -- messages, validators, etc.
+
+`rounds_per_sim` (number): Specifies the number of rounds of the message
+propogation scheme to run per simulation.
+
+`report_interval` (number): Specifies at which intervals of the message
+propogation to collect data. For example, if `rounds_per_sim` is 100 and `report_interval` is 20,
+the experiment will collect data at round 20, 40, 60, 80, and 100.
+
+`data` (list): Specifies which types of data to collect from the simulations as
+strings. The available types of data are the methods of `Analyzer`. New types of data
+can be added by simply adding a method to Analyzer and referencing the method
+name in `data` of an experiment.
+
+`validator_info` (object): Specifies the parameters for generating a validator
+set for each simulation.
+
+`validator_info.gen_type` (string): Specifies the type of validator generation
+scheme. The available schemes are "gauss" and "weights".
+
+`validator_info.num_validators` (number): [*only "gauss" `gen_type`*]
+Specifies the number of validators per validator set.
+
+`validator_info.mu` (number): [*only "gauss" `gen_type`*]
+Specifies the mean of the gaussian distribution used to generate validator weights.
+
+`validator_info.sigma` (number): [*only "gauss" `gen_type`*]
+Specifies the standard deviation of the gaussian distribution used to generate validator weights.
+
+`validator_info.min_weight` (number): [*only "gauss" `gen_type`*]
+Specifies the absolute minimum validator weight can result from the "gauss"
+`gen_type`
+
+`validator_info.weights` (array): [*only "weights" `gen_type`*]
+Specifies an explicit set of validator weights to be used in each simulation.
+It is formatted as a json array with positive numbers as values.
+
 ## Run Tests
 To run all tests:
 

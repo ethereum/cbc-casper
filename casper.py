@@ -12,7 +12,7 @@ from configparser import ConfigParser
 
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
-    generate_random_validator_set,
+    generate_random_gaussian_validator_set,
     message_maker,
     MESSAGE_MODES
 )
@@ -55,7 +55,10 @@ def main():
 
     args = parser.parse_args()
 
-    validator_set = generate_random_validator_set(BlockchainView, args.validators)
+    validator_set = generate_random_gaussian_validator_set(
+        BlockchainView,
+        args.validators
+    )
     msg_gen = message_maker(args.mode)
     display = not args.hide_display
 
@@ -63,9 +66,9 @@ def main():
         validator_set,
         msg_gen,
         total_rounds=args.rounds,
-        dispay=display,
+        report_interval=args.report_interval,
+        display=display,
         save=args.save,
-        report_interval=args.report_interval
     )
     simulation_runner.run()
 

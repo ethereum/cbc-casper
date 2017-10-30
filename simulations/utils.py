@@ -2,6 +2,7 @@
 import itertools
 import random as r
 
+from casper.blockchain.blockchain_view import BlockchainView
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
@@ -16,7 +17,7 @@ def message_maker(mode):
             """Each round, some randomly selected validators propagate their most recent
             message to other randomly selected validators, who then create new messages."""
             pairs = list(itertools.permutations(validator_set, 2))
-            return r.sample(pairs, 1)
+            return r.sample(pairs, num_messages)
 
         return random
 
@@ -62,7 +63,7 @@ def message_maker(mode):
     return None
 
 
-def generate_random_validator_set(
+def generate_random_gaussian_validator_set(
         view_class,
         num_validators=5,
         mu=60,
@@ -86,3 +87,29 @@ def generate_random_validator_set(
     }
 
     return ValidatorSet(weights, view_class)
+
+
+def validator_generator(config):
+    if config['gen_type'] == 'gauss':
+
+        def gauss_generator():
+            return generate_random_gaussian_validator_set(
+                BlockchainView,
+                config['num_validators'],
+                config['mu'],
+                config['sigma'],
+                config['min_weight']
+            )
+
+        return gauss_generator
+
+    if config['gen_type'] == 'weights':
+        jitter_weights = {
+            i: weight + r.random()
+            for i, weight in enumerate(config['weights'])
+        }
+
+        def weights_generator():
+            return ValidatorSet(jitter_weights)
+
+        return weights_generator

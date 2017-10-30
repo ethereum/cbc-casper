@@ -7,6 +7,9 @@ venv*
 results.txt
 notes.txt
 
+graphs/
+out/
 .cache/
 .tox/
-graphs/
+
+.DS_Store

@@ -1,9 +1,7 @@
 import sys
 
-import casper.utils as utils
 from casper.network import Network
 from casper.blockchain.blockchain_plot_tool import BlockchainPlotTool
-from casper.safety_oracles.clique_oracle import CliqueOracle
 
 
 class SimulationRunner:
@@ -12,13 +10,12 @@ class SimulationRunner:
             validator_set,
             msg_gen,
             total_rounds,
-            dispay,
+            report_interval,
+            display,
             save,
-            report_interval=20
     ):
         self.validator_set = validator_set
         self.msg_gen = msg_gen
-        self.report_interval = report_interval
         self.save = save
 
         self.round = 0
@@ -27,10 +24,21 @@ class SimulationRunner:
         else:
             self.total_rounds = sys.maxsize
 
+        if report_interval:
+            self.report_interval = report_interval
+        else:
+            self.report_interval = 1
+
         self.network = Network(validator_set)
         self.network.random_initialization()
 
-        self.plot_tool = BlockchainPlotTool(dispay, save, self.network.global_view, validator_set)
+        # cache info about message events
+        self.when_added = {}
+        for message in self.network.global_view.messages:
+            self.when_added[message] = 0
+        self.when_finalized = {}
+
+        self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()
 
     def run(self):
@@ -57,7 +65,6 @@ class SimulationRunner:
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
-
     def _send_messages_along_paths(self, message_paths):
         sent_messages = {}
         # Send most recent message of sender to receive
@@ -73,9 +80,18 @@ class SimulationRunner:
         for validator in validators:
             message = self.network.get_message_from_validator(validator)
             messages[validator] = message
+            self.when_added[message] = len(self.network.global_view.messages)
 
         return messages
 
     def _check_for_new_safety(self, affected_validators):
         for validator in affected_validators:
             validator.update_safe_estimates()
+
+        self.network.global_view.update_safe_estimates(self.validator_set)
+
+        # cache when_finalized
+        tip = self.network.global_view.last_finalized_block
+        while tip and tip not in self.when_finalized:
+            self.when_finalized[tip] = len(self.network.global_view.messages)
+            tip = tip.estimate

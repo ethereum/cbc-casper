@@ -1,5 +1,4 @@
 """The blockchain view module extends a view for blockchain data structures """
-from casper.justification import Justification
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 from casper.blockchain.block import Block
@@ -17,7 +16,6 @@ class BlockchainView(AbstractView):
         self.add_messages(messages)
         self.children = dict()
         self.last_finalized_block = None
-
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -42,18 +40,17 @@ class BlockchainView(AbstractView):
         # add these new messages to the messages in view
         self.messages.update(newly_discovered_messages)
 
-        # update views most recently seen messages
         for message in newly_discovered_messages:
+            # update views most recently seen messages
             if message.sender not in self.latest_messages:
                 self.latest_messages[message.sender] = message
             elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
                 self.latest_messages[message.sender] = message
 
-        # update the children dictonary with the new message
-        for bet in newly_discovered_messages:
-            if bet.estimate not in self.children:
-                self.children[bet.estimate] = set()
-            self.children[bet.estimate].add(bet)
+            # update the children dictonary with the new message
+            if message.estimate not in self.children:
+                self.children[message.estimate] = set()
+            self.children[message.estimate].add(message)
 
     def make_new_message(self, validator):
         justification = self.justification()
@@ -63,7 +60,6 @@ class BlockchainView(AbstractView):
         self.add_messages(set([new_message]))
 
         return new_message
-
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
@@ -81,6 +77,6 @@ class BlockchainView(AbstractView):
                 if prev_last_finalized_block:
                     assert prev_last_finalized_block.is_in_blockchain(self.last_finalized_block)
 
-                return
+                return self.last_finalized_block
 
             tip = tip.estimate

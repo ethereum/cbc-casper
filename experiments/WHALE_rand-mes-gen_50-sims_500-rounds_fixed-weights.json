@@ -1,0 +1,20 @@
+{
+    "msg_mode": "rand",
+    "num_simulations": 50,
+    "rounds_per_sim": 500,
+    "report_interval": 20,
+    "validator_info": {
+        "gen_type": "weights",
+        "weights": [150, 25, 25, 25, 25, 25, 25, 25]
+    },
+    "data": [
+        "orphan_rate",
+        "num_messages",
+        "num_safe_messages",
+        "prop_safe_messages",
+        "safe_to_tip_length",
+        "bivalent_message_depth",
+        "bivalent_message_branching_factor",
+        "latency_to_finality"
+    ]
+}

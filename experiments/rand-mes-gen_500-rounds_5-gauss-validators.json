@@ -1,0 +1,23 @@
+{
+    "msg_mode": "rand",
+    "num_simulations": 5,
+    "rounds_per_sim": 500,
+    "report_interval": 20,
+    "validator_info": {
+        "gen_type": "gauss",
+        "num_validators": 5,
+        "mu": 100,
+        "sigma": 20,
+        "min_weight": 20
+    },
+    "data": [
+        "orphan_rate",
+        "num_messages",
+        "num_safe_messages",
+        "prop_safe_messages",
+        "safe_to_tip_length",
+        "bivalent_message_depth",
+        "bivalent_message_branching_factor",
+        "latency_to_finality"
+    ]
+}

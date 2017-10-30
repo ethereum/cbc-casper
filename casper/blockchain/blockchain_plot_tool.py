@@ -19,7 +19,6 @@ class BlockchainPlotTool(PlotTool):
         self.block_fault_tolerance = {}
         self.message_labels = {}
 
-
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
         """Updates displayable items with new messages and paths"""
         if message_paths is None:
@@ -54,18 +53,17 @@ class BlockchainPlotTool(PlotTool):
             message_labels=self.message_labels
         )
 
-
     def get_best_chain(self):
         """Returns an edge made of the global forkchoice to genesis"""
         best_message = self.view.estimate()
-        best_chain = utils.build_chain(best_message, None)
+        best_chain = utils.build_chain(best_message, None)[:-1]
         return utils.edge(best_chain, 5, 'red', 'solid')
 
     def get_validator_chains(self):
         """Returns a list of edges main from validators current forkchoice to genesis"""
         vals_chain_edges = []
         for validator in self.validator_set:
-            chain = utils.build_chain(validator.my_latest_message(), None)
+            chain = utils.build_chain(validator.my_latest_message(), None)[:-1]
             vals_chain_edges.append(utils.edge(chain, 2, 'blue', 'solid'))
 
         return vals_chain_edges
