@@ -6,6 +6,12 @@ from casper.blockchain.blockchain_view import BlockchainView
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
+PROTOCOLS = ['blockchain']
+
+
+def protocol_view_class(protocol):
+    if protocol == 'blockchain':
+        return BlockchainView
 
 
 def message_maker(mode):

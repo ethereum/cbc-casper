@@ -14,7 +14,9 @@ from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
     message_maker,
-    MESSAGE_MODES
+    protocol_view_class,
+    MESSAGE_MODES,
+    PROTOCOLS
 )
 
 from casper.blockchain.blockchain_view import BlockchainView
@@ -33,6 +35,11 @@ def main():
         'mode', metavar='Mode', type=str,
         choices=MESSAGE_MODES,
         help='specifies how to generate and propogate new messages'
+    )
+    parser.add_argument(
+        '--protocol', type=str, default=config.get("DefaultProtocol"),
+        choices=PROTOCOLS,
+        help='specifies the protocol for the simulation'
     )
     parser.add_argument(
         '--validators', type=int, default=config.getint("NumValidators"),
@@ -56,7 +63,7 @@ def main():
     args = parser.parse_args()
 
     validator_set = generate_random_gaussian_validator_set(
-        BlockchainView,
+        protocol_view_class(args.protocol),
         args.validators
     )
     msg_gen = message_maker(args.mode)
@@ -65,6 +72,7 @@ def main():
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
+        protocol_view_class(args.protocol),
         total_rounds=args.rounds,
         report_interval=args.report_interval,
         display=display,

@@ -9,6 +9,7 @@ class SimulationRunner:
             self,
             validator_set,
             msg_gen,
+            protocol_view_class,
             total_rounds,
             report_interval,
             display,
@@ -29,7 +30,7 @@ class SimulationRunner:
         else:
             self.report_interval = 1
 
-        self.network = Network(validator_set)
+        self.network = Network(validator_set, protocol_view_class)
         self.network.random_initialization()
 
         self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set)

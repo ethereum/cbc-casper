@@ -1,6 +1,8 @@
 import sys
 import pytest
 
+from casper.blockchain.blockchain_view import BlockchainView
+
 from casper.network import Network
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
@@ -18,6 +20,7 @@ def test_new_simulation_runner(validator_set, mode, rounds, report_interval):
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
+        BlockchainView,
         rounds,
         report_interval,
         False,
@@ -78,7 +81,15 @@ def test_simulation_runner_step(simulation_runner):
 )
 def test_simulation_runner_send_messages(validator_set, mode, messages_generated_per_round):
     msg_gen = utils.message_maker(mode)
-    simulation_runner = SimulationRunner(validator_set, msg_gen, 100, 20, False, False)
+    simulation_runner = SimulationRunner(
+        validator_set,
+        msg_gen,
+        BlockchainView,
+        100,
+        20,
+        False,
+        False
+    )
 
     assert len(simulation_runner.network.global_view.messages) == len(validator_set)
 
