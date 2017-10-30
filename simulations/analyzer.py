@@ -96,7 +96,7 @@ class Analyzer:
             return None
 
         individual_latency = [
-            self.global_view.when_finalized[message] - self.global_view.when_added[message]
+            self.simulation.when_finalized[message] - self.simulation.when_added[message]
             for message in safe_messages
         ]
 

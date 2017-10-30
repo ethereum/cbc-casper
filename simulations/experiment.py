@@ -79,7 +79,7 @@ class Experiment:
             ]
             for stat in self.INTERVAL_STATS:
                 key = "{}-{}".format(data, stat)
-                if any(interval_list):
+                if len(interval_list) > 1:
                     aggregated_interval[key] = getattr(statistics, stat)(interval_list)
                 else:
                     aggregated_interval[key] = None

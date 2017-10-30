@@ -32,6 +32,12 @@ class SimulationRunner:
         self.network = Network(validator_set)
         self.network.random_initialization()
 
+        # cache info about message events
+        self.when_added = {}
+        for message in self.network.global_view.messages:
+            self.when_added[message] = 0
+        self.when_finalized = {}
+
         self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()
 
@@ -74,6 +80,7 @@ class SimulationRunner:
         for validator in validators:
             message = self.network.get_message_from_validator(validator)
             messages[validator] = message
+            self.when_added[message] = len(self.network.global_view.messages)
 
         return messages
 
@@ -82,3 +89,9 @@ class SimulationRunner:
             validator.update_safe_estimates()
 
         self.network.global_view.update_safe_estimates(self.validator_set)
+
+        # cache when_finalized
+        tip = self.network.global_view.last_finalized_block
+        while tip and tip not in self.when_finalized:
+            self.when_finalized[tip] = len(self.network.global_view.messages)
+            tip = tip.estimate
