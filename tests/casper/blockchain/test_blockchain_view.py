@@ -1,7 +1,7 @@
 """The BlockchainView testing module..."""
 import pytest
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from simulations.testing_language import TestLangCBC
 
 
@@ -35,9 +35,9 @@ from simulations.testing_language import TestLangCBC
     ]
 )
 def test_get_new_messages(weights, test_string, showed_message_names, new_message_names, report):
-    test_lang = TestLangCBC(weights, BlockchainView, report)
+    test_lang = TestLangCBC(weights, BlockchainProtocol, report)
 
-    view = BlockchainView()
+    view = BlockchainProtocol.View()
     # add the initial messages to the view
     view.add_messages(test_lang.network.global_view.messages)
     test_lang.parse(test_string)

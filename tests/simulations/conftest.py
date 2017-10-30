@@ -1,6 +1,6 @@
 import pytest
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
 
@@ -8,4 +8,4 @@ import simulations.utils as utils
 @pytest.fixture
 def simulation_runner(validator_set):
     msg_gen = utils.message_maker('rand')
-    return SimulationRunner(validator_set, msg_gen, BlockchainView, 20, 20, False, False)
+    return SimulationRunner(validator_set, msg_gen, BlockchainProtocol, 20, 20, False, False)

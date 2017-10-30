@@ -1,7 +1,7 @@
 import sys
 import pytest
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
 from casper.network import Network
 from simulations.simulation_runner import SimulationRunner
@@ -20,7 +20,7 @@ def test_new_simulation_runner(validator_set, mode, rounds, report_interval):
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        BlockchainView,
+        BlockchainProtocol,
         rounds,
         report_interval,
         False,
@@ -84,7 +84,7 @@ def test_simulation_runner_send_messages(validator_set, mode, messages_generated
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        BlockchainView,
+        BlockchainProtocol,
         100,
         20,
         False,

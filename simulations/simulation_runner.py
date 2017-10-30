@@ -1,7 +1,10 @@
 import sys
 
 from casper.network import Network
+
 from casper.blockchain.blockchain_plot_tool import BlockchainPlotTool
+from casper.binary.binary_plot_tool import BinaryPlotTool
+from casper.safety_oracles.clique_oracle import CliqueOracle
 
 
 class SimulationRunner:
@@ -9,7 +12,7 @@ class SimulationRunner:
             self,
             validator_set,
             msg_gen,
-            protocol_view_class,
+            protocol,
             total_rounds,
             report_interval,
             display,
@@ -30,10 +33,11 @@ class SimulationRunner:
         else:
             self.report_interval = 1
 
-        self.network = Network(validator_set, protocol_view_class)
+        self.network = Network(validator_set, protocol)
         self.network.random_initialization()
 
-        self.plot_tool = BlockchainPlotTool(display, save, self.network.global_view, validator_set)
+        self.plot_tool = protocol.PlotTool(display, save, self.network.global_view, validator_set)
+
         self.plot_tool.plot()
 
     def run(self):
