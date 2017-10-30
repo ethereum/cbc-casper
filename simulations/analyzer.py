@@ -92,11 +92,8 @@ class Analyzer:
     def latency_to_finality(self):
         safe_messages = self.safe_messages()
 
-        # This can kind of throw off data.
-        # Really just shouldn't report anything if no finality
-        # But I didn't want to handle the reprecussions of returning None or something
         if not any(safe_messages):
-            return len(self.global_view.messages)
+            return None
 
         individual_latency = [
             self.global_view.when_finalized[message] - self.global_view.when_added[message]

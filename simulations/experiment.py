@@ -75,10 +75,14 @@ class Experiment:
             interval_list = [
                 self.analyzer_data['simulation_data'][sim_id][interval][data]
                 for sim_id in self.analyzer_data['simulation_data']
+                if self.analyzer_data['simulation_data'][sim_id][interval][data]
             ]
             for stat in self.INTERVAL_STATS:
                 key = "{}-{}".format(data, stat)
-                aggregated_interval[key] = getattr(statistics, stat)(interval_list)
+                if any(interval_list):
+                    aggregated_interval[key] = getattr(statistics, stat)(interval_list)
+                else:
+                    aggregated_interval[key] = None
 
         aggregated_interval['interval'] = interval
         return aggregated_interval

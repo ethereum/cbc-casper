@@ -20,7 +20,6 @@
         "safe_tip_height",
         "bivalent_message_depth",
         "bivalent_message_branching_factor",
-        "bivalent_message_branching_factor_estimate",
         "latency_to_finality",
         "orphan_rate"
     ]
