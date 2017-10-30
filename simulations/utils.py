@@ -105,8 +105,8 @@ def validator_generator(config):
 
     if config['gen_type'] == 'weights':
         jitter_weights = {
-            name: config['weights'][name] + r.random()
-            for name in config['weights']
+            i: weight + r.random()
+            for i, weight in enumerate(config['weights'])
         }
 
         def weights_generator():

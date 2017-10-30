@@ -59,7 +59,7 @@ class Analyzer:
         return branches / num_checked
 
     def safe_tip(self):
-        return self.global_view.last_finalized_message
+        return self.global_view.last_finalized_block
 
     def messages(self):
         return self.global_view.messages

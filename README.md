@@ -117,10 +117,9 @@ Specifies the standard deviation of the gaussian distribution used to generate v
 Specifies the absolute minimum validator weight can result from the "gauss"
 `gen_type`
 
-`validator_info.weights` (object): [*only "weights" `gen_type`*]
+`validator_info.weights` (array): [*only "weights" `gen_type`*]
 Specifies an explicit set of validator weights to be used in each simulation.
-It is formatted as a json object with strings as keys and positive numbers as
-values.
+It is formatted as a json array with positive numbers as values.
 
 ## Run Tests
 To run all tests:
