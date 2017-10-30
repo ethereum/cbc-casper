@@ -33,7 +33,10 @@ class Analyzer:
         return -1
 
     def bivalent_message_depth(self):
-        max_height = max(map(lambda m: m.height, self.bivalent_messages()))
+        max_height = max(
+            message.height
+            for message in self.global_view.latest_messages.values()
+        )
         return max_height - self.safe_tip_height()
 
     def bivalent_message_branching_factor(self):
@@ -56,17 +59,8 @@ class Analyzer:
             return 0
         return branches / num_checked
 
-    def bivalent_message_branching_factor_estimate(self):
-        ''' Estimate formula taken from
-        http://ozark.hendrix.edu/~ferrer/courses/335/f11/lectures/effective-branching.html '''
-        return self.num_bivalent_messages() ** (1 / float(self.bivalent_message_depth()))
-
     def safe_tip(self):
-        safe_messages = self.safe_messages()
-        if not safe_messages:
-            return None
-        return sorted(list(safe_messages), key=lambda m: m.height)[-1]
-        # return self.global_view.last_finalized_block
+        return self.global_view.last_finalized_message
 
     def messages(self):
         return self.global_view.messages
@@ -102,7 +96,7 @@ class Analyzer:
         # This can kind of throw off data.
         # Really just shouldn't report anything if no finality
         # But I didn't want to handle the reprecussions of returning None or something
-        if not safe_messages:
+        if not any(safe_messages):
             return len(self.global_view.messages)
 
         individual_latency = [

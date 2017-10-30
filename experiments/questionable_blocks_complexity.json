@@ -16,6 +16,5 @@
         "safe_to_tip_length",
         "bivalent_message_depth",
         "bivalent_message_branching_factor",
-        "bivalent_message_branching_factor_estimate"
     ]
 }
