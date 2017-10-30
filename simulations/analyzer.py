@@ -29,8 +29,7 @@ class Analyzer:
     def safe_tip_height(self):
         if self.safe_tip():
             return self.safe_tip().height
-        # Not sure I'm happy with -1 here
-        return -1
+        return 0
 
     def bivalent_message_depth(self):
         max_height = max(
