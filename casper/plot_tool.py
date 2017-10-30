@@ -136,7 +136,7 @@ class PlotTool(object):
             message_colors=None,
             message_labels=None,
             edges=None
-        ):
+    ):
         """Generates the next viewgraph, and saves and/or displays it"""
         if message_colors is None:
             message_colors = {}
