@@ -20,7 +20,6 @@ class BinaryPlotTool(PlotTool):
 
         self.first_time = True
 
-
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
         """Updates displayable items with new messages and paths"""
         if message_paths is None:
@@ -53,7 +52,6 @@ class BinaryPlotTool(PlotTool):
             message_labels=self.message_labels
         )
 
-
     def _update_first_message_labels(self):
         for message in self.view.messages:
             self.message_labels[message] = message.estimate
@@ -69,7 +67,6 @@ class BinaryPlotTool(PlotTool):
             if validator in message.justification.latest_messages:
                 last_message = message.justification.latest_messages[validator]
                 self.self_communications.append([last_message, message])
-
 
     def _update_message_labels(self, new_messages):
         for message in new_messages.values():

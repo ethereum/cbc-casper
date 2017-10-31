@@ -20,7 +20,6 @@ from simulations.utils import (
 )
 
 
-
 def default_configuration():
     config = ConfigParser()
     config.read("config.ini")
