@@ -13,6 +13,12 @@ class BlockchainView(AbstractView):
         self.children = dict()
         self.last_finalized_block = None
 
+        # cache info about message events
+        self.when_added = {}
+        for message in self.messages:
+            self.when_added[message] = 0
+        self.when_finalized = {}
+
     def estimate(self):
         """Returns the current forkchoice in this view"""
         return forkchoice.get_fork_choice(
@@ -48,6 +54,10 @@ class BlockchainView(AbstractView):
                 self.children[message.estimate] = set()
             self.children[message.estimate].add(message)
 
+            # update when_added cache
+            if message not in self.when_added:
+                self.when_added[message] = len(self.messages)
+
     def make_new_message(self, validator):
         justification = self.justification()
         estimate = self.estimate()
@@ -72,6 +82,11 @@ class BlockchainView(AbstractView):
                 # then, a sanity check!
                 if prev_last_finalized_block:
                     assert prev_last_finalized_block.is_in_blockchain(self.last_finalized_block)
+
+                # cache when_finalized
+                while tip and tip not in self.when_finalized:
+                    self.when_finalized[tip] = len(self.messages)
+                    tip = tip.estimate
 
                 return self.last_finalized_block
 

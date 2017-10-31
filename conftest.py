@@ -21,6 +21,10 @@ def run_test_lang_without_reports(test_string, weights):
     TestLangCBC(weights, BlockchainProtocol, False).parse(test_string)
 
 
+def random_gaussian_validator_set_from_protocol(protocol=BlockchainProtocol):
+    return generate_random_gaussian_validator_set(protocol)
+
+
 @pytest.fixture
 def report(request):
     return request.config.getoption("--report")
@@ -35,8 +39,13 @@ def test_lang_runner(report):
 
 
 @pytest.fixture
+def generate_validator_set():
+    return random_gaussian_validator_set_from_protocol
+
+
+@pytest.fixture
 def validator_set():
-    return generate_random_gaussian_validator_set(BlockchainProtocol)
+    return random_gaussian_validator_set_from_protocol(BlockchainProtocol)
 
 
 @pytest.fixture

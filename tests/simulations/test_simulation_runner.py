@@ -2,6 +2,7 @@ import sys
 import pytest
 
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.binary.binary_protocol import BinaryProtocol
 
 from casper.network import Network
 from simulations.simulation_runner import SimulationRunner
@@ -9,18 +10,22 @@ import simulations.utils as utils
 
 
 @pytest.mark.parametrize(
-    'mode, rounds, report_interval',
+    'protocol, mode, rounds, report_interval',
     [
-        ('rand', 10, 2),
-        ('rrob', None, None),
+        (BinaryProtocol, 'rand', 10, 2),
+        (BlockchainProtocol, 'rand', 10, 1),
+        (BlockchainProtocol, 'rrob', None, None),
+        (BinaryProtocol, 'rrob', None, None),
     ]
 )
-def test_new_simulation_runner(validator_set, mode, rounds, report_interval):
+def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, report_interval):
     msg_gen = utils.message_maker(mode)
+    validator_set = generate_validator_set(protocol)
+
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        BlockchainProtocol,
+        protocol,
         rounds,
         report_interval,
         False,
@@ -71,20 +76,31 @@ def test_simulation_runner_step(simulation_runner):
 
 
 @pytest.mark.parametrize(
-    'mode, messages_generated_per_round',
+    'protocol, mode, messages_generated_per_round',
     [
-        ('rand', 1),
-        ('rrob', 1),
-        ('full', 5),
-        ('nofinal', 2),
+        (BlockchainProtocol, 'rand', 1),
+        (BlockchainProtocol, 'rrob', 1),
+        (BlockchainProtocol, 'full', 5),
+        (BlockchainProtocol, 'nofinal', 2),
+        (BinaryProtocol, 'rand', 1),
+        (BinaryProtocol, 'rrob', 1),
+        (BinaryProtocol, 'full', 5),
+        (BinaryProtocol, 'nofinal', 2),
     ]
 )
-def test_simulation_runner_send_messages(validator_set, mode, messages_generated_per_round):
+def test_simulation_runner_send_messages(
+        generate_validator_set,
+        protocol,
+        mode,
+        messages_generated_per_round
+        ):
     msg_gen = utils.message_maker(mode)
+    validator_set = generate_validator_set(protocol)
+
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        BlockchainProtocol,
+        protocol,
         100,
         20,
         False,

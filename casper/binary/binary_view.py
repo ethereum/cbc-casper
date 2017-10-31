@@ -18,7 +18,6 @@ class BinaryView(AbstractView):
         self.add_messages(messages)
         self.last_finalized_estimate = None
 
-
     def estimate(self):
         """Returns the current forkchoice in this view"""
         return estimator.get_estimate_from_latest_messages(
@@ -32,7 +31,7 @@ class BinaryView(AbstractView):
             return
 
         for message in showed_messages:
-            assert isinstance(message, Bet), "expected only to add a block!"
+            assert isinstance(message, Bet), "expected only to add a Bet!"
 
         # find any not-seen messages
         newly_discovered_messages = self.get_new_messages(showed_messages)
@@ -47,7 +46,6 @@ class BinaryView(AbstractView):
             elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
                 self.latest_messages[message.sender] = message
 
-
     def make_new_message(self, validator):
         """Make a new bet!"""
         justification = self.justification()
@@ -59,7 +57,6 @@ class BinaryView(AbstractView):
         self.add_messages(set([new_message]))
 
         return new_message
-
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""

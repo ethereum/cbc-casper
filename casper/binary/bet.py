@@ -10,8 +10,6 @@ class Bet(Message):
         assert estimate in {0, 1}, "... estimate should be binary!"
         super().__init__(estimate, justification, sender)
 
-
-
     def conflicts_with(self, other_message):
         """Returns true if the other_message estimate is not the same as this estimate"""
         assert other_message.estimate in {0, 1}, "... estimate should be binary!"

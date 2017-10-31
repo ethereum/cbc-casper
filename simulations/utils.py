@@ -99,12 +99,12 @@ def generate_random_gaussian_validator_set(
     return ValidatorSet(weights, protocol)
 
 
-def validator_generator(config):
+def validator_generator(config, protocol):
     if config['gen_type'] == 'gauss':
 
         def gauss_generator():
             return generate_random_gaussian_validator_set(
-                BlockchainProtocol,
+                protocol,
                 config['num_validators'],
                 config['mu'],
                 config['sigma'],
@@ -120,6 +120,6 @@ def validator_generator(config):
         }
 
         def weights_generator():
-            return ValidatorSet(jitter_weights, BlockchainProtocol)
+            return ValidatorSet(jitter_weights, protocol)
 
         return weights_generator
