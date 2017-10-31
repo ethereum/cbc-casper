@@ -102,8 +102,8 @@ class PlotTool(object):
             node_sizes.append(350 * pow(message.sender.weight / pi, 0.5))
             labels[message] = message_labels.get(message, '')
 
-        nx.draw_networkx_nodes(graph, positions, alpha=0.1, node_color=color_values, nodelist=nodes,
-                               node_size=node_sizes, edge_color='black')
+        nx.draw_networkx_nodes(graph, positions, alpha=0.5, node_color=color_values, nodelist=nodes,
+                               node_size=node_sizes, node_shape='s', edge_color='black')
 
         for edge in edges:
             if isinstance(edge, dict):

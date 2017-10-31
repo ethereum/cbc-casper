@@ -5,7 +5,7 @@
     "report_interval": 20,
     "validator_info": {
         "gen_type": "weights",
-        "weights": {"0": 150, "1": 25, "2": 25, "3": 25, "4": 25, "5": 25, "6": 25, "7": 25}
+        "weights": [150, 25, 25, 25, 25, 25, 25, 25]
     },
     "data": [
         "orphan_rate",

@@ -15,15 +15,13 @@ class Block(Message):
         if estimate:
             self.height = estimate.height + 1
         else:
-            self.height = 0
-
+            self.height = 1
 
     def conflicts_with(self, other_message):
         """Returns true if self is not in the prev blocks of other_message"""
         assert isinstance(other_message, Block), "...expected a block"
 
         return not self.is_in_blockchain(other_message)
-
 
     def is_in_blockchain(self, block):
         """Returns True if self is an ancestor of block."""
