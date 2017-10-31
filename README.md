@@ -83,6 +83,9 @@ The following are the fields that make up an experiment to be defined in a `.jso
 `msg_mode` (string): Specifies the message generation/propogation scheme. The
 available schemes are "rand", "rrob", "full", and "nofinal".
 
+`protocol` (string): Specifies the protocol to test. Available protocols are
+"blockchain" and "binary" (for now!).
+
 `num_simulations` (number): Specifies the number of simulations to run. Each
 simulation starts with a fresh setup -- messages, validators, etc.
 
