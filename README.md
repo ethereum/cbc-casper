@@ -31,7 +31,7 @@ make install
 ### Standard
 Standard similuations are marked up for use as follows:
 ```
-make run-[rand | rrob | full | nofinal]
+make run-[rand | rrob | full | nofinal | binary]
 ```
 
 `rand:` each round, some randomly selected validators propagate their most recent message to other randomly selected validators, who then create new messages.
@@ -41,6 +41,8 @@ make run-[rand | rrob | full | nofinal]
 `full:` each round, all validators receive all other validators previous messages, and then all create messages.
 
 `nofinal:` each round, two simultaneous round-robin message propagations occur at the same time. This results in validators never being able to finalize later blocks (they may finalize initial blocks, depending on weight distribution).
+
+`binary:` unlike the above message propagation schemes, this changes the protocol to cbc-casper with binary data structures! Instead of a blockchain, this protocol just comes to consensus on a single bit.
 
 The number of validators, the number of messages that propagate per round, and the report interval can be edited in `casper/settings.py`.
 
