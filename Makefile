@@ -28,3 +28,5 @@ run-full:
 run-nofinal:
 	venv/bin/python casper.py nofinal
 
+run-binary:
+	venv/bin/python casper.py rand --protocol binary --report-interval 3

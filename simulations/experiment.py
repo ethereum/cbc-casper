@@ -20,6 +20,7 @@ class Experiment:
             num_simulations,
             validator_set_generator,
             msg_mode,
+            protocol,
             sim_rounds,
             sim_report_interval
     ):
@@ -28,6 +29,7 @@ class Experiment:
         self.num_simulations = num_simulations
         self.validator_set_generator = validator_set_generator
         self.msg_mode = msg_mode
+        self.protocol = protocol
         self.sim_rounds = sim_rounds
         self.sim_report_interval = sim_report_interval
         self.intervals = int(self.sim_rounds / self.sim_report_interval)
@@ -51,6 +53,7 @@ class Experiment:
         runner = SimulationRunner(
             validator_set,
             message_maker(self.msg_mode),
+            self.protocol,
             total_rounds=self.sim_rounds,
             report_interval=self.sim_report_interval,
             display=False,

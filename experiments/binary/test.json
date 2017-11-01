@@ -1,0 +1,17 @@
+{
+    "msg_mode": "rand",
+    "protocol": "binary",
+    "num_simulations": 5,
+    "rounds_per_sim": 40,
+    "report_interval": 10,
+    "validator_info": {
+        "gen_type": "gauss",
+        "num_validators": 5,
+        "mu": 100,
+        "sigma": 20,
+        "min_weight": 20
+    },
+    "data": [
+        "num_messages"
+    ]
+}

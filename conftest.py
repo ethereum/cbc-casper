@@ -1,9 +1,10 @@
 import pytest
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.network import Network
-from casper.testing_language import TestLangCBC
 from casper.validator import Validator
+
+from simulations.testing_language import TestLangCBC
 from simulations.utils import generate_random_gaussian_validator_set
 
 
@@ -13,11 +14,15 @@ def pytest_addoption(parser):
 
 
 def run_test_lang_with_reports(test_string, weights):
-    TestLangCBC(weights, BlockchainView, True).parse(test_string)
+    TestLangCBC(weights, BlockchainProtocol, True).parse(test_string)
 
 
 def run_test_lang_without_reports(test_string, weights):
-    TestLangCBC(weights, BlockchainView, False).parse(test_string)
+    TestLangCBC(weights, BlockchainProtocol, False).parse(test_string)
+
+
+def random_gaussian_validator_set_from_protocol(protocol=BlockchainProtocol):
+    return generate_random_gaussian_validator_set(protocol)
 
 
 @pytest.fixture
@@ -34,8 +39,13 @@ def test_lang_runner(report):
 
 
 @pytest.fixture
+def generate_validator_set():
+    return random_gaussian_validator_set_from_protocol
+
+
+@pytest.fixture
 def validator_set():
-    return generate_random_gaussian_validator_set(BlockchainView)
+    return random_gaussian_validator_set_from_protocol(BlockchainProtocol)
 
 
 @pytest.fixture

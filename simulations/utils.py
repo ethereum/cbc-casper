@@ -2,10 +2,20 @@
 import itertools
 import random as r
 
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.binary.binary_protocol import BinaryProtocol
+
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
+PROTOCOLS = ['blockchain', 'binary']
+
+
+def select_protocol(protocol):
+    if protocol == 'blockchain':
+        return BlockchainProtocol
+    if protocol == 'binary':
+        return BinaryProtocol
 
 
 def message_maker(mode):
@@ -64,7 +74,7 @@ def message_maker(mode):
 
 
 def generate_random_gaussian_validator_set(
-        view_class,
+        protocol,
         num_validators=5,
         mu=60,
         sigma=40,
@@ -86,15 +96,15 @@ def generate_random_gaussian_validator_set(
         for i in names
     }
 
-    return ValidatorSet(weights, view_class)
+    return ValidatorSet(weights, protocol)
 
 
-def validator_generator(config):
+def validator_generator(config, protocol):
     if config['gen_type'] == 'gauss':
 
         def gauss_generator():
             return generate_random_gaussian_validator_set(
-                BlockchainView,
+                protocol,
                 config['num_validators'],
                 config['mu'],
                 config['sigma'],
@@ -110,6 +120,6 @@ def validator_generator(config):
         }
 
         def weights_generator():
-            return ValidatorSet(jitter_weights)
+            return ValidatorSet(jitter_weights, protocol)
 
         return weights_generator

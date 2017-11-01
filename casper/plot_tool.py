@@ -21,9 +21,10 @@ COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Bl
 
 class PlotTool(object):
 
-    def __init__(self, display, save):
+    def __init__(self, display, save, node_shape):
         self.display = display
         self.save = save
+        self.node_shape = node_shape
 
         if save:
             self._create_graph_folder()
@@ -103,7 +104,7 @@ class PlotTool(object):
             labels[message] = message_labels.get(message, '')
 
         nx.draw_networkx_nodes(graph, positions, alpha=0.5, node_color=color_values, nodelist=nodes,
-                               node_size=node_sizes, node_shape='s', edge_color='black')
+                               node_size=node_sizes, node_shape=self.node_shape, edge_color='black')
 
         for edge in edges:
             if isinstance(edge, dict):
@@ -136,7 +137,7 @@ class PlotTool(object):
             message_colors=None,
             message_labels=None,
             edges=None
-        ):
+    ):
         """Generates the next viewgraph, and saves and/or displays it"""
         if message_colors is None:
             message_colors = {}

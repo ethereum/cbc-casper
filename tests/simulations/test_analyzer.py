@@ -1,5 +1,7 @@
 import pytest
 
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
+
 from simulations.analyzer import Analyzer
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
@@ -16,7 +18,15 @@ import simulations.utils as utils
 )
 def test_num_messages(validator_set, mode, messages_generated_per_round):
     msg_gen = utils.message_maker(mode)
-    simulation_runner = SimulationRunner(validator_set, msg_gen, 100, 20, False, False)
+    simulation_runner = SimulationRunner(
+        validator_set,
+        msg_gen,
+        BlockchainProtocol,
+        100,
+        20,
+        False,
+        False
+    )
     analyzer = Analyzer(simulation_runner)
 
     # due to random_initialization

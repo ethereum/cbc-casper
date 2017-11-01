@@ -1,7 +1,7 @@
 """The validator module ... """
 import numbers
 import random as r
-from casper.blockchain.blockchain_view import BlockchainView
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 r.seed()
@@ -10,7 +10,7 @@ REPORT = True
 
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
-    def __init__(self, name, weight, view_class=BlockchainView, validator_set=None):
+    def __init__(self, name, weight, protocol=BlockchainProtocol, validator_set=None):
         if name is None:
             raise ValueError("Validator name must be defined.")
         if not isinstance(weight, numbers.Number):
@@ -20,7 +20,7 @@ class Validator(object):
 
         self.name = name
         self.weight = weight
-        self.view = view_class(set())
+        self.view = protocol.View(set())
         self.validator_set = validator_set
 
     def receive_messages(self, messages):

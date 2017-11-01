@@ -41,3 +41,7 @@ class Message(object):
     def __hash__(self):
         # NOTE: This does not work once validators have the ability to equivocate!
         return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
+
+    def conflicts_with(self, message):
+        '''Must be implemented by child class'''
+        pass

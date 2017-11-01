@@ -7,6 +7,7 @@ import calendar
 
 from simulations.experiment import Experiment
 from simulations.utils import (
+    select_protocol,
     validator_generator
 )
 
@@ -32,13 +33,15 @@ def main():
     file_name = os.path.splitext(base_name)[0]
 
     experiment_name = "{}-{}".format(file_name, timestamp())
+    protocol = select_protocol(config['protocol'])
 
     experiment = Experiment(
         experiment_name,
         config['data'],
         config['num_simulations'],
-        validator_generator(config['validator_info']),
+        validator_generator(config['validator_info'], protocol),
         config['msg_mode'],
+        protocol,
         config['rounds_per_sim'],
         config['report_interval']
     )
