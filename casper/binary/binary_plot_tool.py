@@ -9,7 +9,7 @@ class BinaryPlotTool(PlotTool):
     """The module contains functions for plotting a binary data structure"""
 
     def __init__(self, display, save, view, validator_set):
-        super().__init__(display, save)
+        super().__init__(display, save, 'o')
         self.view = view
         self.validator_set = validator_set
 

@@ -9,7 +9,7 @@ class BlockchainPlotTool(PlotTool):
     """The module contains functions for plotting a blockchain data structure"""
 
     def __init__(self, display, save, view, validator_set):
-        super().__init__(display, save)
+        super().__init__(display, save, 's')
         self.view = view
         self.validator_set = validator_set
         self.message_fault_tolerance = dict()
