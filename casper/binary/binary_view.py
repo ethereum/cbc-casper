@@ -10,12 +10,8 @@ import random as r
 class BinaryView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None):
-        super().__init__()
+        super().__init__(messages)
 
-        if messages is None:
-            messages = set()
-
-        self.add_messages(messages)
         self.last_finalized_estimate = None
 
     def estimate(self):

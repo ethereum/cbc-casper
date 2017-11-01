@@ -27,7 +27,7 @@ class TestLangCBC(object):
         # This seems to be misnamed. Just generates starting blocks.
         self.network.random_initialization()
 
-        self.plot_tool = PlotTool(display, False)
+        self.plot_tool = PlotTool(display, False, 's')
         self.blocks = dict()
         self.blockchain = []
         self.communications = []
