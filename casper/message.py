@@ -1,4 +1,4 @@
-"""The message module ... """
+"""The message module defines an abstract message class  """
 from casper.justification import Justification
 
 class Message(object):
@@ -12,28 +12,26 @@ class Message(object):
         return not self.__eq__(message)
 
     def __init__(self, estimate, justification, sender):
-        assert isinstance(justification, Justification), "expected justification a Justification!"
+        assert isinstance(justification, Justification), "justification should be a Justification!"
 
-        # set the necessary variables
         self.sender = sender
         self.estimate = estimate
         self.justification = justification
 
-        # The sequence number makes certain operations more
-        # efficient (like checking if bets are later).
-        if self.sender not in self.justification.latest_messages:
-            self.sequence_number = 0
-        else:
+        if self.sender in self.justification.latest_messages:
             latest_message = self.justification.latest_messages[self.sender]
             self.sequence_number = latest_message.sequence_number + 1
+        else:
+            self.sequence_number = 0
 
         # The "display_height" of bets are used for visualization of views
         if not any(self.justification.latest_messages):
             self.display_height = 0
         else:
-            max_height = max(self.justification.latest_messages[validator].display_height \
-                            for validator in self.justification.latest_messages)
-
+            max_height = max(
+                self.justification.latest_messages[validator].display_height
+                for validator in self.justification.latest_messages
+            )
             self.display_height = max_height + 1
 
         self.hash = self.__hash__()
