@@ -1,12 +1,14 @@
 """The message module defines an abstract message class  """
+import random as r
 from casper.justification import Justification
+
 
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
     def __eq__(self, message):
         if message is None:
             return False
-        return self.hash == message.hash
+        return self.message_hash == message.message_hash
 
     def __ne__(self, message):
         return not self.__eq__(message)
@@ -34,11 +36,10 @@ class Message(object):
             )
             self.display_height = max_height + 1
 
-        self.hash = self.__hash__()
+        self.message_hash = r.randint(0, 1000000)
 
     def __hash__(self):
-        # NOTE: This does not work once validators have the ability to equivocate!
-        return hash(str(self.sequence_number) + str(123123124124) + str(self.sender.name))
+        return hash(str(self.sender.name) + str(self.sequence_number) + str(self.message_hash))
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
