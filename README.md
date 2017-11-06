@@ -30,6 +30,8 @@ make install
 ## Run Simulations
 ### Standard
 Standard similuations are marked up for use as follows:
+
+NOTE: after each viewgraph appears, you must manually exit the window for the simulation to continue to run!
 ```
 make run-[rand | rrob | full | nofinal | binary]
 ```
@@ -53,6 +55,9 @@ Advanced simulations can be run with a little command line wizardy.
 ```
 # run a simulation with 100 validators and random message propogation
 python casper.py rand --validators 100
+
+# run a simulation without displaying the viewgraphs, but instead save them and create a GIF
+python casper.py rand --hide-display --save
 
 # run a simulation with 20 validators and 1000 rounds of round robin message propogation,
 # reporting every 100 rounds

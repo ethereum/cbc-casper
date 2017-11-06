@@ -1,4 +1,4 @@
-"""The network module .... """
+"""The network module contains a network class allowing for message passing """
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
 
