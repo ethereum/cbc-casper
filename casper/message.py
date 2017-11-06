@@ -8,7 +8,7 @@ class Message(object):
     def __eq__(self, message):
         if message is None:
             return False
-        return self.message_hash == message.message_hash
+        return self.__hash__() == message.__hash__()
 
     def __ne__(self, message):
         return not self.__eq__(message)
@@ -36,10 +36,10 @@ class Message(object):
             )
             self.display_height = max_height + 1
 
-        self.message_hash = r.randint(0, 1000000)
+        self.salt = r.randint(0, 1000000)
 
     def __hash__(self):
-        return hash(str(self.sender.name) + str(self.sequence_number) + str(self.message_hash))
+        return hash(str(self.sender.name) + str(self.sequence_number) + str(self.salt))
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
