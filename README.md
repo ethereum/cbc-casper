@@ -11,8 +11,8 @@ That said, we will try to detail any breaking changes in subsequent releases.
 
 Branch    | Tests
 ----------|------
-master    | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master)
-develop   | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop)
+master    | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/master)
+develop   | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/develop)
 
 ## Requirements
 * Python 3
