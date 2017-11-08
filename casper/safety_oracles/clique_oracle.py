@@ -31,7 +31,8 @@ class CliqueOracle(AbstractOracle):
             if val2 not in v1_msg.justification.latest_messages:
                 continue
 
-            v2_msg_in_v1_view = v1_msg.justification.latest_messages[val2]
+            message_header = v1_msg.justification.latest_messages[val2]
+            v2_msg_in_v1_view = self.view.justified_messages[message_header]
             if self.candidate_estimate.conflicts_with(v2_msg_in_v1_view):
                 continue
 
@@ -40,7 +41,8 @@ class CliqueOracle(AbstractOracle):
             if val1 not in v2_msg.justification.latest_messages:
                 continue
 
-            v1_msg_in_v2_view = v2_msg.justification.latest_messages[val1]
+            message_header = v2_msg.justification.latest_messages[val1]
+            v1_msg_in_v2_view = self.view.justified_messages[message_header]
             if self.candidate_estimate.conflicts_with(v1_msg_in_v2_view):
                 continue
 

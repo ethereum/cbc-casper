@@ -11,52 +11,18 @@ class AbstractView(object):
 
         self.add_messages(messages)
 
-        self.messages = set()
+        self.justified_messages = dict() # message header => block
+
+        self.messages_waiting_for = dict() # message header => list of message headers
+        self.missing_dependencies_for = dict() # message header => set of message header
+        self.pending_messages = dict() # message header => message
+
         self.latest_messages = dict()
 
-    def __str__(self):
-        output = "View: \n"
-        for bet in self.messages:
-            output += str(bet) + "\n"
-        return output
 
     def justification(self):
         """Returns the latest messages seen from other validators, to justify estimate."""
         return Justification(self.latest_messages)
-
-    def get_new_messages(self, showed_messages):
-        """This method returns the set of messages out of showed_messages
-        and their dependency that isn't part of the view."""
-
-        new_messages = set()
-        # The memo will keep track of messages we've already looked at, so we don't redo work.
-        memo = set()
-
-        # At the start, our working set will be the "showed messages" parameter.
-        current_set = set(showed_messages)
-        while current_set != set():
-
-            next_set = set()
-            # If there's no message in the current working set.
-            for message in current_set:
-
-                # Which we haven't seen it in the view or during this loop.
-                if message not in self.messages and message not in memo:
-
-                    # But if we do have a new message, then we add it to our pile..
-                    new_messages.add(message)
-
-                    # and add the bet in its justification to our next working set
-                    for bet in message.justification.latest_messages.values():
-                        next_set.add(bet)
-                    # Keeping a record of very message we inspect, being sure not
-                    # to do any extra (exponential complexity) work.
-                    memo.add(message)
-
-            current_set = next_set
-
-        # After the loop is done, we return a set of new messages.
-        return new_messages
 
     def next_sequence_number(self, validator):
         """Returns the sequence number for the next message from a validator"""
@@ -75,6 +41,37 @@ class AbstractView(object):
             for validator in self.latest_messages
         )
         return max_height + 1
+
+
+    def get_missing_messages_in_justification(self, message):
+        """Returns any messages headers in the justification of a message not yet seen"""
+        missing_message_headers = set()
+
+        for message_header in message.justification.latest_messages:
+            if message_header not in self.justified_messages:
+                missing_message_headers.add(message_header)
+
+        return missing_message_headers
+
+    def resolve_waiting_messages(self, message):
+        if message.header in self.messages_waiting_for:
+            for message_header in self.messages_waiting_for:
+                assert message.header in self.missing_dependencies_for[message_header]
+                self.missing_dependencies_for[message_header].remove(message.header)
+
+                if not any(self.missing_dependencies_for[message_header]):
+                    del self.missing_dependencies_for[message_header]
+                    self.add_to_justified_messages(self.pending_messages[message_header])
+                    self.resolve_waiting_messages(self.justified_messages[message_header])
+
+            del self.messages_waiting_for[message.header]
+        else:
+            self.add_to_justified_messages(message)
+
+
+    def add_to_justified_messages(self, message):
+        """Must be defined in child class
+        Adds a message with all messages in justification recieved to view"""
 
     def estimate(self):
         '''Must be defined in child class.

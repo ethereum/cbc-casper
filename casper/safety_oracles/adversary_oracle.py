@@ -55,7 +55,8 @@ class AdversaryOracle(AbstractOracle):
 
                     # If they have seen something from other validators, do a free block check
                     # If there is a free block, assume they will see that (side-effects free!)
-                    val2_msg_in_v_view = val_latest_message.justification.latest_messages[val2]
+                    message_header = val_latest_message.justification.latest_messages[val2]
+                    val2_msg_in_v_view = self.view.justified_messages[message_header]
                     if utils.exists_free_message(
                             self.candidate_estimate,
                             val2,

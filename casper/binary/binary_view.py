@@ -42,6 +42,8 @@ class BinaryView(AbstractView):
             elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
                 self.latest_messages[message.sender] = message
 
+            self.justified_messages[message.header] = message
+
     def make_new_message(self, validator):
         """Make a new bet!"""
         justification = self.justification()

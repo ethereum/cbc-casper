@@ -8,4 +8,4 @@ class Justification(object):
             latest_messages = {}
         self.latest_messages = dict()
         for validator in latest_messages:
-            self.latest_messages[validator] = latest_messages[validator]
+            self.latest_messages[validator] = latest_messages[validator].header
