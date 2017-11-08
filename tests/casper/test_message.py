@@ -6,7 +6,7 @@ from casper.validator import Validator
 
 
 def test_new_message(validator):
-    message = Message(None, Justification(), validator)
+    message = Message(None, Justification(), validator, 0, 0)
 
     assert message.sender == validator
     assert message.estimate is None
@@ -15,7 +15,7 @@ def test_new_message(validator):
 
 
 def test_equality_of_copies_off_genesis(validator):
-    message = Message(None, Justification(), validator)
+    message = Message(None, Justification(), validator, 0, 0)
 
     shallow_copy = copy.copy(message)
     deep_copy = copy.deepcopy(message)
@@ -29,7 +29,7 @@ def test_non_equality_of_copies_off_genesis():
     validator_0 = Validator("v0", 10)
     validator_1 = Validator("v1", 11)
 
-    message_0 = Message(None, Justification(), validator_0)
-    message_1 = Message(None, Justification(), validator_1)
+    message_0 = Message(None, Justification(), validator_0, 0, 0)
+    message_1 = Message(None, Justification(), validator_1, 0, 0)
 
     assert message_0 != message_1

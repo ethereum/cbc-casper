@@ -12,7 +12,7 @@ from simulations.testing_language import TestLangCBC
 
 
 def test_equality_of_copies_off_genesis(validator):
-    block = Block(None, Justification(), validator)
+    block = Block(None, Justification(), validator, 0, 0)
 
     shallow_copy = copy.copy(block)
     deep_copy = copy.deepcopy(block)
@@ -40,8 +40,8 @@ def test_non_equality_of_copies_off_genesis():
     validator_0 = Validator("v0", 10)
     validator_1 = Validator("v1", 11)
 
-    block_0 = Block(None, Justification(), validator_0)
-    block_1 = Block(None, Justification(), validator_1)
+    block_0 = Block(None, Justification(), validator_0, 0, 0)
+    block_1 = Block(None, Justification(), validator_1, 0, 0)
 
     assert block_0 != block_1
 
@@ -67,8 +67,8 @@ def test_is_in_blockchain__separate_genesis():
     validator_0 = Validator("v0", 10)
     validator_1 = Validator("v1", 11)
 
-    block_0 = Block(None, Justification(), validator_0)
-    block_1 = Block(None, Justification(), validator_1)
+    block_0 = Block(None, Justification(), validator_0, 0, 0)
+    block_1 = Block(None, Justification(), validator_1, 0, 0)
 
     assert not block_0.is_in_blockchain(block_1)
     assert not block_1.is_in_blockchain(block_0)

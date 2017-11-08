@@ -61,8 +61,11 @@ class BlockchainView(AbstractView):
     def make_new_message(self, validator):
         justification = self.justification()
         estimate = self.estimate()
+        sequence_number = self.next_sequence_number(validator)
+        display_height = self.next_display_height()
 
-        new_message = Block(estimate, justification, validator)
+
+        new_message = Block(estimate, justification, validator, sequence_number, display_height)
         self.add_messages(set([new_message]))
 
         return new_message

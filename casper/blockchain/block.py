@@ -5,11 +5,11 @@ from casper.message import Message
 class Block(Message):
     """Message data structure for blockchain consensus"""
 
-    def __init__(self, estimate, justification, sender):
+    def __init__(self, estimate, justification, sender, sequence_number, display_height):
         # Do some type checking for safety!
         assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
 
-        super().__init__(estimate, justification, sender)
+        super().__init__(estimate, justification, sender, sequence_number, display_height)
 
         # height is the traditional block height - number of blocks back to genesis block
         if estimate:

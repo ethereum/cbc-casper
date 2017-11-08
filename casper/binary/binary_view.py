@@ -46,10 +46,10 @@ class BinaryView(AbstractView):
         """Make a new bet!"""
         justification = self.justification()
         estimate = self.estimate()
-        if not any(self.messages):
-            estimate = r.randint(0, 1)
+        sequence_number = self.next_sequence_number(validator)
+        display_height = self.next_display_height()
 
-        new_message = Bet(estimate, justification, validator)
+        new_message = Bet(estimate, justification, validator, sequence_number, display_height)
         self.add_messages(set([new_message]))
 
         return new_message

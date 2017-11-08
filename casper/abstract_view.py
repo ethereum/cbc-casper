@@ -58,6 +58,24 @@ class AbstractView(object):
         # After the loop is done, we return a set of new messages.
         return new_messages
 
+    def next_sequence_number(self, validator):
+        """Returns the sequence number for the next message from a validator"""
+        if validator not in self.latest_messages:
+            return 0
+
+        return self.latest_messages[validator].sequence_number + 1
+
+    def next_display_height(self):
+        """Returns the display height for a message created in this view"""
+        if not any(self.latest_messages):
+            return 0
+
+        max_height = max(
+            self.latest_messages[validator].display_height
+            for validator in self.latest_messages
+        )
+        return max_height + 1
+
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''

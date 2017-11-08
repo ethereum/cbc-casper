@@ -32,7 +32,8 @@ def test_new_validator(name, weight, error):
 
 def test_check_estimate_safety_without_validator_set():
     validator = Validator("cool", 10.2)
-    block = Block(None, Justification(), validator)
+    block = Block(None, Justification(), validator, 0, 0)
+    validator.receive_messages(set([block]))
 
-    with pytest.raises(AttributeError):
-        validator.check_estimate_safety(block)
+    with pytest.raises(TypeError):
+        validator.update_safe_estimates()
