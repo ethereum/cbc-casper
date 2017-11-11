@@ -4,15 +4,13 @@ from casper.abstract_view import AbstractView
 from casper.binary.bet import Bet
 import casper.binary.binary_estimator as estimator
 
-import random as r
-
-
 class BinaryView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
+        self.first = True
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -21,21 +19,23 @@ class BinaryView(AbstractView):
         )
 
 
-    def add_to_justified_messages(self, message):
-        if message.sender not in self.latest_messages:
-            self.latest_messages[message.sender] = message
-        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-            self.latest_messages[message.sender] = message
+    def add_to_justified_messages(self, messages):
+        """Given a set of newly justified messages, updates latest messages"""
+        for message in messages:
+            if message.sender not in self.latest_messages:
+                self.latest_messages[message.sender] = message
+            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
+                self.latest_messages[message.sender] = message
 
-        self.justified_messages[message.header] = message
+            self.justified_messages[message.header] = message
 
 
     def make_new_message(self, validator):
         """Make a new bet!"""
         justification = self.justification()
         estimate = self.estimate()
-        sequence_number = self.next_sequence_number(validator)
-        display_height = self.next_display_height()
+        sequence_number = self._next_sequence_number(validator)
+        display_height = self._next_display_height()
 
         new_message = Bet(estimate, justification, validator, sequence_number, display_height)
         self.add_messages(set([new_message]))

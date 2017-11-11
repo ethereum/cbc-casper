@@ -40,5 +40,4 @@ class Network:
     def random_initialization(self):
         """Generates starting messages for all validators with None as an estiamte."""
         for validator in self.validator_set:
-            new_bet = self.get_message_from_validator(validator)
-            self.global_view.add_messages(set([new_bet]))
+            self.get_message_from_validator(validator)

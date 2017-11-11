@@ -11,27 +11,27 @@ class AbstractView(object):
 
         self.add_messages(messages)
 
-        self.justified_messages = dict() # message header => block
+        self.justified_messages = dict()            # message header => message
+        self.pending_messages = dict()              # message header => message
 
-        self.messages_waiting_for = dict() # message header => list of message headers
-        self.missing_dependencies_for = dict() # message header => set of message header
-        self.pending_messages = dict() # message header => message
+        self.missing_message_dependencies = dict()  # message header => set(message headers)
+        self.dependents_of_message = dict()         # message header => list(message headers)
 
         self.latest_messages = dict()
 
 
     def justification(self):
-        """Returns the latest messages seen from other validators, to justify estimate."""
+        """Returns the headers of latest message seen from other validators."""
         return Justification(self.latest_messages)
 
-    def next_sequence_number(self, validator):
+    def _next_sequence_number(self, validator):
         """Returns the sequence number for the next message from a validator"""
         if validator not in self.latest_messages:
             return 0
 
         return self.latest_messages[validator].sequence_number + 1
 
-    def next_display_height(self):
+    def _next_display_height(self):
         """Returns the display height for a message created in this view"""
         if not any(self.latest_messages):
             return 0
@@ -44,52 +44,60 @@ class AbstractView(object):
 
 
     def get_missing_messages_in_justification(self, message):
-        """Returns any messages headers in the justification of a message not yet seen"""
+        """Returns the set of not seen messages headers from the justification of a message"""
         missing_message_headers = set()
 
-        for message_header in message.justification.latest_messages:
+        for message_header in message.justification.latest_messages.values():
             if message_header not in self.justified_messages:
                 missing_message_headers.add(message_header)
 
         return missing_message_headers
 
     def add_messages(self, showed_messages):
-        """Updates views latest_messages and children based on new messages"""
+        """Adds a set of newly recieved messages to pending or justified"""
         if not showed_messages:
             return
 
         for message in showed_messages:
+            if message.header in self.pending_messages or message.header in self.justified_messages:
+                continue
+
             missing_message_headers = self.get_missing_messages_in_justification(message)
-
             if not any(missing_message_headers):
-                self.resolve_waiting_messages(message)
+                newly_justified_messages = {message}
+                newly_justified_messages.update(self.resolve_waiting_messages(message))
+                self.add_to_justified_messages(newly_justified_messages)
             else:
-                for message_header in missing_message_headers:
-                    if message_header not in self.messages_waiting_for:
-                        self.messages_waiting_for[message_header] = []
+                for missing_message_header in missing_message_headers:
+                    if missing_message_header not in self.dependents_of_message:
+                        self.dependents_of_message[missing_message_header] = []
 
-                    self.messages_waiting_for[message_header].append(message.header)
-                    self.missing_dependencies_for[message.header] = missing_message_headers
+                    self.dependents_of_message[missing_message_header].append(message.header)
+                    self.missing_message_dependencies[message.header] = missing_message_headers
+                    self.pending_messages[message.header] = message
 
-                self.resolve_waiting_messages(message)
 
     def resolve_waiting_messages(self, message):
-        if message.header in self.messages_waiting_for:
-            for message_header in self.messages_waiting_for:
-                assert message.header in self.missing_dependencies_for[message_header]
-                self.missing_dependencies_for[message_header].remove(message.header)
+        """Given a new message, resolve all messages that are waiting for it to be justified"""
+        if message.header not in self.dependents_of_message:
+            return {}
 
-                if not any(self.missing_dependencies_for[message_header]):
-                    del self.missing_dependencies_for[message_header]
-                    self.add_to_justified_messages(self.pending_messages[message_header])
-                    self.resolve_waiting_messages(self.justified_messages[message_header])
+        newly_justified_messages = {}
+        for message_header in self.dependents_of_message[message.header]:
+            # sanity check!
+            assert message.header in self.missing_message_dependencies[message_header]
 
-            del self.messages_waiting_for[message.header]
-        else:
-            self.add_to_justified_messages(message)
+            self.missing_message_dependencies[message_header].remove(message.header)
 
+            if not any(self.missing_message_dependencies[message_header]):
+                del self.missing_message_dependencies[message_header]
+                new_message = self.pending_messages[message_header]
+                newly_justified_messages.update(self.resolve_waiting_messages(new_message))
 
-    def add_to_justified_messages(self, message):
+        del self.dependents_of_message[message.header]
+        return newly_justified_messages
+
+    def add_to_justified_messages(self, messages):
         """Must be defined in child class
         Adds a message with all messages in justification recieved to view"""
 
