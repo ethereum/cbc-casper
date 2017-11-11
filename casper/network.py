@@ -10,7 +10,6 @@ class Network:
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
-        print(message)
         assert message.header in self.global_view.justified_messages, ("...expected only to propagate messages "
                                                       "from the global view")
         assert validator in self.validator_set, "...expected a known validator"
@@ -43,5 +42,3 @@ class Network:
         for validator in self.validator_set:
             new_bet = self.get_message_from_validator(validator)
             self.global_view.add_messages(set([new_bet]))
-
-        print(len(self.global_view.latest_messages))

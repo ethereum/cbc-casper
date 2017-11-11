@@ -20,29 +20,15 @@ class BinaryView(AbstractView):
             self.latest_messages
         )
 
-    def add_messages(self, showed_messages):
-        """Updates views latest_messages and children based on new messages"""
 
-        if not showed_messages:
-            return
+    def add_to_justified_messages(self, message):
+        if message.sender not in self.latest_messages:
+            self.latest_messages[message.sender] = message
+        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
+            self.latest_messages[message.sender] = message
 
-        for message in showed_messages:
-            assert isinstance(message, Bet), "expected only to add a Bet!"
+        self.justified_messages[message.header] = message
 
-        # find any not-seen messages
-        newly_discovered_messages = self.get_new_messages(showed_messages)
-
-        # add these new messages to the messages in view
-        self.messages.update(newly_discovered_messages)
-
-        # update views most recently seen messages
-        for message in newly_discovered_messages:
-            if message.sender not in self.latest_messages:
-                self.latest_messages[message.sender] = message
-            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-                self.latest_messages[message.sender] = message
-
-            self.justified_messages[message.header] = message
 
     def make_new_message(self, validator):
         """Make a new bet!"""

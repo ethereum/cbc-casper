@@ -82,7 +82,6 @@ class PlotTool(object):
             # Index of val in list may have some small performance concerns.
             positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
                                  (float)(len(validator_set) + 1), 0.2 + 0.1*message.display_height
-        print(nodes)
 
         node_color_map = {}
         for message in nodes:

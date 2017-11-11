@@ -53,6 +53,26 @@ class AbstractView(object):
 
         return missing_message_headers
 
+    def add_messages(self, showed_messages):
+        """Updates views latest_messages and children based on new messages"""
+        if not showed_messages:
+            return
+
+        for message in showed_messages:
+            missing_message_headers = self.get_missing_messages_in_justification(message)
+
+            if not any(missing_message_headers):
+                self.resolve_waiting_messages(message)
+            else:
+                for message_header in missing_message_headers:
+                    if message_header not in self.messages_waiting_for:
+                        self.messages_waiting_for[message_header] = []
+
+                    self.messages_waiting_for[message_header].append(message.header)
+                    self.missing_dependencies_for[message.header] = missing_message_headers
+
+                self.resolve_waiting_messages(message)
+
     def resolve_waiting_messages(self, message):
         if message.header in self.messages_waiting_for:
             for message_header in self.messages_waiting_for:
@@ -76,10 +96,6 @@ class AbstractView(object):
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''
-        pass
-
-    def add_messages(self, showed_messages):
-        '''Must be defined in child class.'''
         pass
 
     def make_new_message(self, validator):
