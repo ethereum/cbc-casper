@@ -40,10 +40,10 @@ def test_init_creates_network():
 def test_init_validators_create_blocks():
     test_lang = TestLangCBC(TEST_WEIGHT)
 
-    assert len(test_lang.network.global_view.messages) == len(TEST_WEIGHT)
+    assert len(test_lang.network.global_view.justified_messages) == len(TEST_WEIGHT)
 
     for validator in test_lang.network.validator_set:
-        assert len(validator.view.messages) == 1
+        assert len(validator.view.justified_messages) == 1
         assert len(validator.view.latest_messages) == 1
         assert validator.view.latest_messages[validator].estimate is None
 
@@ -185,7 +185,7 @@ def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, 
         return
 
     test_lang.parse(test_string)
-    assert len(test_lang.network.global_view.messages) == num_blocks
+    assert len(test_lang.network.global_view.justified_messages) == num_blocks
 
 
 # NOTE: None means the block is not named by the testing language
@@ -222,8 +222,9 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
             validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
             if block_in_justification:
-                validator_justification_message = block.justification.latest_messages[validator]
-                assert test_lang.blocks[block_in_justification] == validator_justification_message
+                message_header = block.justification.latest_messages[validator]
+                justification_message = test_lang.network.global_view.justified_messages[message_header]
+                assert test_lang.blocks[block_in_justification] == justification_message
 
 
 @pytest.mark.parametrize(
@@ -284,9 +285,9 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
 
     for validator_name in num_messages_per_view:
         validator = test_lang.validator_set.get_validator_by_name(validator_name)
-        assert len(validator.view.messages) == num_messages_per_view[validator_name]
+        assert len(validator.view.justified_messages) == num_messages_per_view[validator_name]
         for message_name in message_keys[validator_name]:
-            assert test_lang.blocks[message_name] in validator.view.messages
+            assert test_lang.blocks[message_name] in validator.view.justified_messages.values()
 
 
 @pytest.mark.parametrize(
@@ -333,7 +334,7 @@ def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_
     for validator_name in num_messages_per_view:
         validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
-        assert len(validator.view.messages) == num_messages_per_view[validator_name]
+        assert len(validator.view.justified_messages) == num_messages_per_view[validator_name]
         assert len(validator.view.latest_messages) == len(other_val_seen[validator_name])
         for other_validator_name in other_val_seen[validator_name]:
             other_validator = test_lang.validator_set.get_validator_by_name(other_validator_name)

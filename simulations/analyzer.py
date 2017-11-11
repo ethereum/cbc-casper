@@ -62,7 +62,7 @@ class Analyzer:
         return self.global_view.last_finalized_block
 
     def messages(self):
-        return self.global_view.messages
+        return self.global_view.justified_messages.values()
 
     def safe_messages(self):
         if not self.global_view.last_finalized_block:

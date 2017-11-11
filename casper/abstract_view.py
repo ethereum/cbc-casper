@@ -67,6 +67,9 @@ class AbstractView(object):
                 newly_justified_messages = {message}
                 newly_justified_messages.update(self.resolve_waiting_messages(message))
                 self.add_to_justified_messages(newly_justified_messages)
+
+                for message_header in self.pending_messages:
+                    assert message_header in self.missing_message_dependencies
             else:
                 for missing_message_header in missing_message_headers:
                     if missing_message_header not in self.dependents_of_message:
@@ -80,9 +83,9 @@ class AbstractView(object):
     def resolve_waiting_messages(self, message):
         """Given a new message, resolve all messages that are waiting for it to be justified"""
         if message.header not in self.dependents_of_message:
-            return {}
+            return set()
 
-        newly_justified_messages = {}
+        newly_justified_messages = set()
         for message_header in self.dependents_of_message[message.header]:
             # sanity check!
             assert message.header in self.missing_message_dependencies[message_header]
@@ -90,9 +93,11 @@ class AbstractView(object):
             self.missing_message_dependencies[message_header].remove(message.header)
 
             if not any(self.missing_message_dependencies[message_header]):
-                del self.missing_message_dependencies[message_header]
                 new_message = self.pending_messages[message_header]
+                newly_justified_messages.add(new_message)
                 newly_justified_messages.update(self.resolve_waiting_messages(new_message))
+                del self.missing_message_dependencies[message_header]
+                del self.pending_messages[message_header]
 
         del self.dependents_of_message[message.header]
         return newly_justified_messages

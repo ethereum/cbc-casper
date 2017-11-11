@@ -1,6 +1,7 @@
 """The testing language module ... """
 import re
 import random as r
+import copy
 
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.network import Network
@@ -36,7 +37,7 @@ class TestLangCBC(object):
         # Register token handlers.
         self.handlers = dict()
         self.handlers['B'] = self.make_block
-        self.handlers['S'] = self.send_block
+        self.handlers['S'] = self.send_all_blocks
         self.handlers['C'] = self.check_safety
         self.handlers['U'] = self.no_safety
         self.handlers['H'] = self.check_head_equals_block
@@ -55,6 +56,39 @@ class TestLangCBC(object):
         if block_name in self.blocks:
             raise ValueError('Block {} already exists'.format(block_name))
 
+    def _blocks_needed_to_justify(self, block, validator):
+        assert block not in validator.view.pending_messages \
+            and block not in validator.view.justified_messages
+
+        messages_needed = set()
+
+        current_block_headers = set()
+        for block_header in block.justification.latest_messages.values():
+            if block_header not in validator.view.pending_messages and \
+                block_header not in validator.view.justified_messages:
+                current_block_headers.add(block_header)
+
+        while any(current_block_headers):
+            next_headers = set()
+
+            for header in current_block_headers:
+                block = self.network.global_view.justified_messages[header]
+                messages_needed.add(block)
+
+                for other_header in block.justification.latest_messages.values():
+                    if other_header not in validator.view.pending_messages and \
+                        other_header not in validator.view.justified_messages:
+                        next_headers.add(other_header)
+
+            current_block_headers = next_headers
+
+
+        return messages_needed
+
+
+
+
+
     def parse(self, test_string):
         """Parse the test_string, and run the test"""
         for token in test_string.split(' '):
@@ -69,20 +103,27 @@ class TestLangCBC(object):
 
             self.handlers[letter](validator, name)
 
-    def send_block(self, validator, block_name):
-        """Send some validator a block."""
+    def send_all_blocks(self, validator, block_name):
+        """Send some validator a block, and all unseen messages in its justification."""
         self._validate_validator(validator)
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-
-        if block in validator.view.messages:
-            raise Exception(
-                'Validator {} has already seen block {}'
-                .format(validator, block_name)
-            )
+        if block.header in validator.view.pending_messages or \
+            block.header in validator.view.justified_messages:
+            raise Exception("Validator has already seen block")
 
         self.network.propagate_message_to_validator(block, validator)
+
+        blocks_to_send = self._blocks_needed_to_justify(block, validator)
+        for block in blocks_to_send:
+            self.network.propagate_message_to_validator(block, validator)
+
+        assert block.header not in validator.view.pending_messages
+        assert block.header not in validator.view.missing_message_dependencies
+        assert self.blocks[block_name].header in validator.view.justified_messages
+
+
 
     def make_block(self, validator, block_name):
         """Have some validator produce a block."""
@@ -115,7 +156,7 @@ class TestLangCBC(object):
             receiver = validators[(i + 1) % len(validators)]
 
             self.make_block(maker, name)
-            self.send_block(receiver, name)
+            self.send_all_blocks(receiver, name)
 
     def check_safety(self, validator, block_name):
         """Check that some validator detects safety on a block."""

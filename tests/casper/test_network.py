@@ -8,15 +8,15 @@ from casper.network import Network
 def test_new_network(validator_set):
     network = Network(validator_set)
     assert network.validator_set == validator_set
-    assert not network.global_view.messages
+    assert not any(network.global_view.justified_messages)
 
 
 def test_random_initialization(validator_set):
     network = Network(validator_set)
 
-    assert not network.global_view.messages
+    assert not any(network.global_view.justified_messages)
     network.random_initialization()
-    assert len(network.global_view.messages) == len(validator_set)
+    assert len(network.global_view.justified_messages) == len(validator_set)
 
 
 def test_get_message_from_validator(network):
@@ -35,8 +35,7 @@ def test_propagate_message_to_validator(network):
     message = network.get_message_from_validator(from_validator)
     network.propagate_message_to_validator(message, to_validator)
 
-    assert message in to_validator.view.messages
-    assert message == to_validator.view.latest_messages[from_validator]
+    assert message in to_validator.view.pending_messages.values()
 
 
 @pytest.mark.skip(reason="test not yet implemented")

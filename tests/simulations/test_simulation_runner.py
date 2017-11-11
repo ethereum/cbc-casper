@@ -107,9 +107,9 @@ def test_simulation_runner_send_messages(
         False
     )
 
-    assert len(simulation_runner.network.global_view.messages) == len(validator_set)
+    assert len(simulation_runner.network.global_view.justified_messages) == len(validator_set)
 
     for i in range(10):
         simulation_runner.step()
-        assert len(simulation_runner.network.global_view.messages) == \
+        assert len(simulation_runner.network.global_view.justified_messages) == \
             (i + 1) * messages_generated_per_round + len(validator_set)
