@@ -38,6 +38,7 @@ class TestLangCBC(object):
         self.handlers = dict()
         self.handlers['B'] = self.make_block
         self.handlers['S'] = self.send_all_blocks
+        self.handlers['P'] = self.send_only_block
         self.handlers['C'] = self.check_safety
         self.handlers['U'] = self.no_safety
         self.handlers['H'] = self.check_head_equals_block
@@ -86,9 +87,6 @@ class TestLangCBC(object):
         return messages_needed
 
 
-
-
-
     def parse(self, test_string):
         """Parse the test_string, and run the test"""
         for token in test_string.split(' '):
@@ -109,10 +107,8 @@ class TestLangCBC(object):
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-        if block.header in validator.view.pending_messages or \
-            block.header in validator.view.justified_messages:
+        if block.header in validator.view.justified_messages:
             raise Exception("Validator has already seen block")
-
         self.network.propagate_message_to_validator(block, validator)
 
         blocks_to_send = self._blocks_needed_to_justify(block, validator)
@@ -122,6 +118,18 @@ class TestLangCBC(object):
         assert block.header not in validator.view.pending_messages
         assert block.header not in validator.view.missing_message_dependencies
         assert self.blocks[block_name].header in validator.view.justified_messages
+
+
+    def send_only_block(self, validator, block_name):
+        """Send some validator a block."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
+
+        block = self.blocks[block_name]
+        if block.header in validator.view.justified_messages:
+            raise Exception("Validator has already seen block")
+
+        self.network.propagate_message_to_validator(block, validator)
 
 
 
