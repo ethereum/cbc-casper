@@ -3,7 +3,7 @@ from casper.message import Message
 from casper.plot_tool import PlotTool
 
 
-class Protocol:
+class Protocol(object):
     View = AbstractView
     Message = Message
     PlotTool = PlotTool
