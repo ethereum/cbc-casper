@@ -1,4 +1,4 @@
-"""The utils module ..."""
+"""The utils module contains functions for safety oracles and plotting"""
 
 
 def exists_free_message(estimate, val, sequence_num, view):
