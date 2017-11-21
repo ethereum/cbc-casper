@@ -149,3 +149,20 @@ def test_resolve_message_when_justification_arrives(weight, test_string, justifi
         for message in unjustified_messages[idx]:
             assert test_lang.blocks[message] in validator.view.justified_messages.values()
             assert test_lang.blocks[message] not in validator.view.pending_messages.values()
+
+
+
+def test_multiple_messages_arriving_resolve():
+    test_string = "B0-A S1-A B0-B B0-C B0-D B0-E B0-F P1-F"
+    test_lang = TestLangCBC(TEST_WEIGHT)
+    test_lang.parse(test_string)
+
+    validator_1 = test_lang.validator_set.get_validator_by_name(1)
+
+    assert len(validator_1.view.justified_messages) == 3
+    assert len(validator_1.view.pending_messages) == 1
+    assert test_lang.blocks['F'] in validator_1.view.pending_messages.values()
+
+    validator_1.receive_messages(test_lang.network.global_view.justified_messages.values())
+
+    assert len(validator_1.view.justified_messages) == 8
