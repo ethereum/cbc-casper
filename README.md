@@ -1,6 +1,12 @@
 # Casper CBC
 
 [![Join the chat at https://gitter.im/cbc-casper/Lobby](https://badges.gitter.im/cbc-casper/Lobby.svg)](https://gitter.im/cbc-casper/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+Branch    | Tests
+----------|------
+master    | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/master)
+develop   | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/develop)
+
 A python implementation of a class of ["correct-by-construction" consensus protocols](https://github.com/ethereum/research/tree/master/papers/cbc-consensus). Currently, this includes Casper the Friendly Ghost (a blockchain consensus protocol) and Casper the Friendly Binary Consensus Protocol. 
 
 Specifications for these protocols can be found here [here](https://github.com/ethereum/research/tree/master/papers/CasperTFG), but the implementation and the spec may deviate from the spec, as they are still moving targets.
@@ -12,11 +18,6 @@ If you use components of this codebase, _expect_ breaking changes to be
 introduced.
 
 That said, we will try to detail any breaking changes in subsequent releases.
-
-Branch    | Tests
-----------|------
-master    | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/master)
-develop   | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/develop)
 
 ## Requirements
 * Python 3
