@@ -16,7 +16,7 @@ def test_new_view():
     assert not view.justification().latest_messages
 
 
-def test_justification_stores_header():
+def test_justification_stores_hash():
     test_lang = TestLangCBC(TEST_WEIGHT)
     test_lang.parse('B0-A S1-A B1-B')
 
@@ -28,8 +28,8 @@ def test_justification_stores_header():
     assert len(justification.latest_messages) == 2
     assert not isinstance(justification.latest_messages[validator_0], Block)
     assert not isinstance(justification.latest_messages[validator_1], Block)
-    assert justification.latest_messages[validator_0] == test_lang.blocks['A'].header
-    assert justification.latest_messages[validator_1] == test_lang.blocks['B'].header
+    assert justification.latest_messages[validator_0] == test_lang.blocks['A'].hash
+    assert justification.latest_messages[validator_1] == test_lang.blocks['B'].hash
 
 
 def test_justification_includes_justified_messages():
@@ -43,15 +43,15 @@ def test_justification_includes_justified_messages():
 
     assert len(justification.latest_messages) == 1
     assert validator_0 not in justification.latest_messages
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].header
+    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].hash
 
     test_lang.parse('S1-B')
 
     justification = validator_1.view.justification()
 
     assert len(justification.latest_messages) == 2
-    assert justification.latest_messages[validator_0] == test_lang.blocks['B'].header
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].header
+    assert justification.latest_messages[validator_0] == test_lang.blocks['B'].hash
+    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].hash
 
 
 def test_add_justified_message():

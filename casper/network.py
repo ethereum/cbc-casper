@@ -10,7 +10,7 @@ class Network(object):
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
-        assert message.header in self.global_view.justified_messages, ("...expected only to propagate messages "
+        assert message.hash in self.global_view.justified_messages, ("...expected only to propagate messages "
                                                       "from the global view")
         assert validator in self.validator_set, "...expected a known validator"
 

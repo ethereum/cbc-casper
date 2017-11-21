@@ -4,6 +4,7 @@ from casper.abstract_view import AbstractView
 from casper.binary.bet import Bet
 import casper.binary.binary_estimator as estimator
 
+
 class BinaryView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None):
@@ -18,7 +19,6 @@ class BinaryView(AbstractView):
             self.latest_messages
         )
 
-
     def add_to_justified_messages(self, messages):
         """Given a set of newly justified messages, updates latest messages"""
         for message in messages:
@@ -27,8 +27,7 @@ class BinaryView(AbstractView):
             elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
                 self.latest_messages[message.sender] = message
 
-            self.justified_messages[message.header] = message
-
+            self.justified_messages[message.hash] = message
 
     def make_new_message(self, validator):
         """Make a new bet!"""
