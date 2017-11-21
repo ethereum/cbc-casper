@@ -1,5 +1,7 @@
 # Casper CBC
-A python implementation of members of a class of "correct-by-construction" consensus protocols (description slowly becoming available [here](https://github.com/ethereum/research/tree/master/papers/cbc-consensus)). Currently, it includes Casper the Friendly Ghost (a blockchain consensus protocol) and Casper the Friendly Binary Consensus Protocol. Specifications for these protocols are [here](https://github.com/ethereum/research/tree/master/papers/CasperTFG), but the implementation and the spec may deviate from the spec, as they are still moving targets:  
+A python implementation of a class of ["correct-by-construction" consensus protocols](https://github.com/ethereum/research/tree/master/papers/cbc-consensus). Currently, this includes Casper the Friendly Ghost (a blockchain consensus protocol) and Casper the Friendly Binary Consensus Protocol. 
+
+Specifications for these protocols can be found here [here](https://github.com/ethereum/research/tree/master/papers/CasperTFG), but the implementation and the spec may deviate from the spec, as they are still moving targets.
 
 ### Warning -- Codebase subject to substantial changes
 This pre v1.0 implementation is under active development and experimentation
