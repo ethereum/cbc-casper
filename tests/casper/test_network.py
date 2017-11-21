@@ -3,6 +3,7 @@ import random as r
 import pytest
 
 from casper.network import Network
+from simulations.testing_language import TestLangCBC
 
 
 def test_new_network(validator_set):
@@ -38,6 +39,21 @@ def test_propagate_message_to_validator(network):
     assert message in to_validator.view.pending_messages.values()
 
 
-@pytest.mark.skip(reason="test not yet implemented")
-def test_view_initialization():
-    pass
+@pytest.mark.parametrize(
+    'test_string, num_messages',
+    [
+        ('RR0-A RR0-B', 9),
+        ('B0-A S1-A B1-B S2-B', 5),
+        ('B0-A S1-A RR1-B', 7),
+    ]
+)
+def test_view_initialization(test_string, num_messages, validator_set):
+    test_lang = TestLangCBC({0: 5, 1: 6, 2: 7})
+    test_lang.parse(test_string)
+
+    network = Network(validator_set)
+
+    network.view_initialization(test_lang.network.global_view)
+
+    for validator in validator_set:
+        assert len(validator.view.justified_messages) == num_messages

@@ -24,7 +24,6 @@ class Message(object):
         self.header = r.random()
 
     def __hash__(self):
-        # NOTE: This does not work once validators have the ability to equivocate!
         return hash(str(self.header))
 
     def conflicts_with(self, message):
