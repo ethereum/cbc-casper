@@ -13,7 +13,7 @@ def test_new_view():
 
     assert not any(view.justified_messages)
     assert not view.latest_messages
-    assert not view.justification().latest_messages
+    assert not any(view.justification())
 
 
 def test_justification_stores_header():
@@ -25,11 +25,11 @@ def test_justification_stores_header():
 
     justification = validator_1.view.justification()
 
-    assert len(justification.latest_messages) == 2
-    assert not isinstance(justification.latest_messages[validator_0], Block)
-    assert not isinstance(justification.latest_messages[validator_1], Block)
-    assert justification.latest_messages[validator_0] == test_lang.blocks['A'].header
-    assert justification.latest_messages[validator_1] == test_lang.blocks['B'].header
+    assert len(justification) == 2
+    assert not isinstance(justification[validator_0], Block)
+    assert not isinstance(justification[validator_1], Block)
+    assert justification[validator_0] == test_lang.blocks['A'].header
+    assert justification[validator_1] == test_lang.blocks['B'].header
 
 
 def test_justification_includes_justified_messages():
@@ -41,17 +41,17 @@ def test_justification_includes_justified_messages():
 
     justification = validator_1.view.justification()
 
-    assert len(justification.latest_messages) == 1
-    assert validator_0 not in justification.latest_messages
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].header
+    assert len(justification) == 1
+    assert validator_0 not in justification
+    assert justification[validator_1] == test_lang.blocks['C'].header
 
     test_lang.parse('S1-B')
 
     justification = validator_1.view.justification()
 
-    assert len(justification.latest_messages) == 2
-    assert justification.latest_messages[validator_0] == test_lang.blocks['B'].header
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].header
+    assert len(justification) == 2
+    assert justification[validator_0] == test_lang.blocks['B'].header
+    assert justification[validator_1] == test_lang.blocks['C'].header
 
 
 def test_add_justified_message():

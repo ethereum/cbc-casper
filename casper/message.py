@@ -1,6 +1,5 @@
 """The message module ... """
 import random as r
-from casper.justification import Justification
 
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
@@ -13,7 +12,7 @@ class Message(object):
         return not self.__eq__(message)
 
     def __init__(self, estimate, justification, sender, sequence_number, display_height):
-        assert isinstance(justification, Justification), "expected justification a Justification!"
+        assert isinstance(justification, dict), "expected justification a Justification!"
 
         # set the necessary variables
         self.sender = sender

@@ -3,9 +3,9 @@
 import pytest
 
 from casper.blockchain.block import Block
-from casper.justification import Justification
 from casper.validator import Validator
 
+EMPTY_JUST = dict()
 
 @pytest.mark.parametrize(
     'name, weight, error',
@@ -32,7 +32,7 @@ def test_new_validator(name, weight, error):
 
 def test_check_estimate_safety_without_validator_set():
     validator = Validator("cool", 10.2)
-    block = Block(None, Justification(), validator, 0, 0)
+    block = Block(None, EMPTY_JUST, validator, 0, 0)
     validator.receive_messages(set([block]))
 
     with pytest.raises(TypeError):

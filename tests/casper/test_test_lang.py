@@ -216,13 +216,13 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
 
     for b in block_justification:
         block = test_lang.blocks[b]
-        assert len(block.justification.latest_messages) == len(block_justification[b].keys())
+        assert len(block.justification) == len(block_justification[b].keys())
         for validator_name in block_justification[b]:
             block_in_justification = block_justification[b][validator_name]
             validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
             if block_in_justification:
-                message_header = block.justification.latest_messages[validator]
+                message_header = block.justification[validator]
                 justification_message = test_lang.network.global_view.justified_messages[message_header]
                 assert test_lang.blocks[block_in_justification] == justification_message
 

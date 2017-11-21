@@ -1,6 +1,4 @@
 """The view module ... """
-from casper.justification import Justification
-
 
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
@@ -22,7 +20,11 @@ class AbstractView(object):
 
     def justification(self):
         """Returns the headers of latest message seen from other validators."""
-        return Justification(self.latest_messages)
+        latest_message_headers = dict()
+        for validator in self.latest_messages:
+            latest_message_headers[validator] = self.latest_messages[validator].header
+        return latest_message_headers
+
 
     def _next_sequence_number(self, validator):
         """Returns the sequence number for the next message from a validator"""
@@ -47,7 +49,7 @@ class AbstractView(object):
         """Returns the set of not seen messages headers from the justification of a message"""
         missing_message_headers = set()
 
-        for message_header in message.justification.latest_messages.values():
+        for message_header in message.justification.values():
             if message_header not in self.justified_messages:
                 missing_message_headers.add(message_header)
 

@@ -1,21 +1,21 @@
 import copy
 
-from casper.justification import Justification
 from casper.message import Message
 from casper.validator import Validator
 
+EMPTY_JUST = dict()
 
 def test_new_message(validator):
-    message = Message(None, Justification(), validator, 0, 0)
+    message = Message(None, EMPTY_JUST, validator, 0, 0)
 
     assert message.sender == validator
     assert message.estimate is None
-    assert not message.justification.latest_messages
+    assert not any(message.justification)
     assert message.sequence_number == 0
 
 
 def test_equality_of_copies_off_genesis(validator):
-    message = Message(None, Justification(), validator, 0, 0)
+    message = Message(None, EMPTY_JUST, validator, 0, 0)
 
     shallow_copy = copy.copy(message)
     deep_copy = copy.deepcopy(message)
@@ -29,7 +29,7 @@ def test_non_equality_of_copies_off_genesis():
     validator_0 = Validator("v0", 10)
     validator_1 = Validator("v1", 11)
 
-    message_0 = Message(None, Justification(), validator_0, 0, 0)
-    message_1 = Message(None, Justification(), validator_1, 0, 0)
+    message_0 = Message(None, EMPTY_JUST, validator_0, 0, 0)
+    message_1 = Message(None, EMPTY_JUST, validator_1, 0, 0)
 
     assert message_0 != message_1

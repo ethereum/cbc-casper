@@ -64,7 +64,7 @@ class TestLangCBC(object):
         messages_needed = set()
 
         current_block_headers = set()
-        for block_header in block.justification.latest_messages.values():
+        for block_header in block.justification.values():
             if block_header not in validator.view.pending_messages and \
                 block_header not in validator.view.justified_messages:
                 current_block_headers.add(block_header)
@@ -76,7 +76,7 @@ class TestLangCBC(object):
                 block = self.network.global_view.justified_messages[header]
                 messages_needed.add(block)
 
-                for other_header in block.justification.latest_messages.values():
+                for other_header in block.justification.values():
                     if other_header not in validator.view.pending_messages and \
                         other_header not in validator.view.justified_messages:
                         next_headers.add(other_header)
