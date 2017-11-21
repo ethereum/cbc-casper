@@ -222,8 +222,8 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
             validator = test_lang.validator_set.get_validator_by_name(validator_name)
 
             if block_in_justification:
-                message_header = block.justification[validator]
-                justification_message = test_lang.network.global_view.justified_messages[message_header]
+                message_hash = block.justification[validator]
+                justification_message = test_lang.network.global_view.justified_messages[message_hash]
                 assert test_lang.blocks[block_in_justification] == justification_message
 
 

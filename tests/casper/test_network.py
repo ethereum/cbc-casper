@@ -51,9 +51,12 @@ def test_view_initialization(test_string, num_messages, validator_set):
     test_lang = TestLangCBC({0: 5, 1: 6, 2: 7})
     test_lang.parse(test_string)
 
-    network = Network(validator_set)
+    global_view = test_lang.network.global_view
 
+    assert len(global_view.justified_messages) == num_messages
+
+    network = Network(validator_set)
     network.view_initialization(test_lang.network.global_view)
 
     for validator in validator_set:
-        assert len(validator.view.justified_messages) == num_messages
+        assert len(validator.view.justified_messages) + len(validator.view.pending_messages) == num_messages

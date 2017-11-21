@@ -4,15 +4,6 @@ import random as r
 
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
-    def __eq__(self, message):
-        if message is None:
-            return False
-        return self.header == message.header
-
-
-    def __ne__(self, message):
-        return not self.__eq__(message)
-
     def __init__(self, estimate, justification, sender, sequence_number, display_height):
         assert isinstance(justification, dict), "expected justification a Justification!"
 
@@ -24,6 +15,19 @@ class Message(object):
         self.header = r.random()
 
     def __hash__(self):
+        # defined differently than self.hash to avoid confusion with builtin
+        # use of __hash__ in dictionaries, sets, etc
+        return hash(self.hash)
+
+    def __eq__(self, message):
+        if message is None:
+            return False
+        if not isinstance(message, Message):
+            return False
+        return self.hash == message.hash
+
+    @property
+    def hash(self):
         return hash(str(self.header))
 
     def conflicts_with(self, message):

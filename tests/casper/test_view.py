@@ -16,7 +16,7 @@ def test_new_view():
     assert not any(view.justification())
 
 
-def test_justification_stores_header():
+def test_justification_stores_hash():
     test_lang = TestLangCBC(TEST_WEIGHT)
     test_lang.parse('B0-A S1-A B1-B')
 
@@ -28,8 +28,8 @@ def test_justification_stores_header():
     assert len(justification) == 2
     assert not isinstance(justification[validator_0], Block)
     assert not isinstance(justification[validator_1], Block)
-    assert justification[validator_0] == test_lang.blocks['A'].header
-    assert justification[validator_1] == test_lang.blocks['B'].header
+    assert justification[validator_0] == test_lang.blocks['A'].hash
+    assert justification[validator_1] == test_lang.blocks['B'].hash
 
 
 def test_justification_includes_justified_messages():
@@ -43,19 +43,19 @@ def test_justification_includes_justified_messages():
 
     assert len(justification) == 1
     assert validator_0 not in justification
-    assert justification[validator_1] == test_lang.blocks['C'].header
+    assert justification[validator_1] == test_lang.blocks['C'].hash
 
     test_lang.parse('S1-B')
 
     justification = validator_1.view.justification()
 
     assert len(justification) == 2
-    assert justification[validator_0] == test_lang.blocks['B'].header
-    assert justification[validator_1] == test_lang.blocks['C'].header
+    assert justification[validator_0] == test_lang.blocks['B'].hash
+    assert justification[validator_1] == test_lang.blocks['C'].hash
 
 
 def test_add_justified_message():
-    test_lang = TestLangCBC({0: 10, 1: 11})
+    test_lang = TestLangCBC(TEST_WEIGHT)
     test_lang.parse('B0-A B0-B S1-A')
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
@@ -63,6 +63,7 @@ def test_add_justified_message():
     assert test_lang.blocks['A'] in validator_1.view.justified_messages.values()
     assert test_lang.blocks['B'] in validator_0.view.justified_messages.values()
     assert test_lang.blocks['B'] not in validator_1.view.justified_messages.values()
+
 
 @pytest.mark.parametrize(
     'test_string, justified_messages, unjustified_messages',

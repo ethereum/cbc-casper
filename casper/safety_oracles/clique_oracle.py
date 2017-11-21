@@ -31,8 +31,8 @@ class CliqueOracle(AbstractOracle):
             if val2 not in v1_msg.justification:
                 continue
 
-            message_header = v1_msg.justification[val2]
-            v2_msg_in_v1_view = self.view.justified_messages[message_header]
+            message_hash = v1_msg.justification[val2]
+            v2_msg_in_v1_view = self.view.justified_messages[message_hash]
             if self.candidate_estimate.conflicts_with(v2_msg_in_v1_view):
                 continue
 
@@ -41,8 +41,8 @@ class CliqueOracle(AbstractOracle):
             if val1 not in v2_msg.justification:
                 continue
 
-            message_header = v2_msg.justification[val1]
-            v1_msg_in_v2_view = self.view.justified_messages[message_header]
+            message_hash = v2_msg.justification[val1]
+            v1_msg_in_v2_view = self.view.justified_messages[message_hash]
             if self.candidate_estimate.conflicts_with(v1_msg_in_v2_view):
                 continue
 
