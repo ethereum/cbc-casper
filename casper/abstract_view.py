@@ -58,7 +58,7 @@ class AbstractView(object):
             if not any(missing_message_hashes):
                 self.add_to_justified_messages(message)
                 self.resolve_waiting_messages(message)
-                return
+                continue
 
             self.pending_messages[message.hash] = message
             self._track_missing_messages(message, missing_message_hashes)
