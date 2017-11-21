@@ -105,16 +105,17 @@ class AbstractView(object):
     def add_to_justified_messages(self, messages):
         """Must be defined in child class
         Adds a message with all messages in justification recieved to view"""
+        raise NotImplementedError
 
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''
-        pass
+        raise NotImplementedError
 
     def make_new_message(self, validator):
         '''Must be defined in child class.'''
-        pass
+        raise NotImplementedError
 
     def update_safe_estimates(self, validator_set):
         '''Must be defined in child class.'''
-        pass
+        raise NotImplementedError

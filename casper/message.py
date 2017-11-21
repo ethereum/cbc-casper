@@ -30,4 +30,4 @@ class Message(object):
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
-        pass
+        raise NotImplementedError
