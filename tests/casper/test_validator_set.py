@@ -2,6 +2,7 @@
 
 import random as r
 import pytest
+import itertools
 
 from casper.validator_set import ValidatorSet
 
@@ -104,11 +105,43 @@ def test_weight(weights, expected_weight, validator_names):
     assert round(val_set.weight(validators), 2) == round(expected_weight, 2)
 
 
-@pytest.mark.skip(reason="test not yet implemented")
-def test_get_validator_by_name():
-    pass
+@pytest.mark.parametrize(
+    'weights',
+    [
+        ({i: i for i in range(10)}),
+        ({i: 9 - i for i in range(9, -1, -1)}),
+        ({i: r.random() for i in range(10)}),
+        ({i: i*2 for i in range(10)}),
+        ({i: i*2 for i in range(10)}),
+    ]
+)
+def test_get_validator_by_name(weights):
+    val_set = ValidatorSet(weights)
+
+    for validator in val_set:
+        returned_val = val_set.get_validator_by_name(validator.name)
+        assert validator == returned_val
 
 
-@pytest.mark.skip(reason="test not yet implemented")
-def test_get_validators_by_names():
-    pass
+
+@pytest.mark.parametrize(
+    'weights',
+    [
+        ({i: i for i in range(10)}),
+        ({i: 9 - i for i in range(9, -1, -1)}),
+        ({i: r.random() for i in range(10)}),
+        ({i: i*2 for i in range(10)}),
+        ({i: i*2 for i in range(10)}),
+    ]
+)
+def test_get_validators_by_names(weights):
+    val_set = ValidatorSet(weights)
+
+    for i in range(1, len(weights)):
+        val_subsets = itertools.combinations(val_set, i)
+        for subset in val_subsets:
+            subset = {val for val in subset}
+            val_names = {validator.name for validator in subset}
+            returned_set = val_set.get_validators_by_names(val_names)
+
+            assert subset == returned_set
