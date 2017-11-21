@@ -11,8 +11,8 @@ That said, we will try to detail any breaking changes in subsequent releases.
 
 Branch    | Tests
 ----------|------
-master    | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/master)
-develop   | [![CircleCI](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/karlfloersch/cbc-casper/tree/develop)
+master    | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/master)
+develop   | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/develop)
 
 ## Requirements
 * Python 3
@@ -29,7 +29,9 @@ make install
 
 ## Run Simulations
 ### Standard
-Standard similuations are marked up for use as follows:
+Standard simulations are marked up for use as follows:
+
+NOTE: after each viewgraph appears, you must manually exit the window for the simulation to continue to run!
 ```
 make run-[rand | rrob | full | nofinal | binary]
 ```
@@ -51,10 +53,13 @@ Advanced simulations can be run with a little command line wizardy.
 - First ensure that you are using the virtual environment via: `. venv/bin/activate`
 - Simulations can then be run via `casper.py`. The following are example usages:
 ```
-# run a simulation with 100 validators and random message propogation
+# run a simulation with 100 validators and random message propagation
 python casper.py rand --validators 100
 
-# run a simulation with 20 validators and 1000 rounds of round robin message propogation,
+# run a simulation without displaying the viewgraphs, but instead save them and create a GIF
+python casper.py rand --hide-display --save
+
+# run a simulation with 20 validators and 1000 rounds of round robin message propagation,
 # reporting every 100 rounds
 python casper.py rrob --validators 6 --rounds 300 --report-interval 100
 
@@ -82,7 +87,7 @@ python run_experiment.py experiments/orphan_rate.json
 
 The following are the fields that make up an experiment to be defined in a `.json` file:
 
-`msg_mode` (string): Specifies the message generation/propogation scheme. The
+`msg_mode` (string): Specifies the message generation/propagation scheme. The
 available schemes are "rand", "rrob", "full", and "nofinal".
 
 `protocol` (string): Specifies the protocol to test. Available protocols are
@@ -92,10 +97,10 @@ available schemes are "rand", "rrob", "full", and "nofinal".
 simulation starts with a fresh setup -- messages, validators, etc.
 
 `rounds_per_sim` (number): Specifies the number of rounds of the message
-propogation scheme to run per simulation.
+propagation scheme to run per simulation.
 
 `report_interval` (number): Specifies at which intervals of the message
-propogation to collect data. For example, if `rounds_per_sim` is 100 and `report_interval` is 20,
+propagation to collect data. For example, if `rounds_per_sim` is 100 and `report_interval` is 20,
 the experiment will collect data at round 20, 40, 60, 80, and 100.
 
 `data` (list): Specifies which types of data to collect from the simulations as

@@ -1,4 +1,4 @@
-"""The plot tool module ... """
+"""The plot tool module contains a base plot tool for displaying viewgraphs """
 
 from math import pi
 import os
@@ -20,6 +20,7 @@ COLOURS = ["LightYellow", "Yellow", "Orange", "OrangeRed", "Red", "DarkRed", "Bl
 
 
 class PlotTool(object):
+    """A base object with functions for building, displaying, and saving viewgraphs"""
 
     def __init__(self, display, save, node_shape):
         self.display = display

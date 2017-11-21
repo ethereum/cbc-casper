@@ -1,4 +1,4 @@
-"""The validator set module ... """
+"""The validator set module contains the ValidatorSet class """
 from casper.validator import Validator
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 

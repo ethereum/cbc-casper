@@ -1,8 +1,8 @@
-"""The network module .... """
+"""The network module contains a network class allowing for message passing """
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
 
-class Network:
+class Network(object):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set

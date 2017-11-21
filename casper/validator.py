@@ -1,4 +1,4 @@
-"""The validator module ... """
+"""The validator module contains the Validator class, which creates/sends/recieves messages """
 import numbers
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
@@ -30,8 +30,7 @@ class Validator(object):
         """This function returns the validator's latest message."""
         if self in self.view.latest_messages:
             return self.view.latest_messages[self]
-        else:
-            assert False
+        raise KeyError("Validator has not previously created a message")
 
     def update_safe_estimates(self):
         """The validator checks estimate safety on some estimate with some safety oracle."""
