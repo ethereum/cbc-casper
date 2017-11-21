@@ -27,26 +27,25 @@ class BlockchainView(AbstractView):
             self.latest_messages
         )
 
-    def add_to_justified_messages(self, messages):
-        """Given a set of now justified messages, updates latest messages and children"""
-        for message in messages:
-            assert message.hash not in self.justified_messages, "...should not have seen message!"
-            # update views most recently seen messages
-            if message.sender not in self.latest_messages:
-                self.latest_messages[message.sender] = message
-            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-                self.latest_messages[message.sender] = message
+    def add_to_justified_messages(self, message):
+        """Given a now justified message, updates latest messages and children"""
+        assert message.hash not in self.justified_messages, "...should not have seen message!"
+        # update views most recently seen messages
+        if message.sender not in self.latest_messages:
+            self.latest_messages[message.sender] = message
+        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
+            self.latest_messages[message.sender] = message
 
-            # update the children dictonary with the new message
-            if message.estimate not in self.children:
-                self.children[message.estimate] = set()
-            self.children[message.estimate].add(message)
+        # update the children dictonary with the new message
+        if message.estimate not in self.children:
+            self.children[message.estimate] = set()
+        self.children[message.estimate].add(message)
 
-            # update when_added cache
-            if message not in self.when_added:
-                self.when_added[message] = len(self.justified_messages)
+        # update when_added cache
+        if message not in self.when_added:
+            self.when_added[message] = len(self.justified_messages)
 
-            self.justified_messages[message.hash] = message
+        self.justified_messages[message.hash] = message
 
     def make_new_message(self, validator):
         justification = self.justification()

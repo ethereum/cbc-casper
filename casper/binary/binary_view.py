@@ -19,15 +19,14 @@ class BinaryView(AbstractView):
             self.latest_messages
         )
 
-    def add_to_justified_messages(self, messages):
-        """Given a set of newly justified messages, updates latest messages"""
-        for message in messages:
-            if message.sender not in self.latest_messages:
-                self.latest_messages[message.sender] = message
-            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-                self.latest_messages[message.sender] = message
+    def add_to_justified_messages(self, message):
+        """Given a newly justified messages, updates latest messages"""
+        if message.sender not in self.latest_messages:
+            self.latest_messages[message.sender] = message
+        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
+            self.latest_messages[message.sender] = message
 
-            self.justified_messages[message.hash] = message
+        self.justified_messages[message.hash] = message
 
     def make_new_message(self, validator):
         """Make a new bet!"""
