@@ -15,8 +15,8 @@ def exists_free_message(estimate, val, sequence_num, view):
         if curr_message.sequence_number == 0:
             break
 
-        next_message_header = curr_message.justification.latest_messages[val]
-        curr_message = view.justified_messages[next_message_header]
+        next_message_hash = curr_message.justification.latest_messages[val]
+        curr_message = view.justified_messages[next_message_hash]
 
     return False
 
