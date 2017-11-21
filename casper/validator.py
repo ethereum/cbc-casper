@@ -1,12 +1,6 @@
 """The validator module ... """
 import numbers
-import random as r
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
-
-
-r.seed()
-REPORT = True
-
 
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
