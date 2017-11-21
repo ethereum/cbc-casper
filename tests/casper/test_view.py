@@ -55,7 +55,7 @@ def test_justification_includes_justified_messages():
 
 
 def test_add_justified_message():
-    test_lang = TestLangCBC({0: 10, 1: 11})
+    test_lang = TestLangCBC(TEST_WEIGHT)
     test_lang.parse('B0-A B0-B S1-A')
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
@@ -63,6 +63,7 @@ def test_add_justified_message():
     assert test_lang.blocks['A'] in validator_1.view.justified_messages.values()
     assert test_lang.blocks['B'] in validator_0.view.justified_messages.values()
     assert test_lang.blocks['B'] not in validator_1.view.justified_messages.values()
+
 
 @pytest.mark.parametrize(
     'test_string, justified_messages, unjustified_messages',

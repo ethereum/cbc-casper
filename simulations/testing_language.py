@@ -1,7 +1,6 @@
 """The testing language module ... """
 import re
 import random as r
-import copy
 
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.network import Network
@@ -66,7 +65,7 @@ class TestLangCBC(object):
         current_block_headers = set()
         for block_header in block.justification.latest_messages.values():
             if block_header not in validator.view.pending_messages and \
-                block_header not in validator.view.justified_messages:
+               block_header not in validator.view.justified_messages:
                 current_block_headers.add(block_header)
 
         while any(current_block_headers):
@@ -78,14 +77,12 @@ class TestLangCBC(object):
 
                 for other_header in block.justification.latest_messages.values():
                     if other_header not in validator.view.pending_messages and \
-                        other_header not in validator.view.justified_messages:
+                       other_header not in validator.view.justified_messages:
                         next_headers.add(other_header)
 
             current_block_headers = next_headers
 
-
         return messages_needed
-
 
     def parse(self, test_string):
         """Parse the test_string, and run the test"""
@@ -119,7 +116,6 @@ class TestLangCBC(object):
         assert block.header not in validator.view.missing_message_dependencies
         assert self.blocks[block_name].header in validator.view.justified_messages
 
-
     def send_only_block(self, validator, block_name):
         """Send some validator a block."""
         self._validate_validator(validator)
@@ -130,8 +126,6 @@ class TestLangCBC(object):
             raise Exception("Validator has already seen block")
 
         self.network.propagate_message_to_validator(block, validator)
-
-
 
     def make_block(self, validator, block_name):
         """Have some validator produce a block."""
@@ -186,7 +180,7 @@ class TestLangCBC(object):
         block = self.blocks[block_name]
         validator.update_safe_estimates()
 
-        #NOTE: This should never fail
+        # NOTE: This should never fail
         assert validator.view.last_finalized_block is None or \
             block.conflicts_with(validator.view.last_finalized_block), \
             "Block {} failed no-safety assert".format(block_name)

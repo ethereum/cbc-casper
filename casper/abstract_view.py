@@ -19,7 +19,6 @@ class AbstractView(object):
 
         self.latest_messages = dict()
 
-
     def justification(self):
         """Returns the headers of latest message seen from other validators."""
         return Justification(self.latest_messages)
@@ -41,7 +40,6 @@ class AbstractView(object):
             for validator in self.latest_messages
         )
         return max_height + 1
-
 
     def get_missing_messages_in_justification(self, message):
         """Returns the set of not seen messages headers from the justification of a message"""
@@ -79,7 +77,6 @@ class AbstractView(object):
                     self.missing_message_dependencies[message.header] = missing_message_headers
                     self.pending_messages[message.header] = message
 
-
     def resolve_waiting_messages(self, message):
         """Given a new message, resolve all messages that are waiting for it to be justified"""
         if message.header not in self.dependents_of_message:
@@ -105,6 +102,7 @@ class AbstractView(object):
     def add_to_justified_messages(self, messages):
         """Must be defined in child class
         Adds a message with all messages in justification recieved to view"""
+        pass
 
     def estimate(self):
         '''Must be defined in child class.
