@@ -15,7 +15,7 @@ class BlockchainView(AbstractView):
 
         # cache info about message events
         self.when_added = {}
-        for message in self.justified_messages:
+        for message in self.justified_messages.values():
             self.when_added[message] = 0
         self.when_finalized = {}
 
