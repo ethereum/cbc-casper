@@ -20,15 +20,6 @@ class BinaryView(AbstractView):
             self.latest_messages
         )
 
-    def add_to_justified_messages(self, message):
-        """Given a newly justified messages, updates latest messages"""
-        if message.sender not in self.latest_messages:
-            self.latest_messages[message.sender] = message
-        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-            self.latest_messages[message.sender] = message
-
-        self.justified_messages[message.hash] = message
-
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""
         # check estimate safety on the most
