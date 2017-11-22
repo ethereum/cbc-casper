@@ -87,7 +87,7 @@ The parameters of an experiment are specified via a `.json` file and are run
 using the python script, `run_experiment.py`. For example:
 
 ```
-python run_experiment.py experiments/orphan_rate.json
+python run_experiment.py experiments/blockchain/fast_test.json
 ```
 
 The following are the fields that make up an experiment to be defined in a `.json` file:
