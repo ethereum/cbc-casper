@@ -10,6 +10,8 @@ class BlockchainView(AbstractView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
+        self.Message = Block
+
         self.children = dict()
         self.last_finalized_block = None
 

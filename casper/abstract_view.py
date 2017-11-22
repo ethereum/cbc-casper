@@ -91,6 +91,24 @@ class AbstractView(object):
             self.dependents_of_message[missing_message_hash].append(message.hash)
             self.missing_message_dependencies[message.hash] = missing_message_hashes
 
+    def make_new_message(self, validator):
+        justification = self.justification()
+        estimate = self.estimate()
+        sequence_number = self._next_sequence_number(validator)
+        display_height = self._next_display_height()
+
+        new_message = self.Message(
+            estimate,
+            justification,
+            validator,
+            sequence_number,
+            display_height
+        )
+        self.add_messages(set([new_message]))
+        assert new_message.hash in self.justified_messages  # sanity check
+
+        return new_message
+
     def add_to_justified_messages(self, message):
         """Must be defined in child class
         Adds a message with all messages in justification recieved to view"""
@@ -99,10 +117,6 @@ class AbstractView(object):
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''
-        pass
-
-    def make_new_message(self, validator):
-        '''Must be defined in child class.'''
         pass
 
     def update_safe_estimates(self, validator_set):
