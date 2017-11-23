@@ -67,10 +67,7 @@ class AbstractView(object):
         """Given a new message, resolve all messages that are waiting for it to be justified"""
         newly_justified_messages = set([message])
 
-        if message.hash not in self.dependents_of_message:
-            return newly_justified_messages
-
-        for dependent_hash in self.dependents_of_message[message.hash]:
+        for dependent_hash in self.dependents_of_message.get(message.hash, set()):
             # sanity check!
             assert message.hash in self.missing_message_dependencies[dependent_hash]
 
@@ -78,10 +75,8 @@ class AbstractView(object):
 
             if not any(self.missing_message_dependencies[dependent_hash]):
                 new_message = self.pending_messages[dependent_hash]
-
                 newly_justified_messages.update(self.get_new_justified_messages(new_message))
 
-        del self.dependents_of_message[message.hash]
         return newly_justified_messages
 
 
@@ -96,6 +91,8 @@ class AbstractView(object):
         self.justified_messages[message.hash] = message
         if message.hash in self.missing_message_dependencies:
             del self.missing_message_dependencies[message.hash]
+        if message.hash in self.dependents_of_message:
+            del self.dependents_of_message[message.hash]
         if message.hash in self.pending_messages:
             del self.pending_messages[message.hash]
 
