@@ -2,6 +2,7 @@
 import numbers
 from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
+
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
     def __init__(self, name, weight, protocol=BlockchainProtocol, validator_set=None):
@@ -42,8 +43,8 @@ class Validator(object):
         It updates the validator's latest message, estimate, view, and latest observed messages."""
         estimate = self.estimate()
         justification = self.justification()
-        sequence_number = self.next_sequence_number()
-        display_height = self.next_display_height()
+        sequence_number = self._next_sequence_number()
+        display_height = self._next_display_height()
 
         new_message = self.protocol.Message(
             estimate,
@@ -57,7 +58,14 @@ class Validator(object):
 
         return new_message
 
-    def next_sequence_number(self):
+    def justification(self):
+        """Returns the headers of latest message seen from other validators."""
+        latest_message_headers = dict()
+        for validator in self.view.latest_messages:
+            latest_message_headers[validator] = self.view.latest_messages[validator].hash
+        return latest_message_headers
+
+    def _next_sequence_number(self):
         """Returns the sequence number for the next message from a validator"""
         last_message = self.my_latest_message()
 
@@ -65,7 +73,7 @@ class Validator(object):
             return last_message.sequence_number + 1
         return 0
 
-    def next_display_height(self):
+    def _next_display_height(self):
         """Returns the display height for a message created in this view"""
         if not any(self.view.latest_messages):
             return 0
@@ -75,10 +83,3 @@ class Validator(object):
             for validator in self.view.latest_messages
         )
         return max_height + 1
-
-    def justification(self):
-        """Returns the headers of latest message seen from other validators."""
-        latest_message_headers = dict()
-        for validator in self.view.latest_messages:
-            latest_message_headers[validator] = self.view.latest_messages[validator].hash
-        return latest_message_headers

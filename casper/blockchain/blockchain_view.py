@@ -1,7 +1,6 @@
 """The blockchain view module extends a view for blockchain data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.blockchain.block import Block
 import casper.blockchain.forkchoice as forkchoice
 
 
@@ -10,7 +9,6 @@ class BlockchainView(AbstractView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
-        self.Message = Block
         self.children = dict()
         self.last_finalized_block = None
 
@@ -48,15 +46,17 @@ class BlockchainView(AbstractView):
             self.children[message.estimate] = set()
         self.children[message.estimate].add(message)
 
-        # update when_added cache
-        if message not in self.when_added:
-            self.when_added[message] = len(self.justified_messages)
+        self._update_when_added_cache(message)
 
     def _initialize_message_caches(self):
         self.when_added = {}
         for message in self.justified_messages.values():
             self.when_added[message] = 0
         self.when_finalized = {}
+
+    def _update_when_added_cache(self, message):
+        if message not in self.when_added:
+            self.when_added[message] = len(self.justified_messages)
 
     def _update_when_finalized_cache(self, tip):
         while tip and tip not in self.when_finalized:

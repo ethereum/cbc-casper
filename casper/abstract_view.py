@@ -1,5 +1,6 @@
 """The view module ... """
 
+
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
     def __init__(self, messages=None):
@@ -75,7 +76,6 @@ class AbstractView(object):
                 newly_justified_messages.update(self.get_new_justified_messages(new_message))
 
         return newly_justified_messages
-
 
     def _add_to_latest_messages(self, message):
         """Updates a views most recent messages, if this message is later"""
