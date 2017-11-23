@@ -17,14 +17,6 @@ class AbstractView(object):
 
         self.latest_messages = dict()               # validator => message
 
-    def justification(self):
-        """Returns the headers of latest message seen from other validators."""
-        latest_message_headers = dict()
-        for validator in self.latest_messages:
-            latest_message_headers[validator] = self.latest_messages[validator].hash
-        return latest_message_headers
-
-
     def missing_messages_in_justification(self, message):
         """Returns the set of not seen messages hashes from the justification of a message"""
         return {
@@ -35,29 +27,11 @@ class AbstractView(object):
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''
-        pass
+        raise NotImplementedError
 
     def update_safe_estimates(self, validator_set):
         '''Must be defined in child class.'''
-        pass
-
-    def make_new_message(self, validator):
-        justification = self.justification()
-        estimate = self.estimate()
-        sequence_number = self._next_sequence_number(validator)
-        display_height = self._next_display_height()
-
-        new_message = self.Message(
-            estimate,
-            justification,
-            validator,
-            sequence_number,
-            display_height
-        )
-        self.add_messages(set([new_message]))
-        assert new_message.hash in self.justified_messages  # sanity check
-
-        return new_message
+        raise NotImplementedError
 
     def add_messages(self, showed_messages):
         """Adds a set of newly received messages to pending or justified"""
@@ -120,21 +94,3 @@ class AbstractView(object):
 
             self.dependents_of_message[missing_message_hash].append(message.hash)
             self.missing_message_dependencies[message.hash] = missing_message_hashes
-
-    def _next_sequence_number(self, validator):
-        """Returns the sequence number for the next message from a validator"""
-        if validator not in self.latest_messages:
-            return 0
-
-        return self.latest_messages[validator].sequence_number + 1
-
-    def _next_display_height(self):
-        """Returns the display height for a message created in this view"""
-        if not any(self.latest_messages):
-            return 0
-
-        max_height = max(
-            self.latest_messages[validator].display_height
-            for validator in self.latest_messages
-        )
-        return max_height + 1

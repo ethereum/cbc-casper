@@ -12,8 +12,7 @@ def test_new_view():
     view = AbstractView()
 
     assert not any(view.justified_messages)
-    assert not view.latest_messages
-    assert not any(view.justification())
+    assert not any(view.latest_messages)
 
 
 def test_justification_stores_hash():
@@ -23,7 +22,7 @@ def test_justification_stores_hash():
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
     assert len(justification) == 2
     assert not isinstance(justification[validator_0], Block)
@@ -39,7 +38,7 @@ def test_justification_includes_justified_messages():
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
     assert len(justification) == 1
     assert validator_0 not in justification
@@ -47,7 +46,7 @@ def test_justification_includes_justified_messages():
 
     test_lang.parse('S1-B')
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
     assert len(justification) == 2
     assert justification[validator_0] == test_lang.blocks['B'].hash
