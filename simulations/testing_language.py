@@ -110,7 +110,7 @@ class TestLangCBC(object):
             self.network.propagate_message_to_validator(block, validator)
 
         assert block.hash not in validator.view.pending_messages
-        assert block.hash not in validator.view.missing_message_dependencies
+        assert block.hash not in validator.view.num_missing_dependencies
         assert self.blocks[block_name].hash in validator.view.justified_messages
 
     def send_only_block(self, validator, block_name):

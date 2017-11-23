@@ -12,7 +12,7 @@ class AbstractView(object):
         self.justified_messages = dict()            # message hash => message
         self.pending_messages = dict()              # message hash => message
 
-        self.missing_message_dependencies = dict()  # message hash => set(message hashes)
+        self.num_missing_dependencies = dict()  # message hash => number of message hashes
         self.dependents_of_message = dict()         # message hash => list(message hashes)
 
         self.latest_messages = dict()               # validator => message
@@ -50,7 +50,7 @@ class AbstractView(object):
     def receive_pending_message(self, message, missing_message_hashes):
         """Updates and stores pending messages and dependencies"""
         self.pending_messages[message.hash] = message
-        self.missing_message_dependencies[message.hash] = missing_message_hashes
+        self.num_missing_dependencies[message.hash] = len(missing_message_hashes)
 
         for missing_message_hash in missing_message_hashes:
             if missing_message_hash not in self.dependents_of_message:
@@ -68,12 +68,9 @@ class AbstractView(object):
         newly_justified_messages = set([message])
 
         for dependent_hash in self.dependents_of_message.get(message.hash, set()):
-            # sanity check!
-            assert message.hash in self.missing_message_dependencies[dependent_hash]
+            self.num_missing_dependencies[dependent_hash] -= 1
 
-            self.missing_message_dependencies[dependent_hash].remove(message.hash)
-
-            if not any(self.missing_message_dependencies[dependent_hash]):
+            if self.num_missing_dependencies[dependent_hash] == 0:
                 new_message = self.pending_messages[dependent_hash]
                 newly_justified_messages.update(self.get_new_justified_messages(new_message))
 
@@ -89,8 +86,8 @@ class AbstractView(object):
 
     def _add_justified_remove_pending(self, message):
         self.justified_messages[message.hash] = message
-        if message.hash in self.missing_message_dependencies:
-            del self.missing_message_dependencies[message.hash]
+        if message.hash in self.num_missing_dependencies:
+            del self.num_missing_dependencies[message.hash]
         if message.hash in self.dependents_of_message:
             del self.dependents_of_message[message.hash]
         if message.hash in self.pending_messages:
