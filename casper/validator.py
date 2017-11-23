@@ -41,17 +41,12 @@ class Validator(object):
     def make_new_message(self):
         """This function produces a new latest message for the validator.
         It updates the validator's latest message, estimate, view, and latest observed messages."""
-        estimate = self.estimate()
-        justification = self.justification()
-        sequence_number = self._next_sequence_number()
-        display_height = self._next_display_height()
-
         new_message = self.protocol.Message(
-            estimate,
-            justification,
+            self.estimate(),
+            self.justification(),
             self,
-            sequence_number,
-            display_height
+            self._next_sequence_number(),
+            self._next_display_height()
         )
         self.view.add_messages(set([new_message]))
         assert new_message.hash in self.view.justified_messages  # sanity check
