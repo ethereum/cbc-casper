@@ -32,6 +32,9 @@ If you would like to hack on cbc-casper or run the simulations yourself, setup y
 make install
 ```
 
+NOTE: If you prefer to manage venv explicitly, run a standard venv setup and
+pip install using `requirements.txt`
+
 ## Run Simulations
 ### Standard
 Standard simulations are marked up for use as follows:
