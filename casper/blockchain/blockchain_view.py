@@ -10,14 +10,11 @@ class BlockchainView(AbstractView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
+        self.Message = Block
         self.children = dict()
         self.last_finalized_block = None
 
-        # cache info about message events
-        self.when_added = {}
-        for message in self.justified_messages:
-            self.when_added[message] = 0
-        self.when_finalized = {}
+        self._initialize_message_caches()
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -27,25 +24,20 @@ class BlockchainView(AbstractView):
             self.latest_messages
         )
 
-    def add_to_justified_messages(self, message):
-        """Given a now justified message, updates latest messages and children"""
-        assert message.hash not in self.justified_messages, "...should not have seen message!"
-        # update views most recently seen messages
-        if message.sender not in self.latest_messages:
-            self.latest_messages[message.sender] = message
-        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-            self.latest_messages[message.sender] = message
+    def update_safe_estimates(self, validator_set):
+        """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
+        tip = self.estimate()
 
-        # update the children dictonary with the new message
-        if message.estimate not in self.children:
-            self.children[message.estimate] = set()
-        self.children[message.estimate].add(message)
+        while tip and tip != self.last_finalized_block:
+            oracle = CliqueOracle(tip, self, validator_set)
+            fault_tolerance, _ = oracle.check_estimate_safety()
 
-        # update when_added cache
-        if message not in self.when_added:
-            self.when_added[message] = len(self.justified_messages)
+            if fault_tolerance > 0:
+                self.last_finalized_block = tip
+                self._update_when_finalized_cache(tip)
+                return self.last_finalized_block
 
-        self.justified_messages[message.hash] = message
+            tip = tip.estimate
 
     def make_new_message(self, validator):
         justification = self.justification()
@@ -59,27 +51,27 @@ class BlockchainView(AbstractView):
 
         return new_message
 
-    def update_safe_estimates(self, validator_set):
-        """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
-        tip = self.estimate()
+    def mark_message_as_fully_received(self, message):
+        """Given a now justified message, updates latest messages and children"""
+        assert message.hash not in self.justified_messages, "...should not have seen message!"
+        super().mark_message_as_fully_received(message)
 
-        prev_last_finalized_block = self.last_finalized_block
+        # update the children dictonary with the new message
+        if message.estimate not in self.children:
+            self.children[message.estimate] = set()
+        self.children[message.estimate].add(message)
 
-        while tip and tip != prev_last_finalized_block:
-            oracle = CliqueOracle(tip, self, validator_set)
-            fault_tolerance, _ = oracle.check_estimate_safety()
+        # update when_added cache
+        if message not in self.when_added:
+            self.when_added[message] = len(self.justified_messages)
 
-            if fault_tolerance > 0:
-                self.last_finalized_block = tip
-                # then, a sanity check!
-                if prev_last_finalized_block:
-                    assert prev_last_finalized_block.is_in_blockchain(self.last_finalized_block)
+    def _initialize_message_caches(self):
+        self.when_added = {}
+        for message in self.justified_messages.values():
+            self.when_added[message] = 0
+        self.when_finalized = {}
 
-                # cache when_finalized
-                while tip and tip not in self.when_finalized:
-                    self.when_finalized[tip] = len(self.justified_messages)
-                    tip = tip.estimate
-
-                return self.last_finalized_block
-
+    def _update_when_finalized_cache(self, tip):
+        while tip and tip not in self.when_finalized:
+            self.when_finalized[tip] = len(self.justified_messages)
             tip = tip.estimate

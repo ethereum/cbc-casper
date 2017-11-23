@@ -10,6 +10,7 @@ class BinaryView(AbstractView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
+        self.Message = Bet
         self.last_finalized_estimate = None
         self.first = True
 
@@ -18,27 +19,6 @@ class BinaryView(AbstractView):
         return estimator.get_estimate_from_latest_messages(
             self.latest_messages
         )
-
-    def add_to_justified_messages(self, message):
-        """Given a newly justified messages, updates latest messages"""
-        if message.sender not in self.latest_messages:
-            self.latest_messages[message.sender] = message
-        elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-            self.latest_messages[message.sender] = message
-
-        self.justified_messages[message.hash] = message
-
-    def make_new_message(self, validator):
-        """Make a new bet!"""
-        justification = self.justification()
-        estimate = self.estimate()
-        sequence_number = self._next_sequence_number(validator)
-        display_height = self._next_display_height()
-
-        new_message = Bet(estimate, justification, validator, sequence_number, display_height)
-        self.add_messages(set([new_message]))
-
-        return new_message
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""
