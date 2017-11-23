@@ -46,7 +46,7 @@ class AbstractView(object):
         for justified_message in newly_justified_messages:
             self._add_to_latest_messages(justified_message)
             self._add_justified_remove_pending(justified_message)
-            self.update_protocol_specific_view(justified_message)
+            self._update_protocol_specific_view(justified_message)
 
     def receive_pending_message(self, message, missing_message_hashes):
         """Updates and stores pending messages and dependencies"""
@@ -58,11 +58,6 @@ class AbstractView(object):
                 self.dependents_of_message[missing_message_hash] = []
 
             self.dependents_of_message[missing_message_hash].append(message.hash)
-
-    def update_protocol_specific_view(self, message):
-        """ Can be implemented by child, though not necessary
-        Updates a view's specific info, given a justified message"""
-        pass
 
     def get_newly_justified_messages(self, message):
         """Given a new justified message, get all messages that are now justified
@@ -78,6 +73,11 @@ class AbstractView(object):
 
         return newly_justified_messages
 
+    def _update_protocol_specific_view(self, message):
+        """ Can be implemented by child, though not necessary
+        Updates a view's specific info, given a justified message"""
+        pass
+
     def _add_to_latest_messages(self, message):
         """Updates a views most recent messages, if this message is later"""
         if message.sender not in self.latest_messages:
@@ -86,6 +86,9 @@ class AbstractView(object):
             self.latest_messages[message.sender] = message
 
     def _add_justified_remove_pending(self, message):
+        """Atomic action that:
+        - removes all data related to tracking the not yet justified message
+        - adds message to justified dict"""
         self.justified_messages[message.hash] = message
         if message.hash in self.num_missing_dependencies:
             del self.num_missing_dependencies[message.hash]

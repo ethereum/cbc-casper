@@ -37,7 +37,7 @@ class BlockchainView(AbstractView):
 
             tip = tip.estimate
 
-    def update_protocol_specific_view(self, message):
+    def _update_protocol_specific_view(self, message):
         """Given a now justified message, updates children and when_recieved"""
         assert message.hash in self.justified_messages, "...should not have seen message!"
 
