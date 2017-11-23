@@ -17,13 +17,6 @@ class AbstractView(object):
 
         self.latest_messages = dict()               # validator => message
 
-    def missing_messages_in_justification(self, message):
-        """Returns the set of not seen messages hashes from the justification of a message"""
-        return {
-            message_hash for message_hash in message.justification.values()
-            if message_hash not in self.justified_messages
-        }
-
     def estimate(self):
         '''Must be defined in child class.
         Returns estimate based on current messages in the view'''
@@ -39,19 +32,43 @@ class AbstractView(object):
             if message.hash in self.pending_messages or message.hash in self.justified_messages:
                 continue
 
-            missing_message_hashes = self.missing_messages_in_justification(message)
+            missing_message_hashes = self._missing_messages_in_justification(message)
             if not any(missing_message_hashes):
-                self.mark_message_as_fully_received(message)
-                self.resolve_waiting_messages(message)
-                continue
+                self.receive_justified_message(message)
+            else:
+                self.receive_pending_message(message, missing_message_hashes)
 
-            self.pending_messages[message.hash] = message
-            self._track_missing_messages(message, missing_message_hashes)
+    def receive_justified_message(self, message):
+        """Upon receiving a justified message, resolves waiting messages and adds to view"""
+        new_justified_messages = self.get_new_justified_messages(message)
 
-    def resolve_waiting_messages(self, message):
+        for justified_message in new_justified_messages:
+            self._add_to_latest_messages(justified_message)
+            self._add_justified_remove_pending(justified_message)
+            self.update_protocol_specific_view(justified_message)
+
+    def receive_pending_message(self, message, missing_message_hashes):
+        """Updates and stores pending messages and dependencies"""
+        self.pending_messages[message.hash] = message
+        self.missing_message_dependencies[message.hash] = missing_message_hashes
+
+        for missing_message_hash in missing_message_hashes:
+            if missing_message_hash not in self.dependents_of_message:
+                self.dependents_of_message[missing_message_hash] = []
+
+            self.dependents_of_message[missing_message_hash].append(message.hash)
+
+    def update_protocol_specific_view(self, message):
+        """ Can be implemented by child, though not necessarily
+        Updates a view's specific info, given a justified message"""
+        pass
+
+    def get_new_justified_messages(self, message):
         """Given a new message, resolve all messages that are waiting for it to be justified"""
+        newly_justified_messages = set([message])
+
         if message.hash not in self.dependents_of_message:
-            return
+            return newly_justified_messages
 
         for dependent_hash in self.dependents_of_message[message.hash]:
             # sanity check!
@@ -61,20 +78,15 @@ class AbstractView(object):
 
             if not any(self.missing_message_dependencies[dependent_hash]):
                 new_message = self.pending_messages[dependent_hash]
-                self.resolve_waiting_messages(new_message)
 
-                self.mark_message_as_fully_received(new_message)
+                newly_justified_messages.update(self.get_new_justified_messages(new_message))
 
         del self.dependents_of_message[message.hash]
+        return newly_justified_messages
 
-    def mark_message_as_fully_received(self, message):
-        """Must be defined in child class
-        Adds a message with all messages in justification received to view"""
-        self._add_to_latest_messages(message)
-        self._add_justified_remove_pending(message)
 
     def _add_to_latest_messages(self, message):
-        # update views most recently seen messages
+        """Updates a views most recent messages, if this message is later"""
         if message.sender not in self.latest_messages:
             self.latest_messages[message.sender] = message
         elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
@@ -87,10 +99,9 @@ class AbstractView(object):
         if message.hash in self.pending_messages:
             del self.pending_messages[message.hash]
 
-    def _track_missing_messages(self, message, missing_message_hashes):
-        for missing_message_hash in missing_message_hashes:
-            if missing_message_hash not in self.dependents_of_message:
-                self.dependents_of_message[missing_message_hash] = []
-
-            self.dependents_of_message[missing_message_hash].append(message.hash)
-            self.missing_message_dependencies[message.hash] = missing_message_hashes
+    def _missing_messages_in_justification(self, message):
+        """Returns the set of not seen messages hashes from the justification of a message"""
+        return {
+            message_hash for message_hash in message.justification.values()
+            if message_hash not in self.justified_messages
+        }

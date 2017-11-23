@@ -39,22 +39,9 @@ class BlockchainView(AbstractView):
 
             tip = tip.estimate
 
-    def make_new_message(self, validator):
-        justification = self.justification()
-        estimate = self.estimate()
-        sequence_number = self._next_sequence_number(validator)
-        display_height = self._next_display_height()
-
-        new_message = Block(estimate, justification, validator, sequence_number, display_height)
-        self.add_messages(set([new_message]))
-        assert new_message.hash in self.justified_messages  # sanity check
-
-        return new_message
-
-    def mark_message_as_fully_received(self, message):
-        """Given a now justified message, updates latest messages and children"""
-        assert message.hash not in self.justified_messages, "...should not have seen message!"
-        super().mark_message_as_fully_received(message)
+    def update_protocol_specific_view(self, message):
+        """Given a now justified message, updates children and when_recieved"""
+        assert message.hash in self.justified_messages, "...should not have seen message!"
 
         # update the children dictonary with the new message
         if message.estimate not in self.children:
