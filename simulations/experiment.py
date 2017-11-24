@@ -96,7 +96,7 @@ class Experiment:
 
         analyzer = Analyzer(runner)
         self.analyzer_data['simulation_data'][sim_id][interval] = {
-            d: getattr(analyzer, d)()
+            d: getattr(analyzer, d)
             for d in self.data
 
         }
