@@ -11,6 +11,7 @@ class BlockchainView(AbstractView):
 
         self.children = dict()
         self.last_finalized_block = genesis_block
+        self.genesis_block = genesis_block
 
         self._initialize_message_caches()
 
