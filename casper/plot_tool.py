@@ -37,6 +37,7 @@ class PlotTool(object):
         graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
         # if there isn't a graph folder, make one!
         if not os.path.isdir(graph_path):
+            print("graphs directory not found; making one at: ", graph_path, sep="")
             os.makedirs(graph_path)
 
         # find the next name for the next plot!
