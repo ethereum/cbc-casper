@@ -6,7 +6,24 @@ from casper.blockchain.blockchain_protocol import BlockchainProtocol
 class ValidatorSet:
     """Defines the validator set."""
     def __init__(self, weights, protocol=BlockchainProtocol):
-        self.validators = {Validator(name, weights[name], protocol, self) for name in weights}
+        if protocol == BlockchainProtocol:
+            self.genesis_block = self._make_genesis_block()
+            self.validators = {
+                Validator(name, weights[name], protocol, self, self.genesis_block)
+                for name in weights
+            }
+        else:
+            self.validators = {Validator(name, weights[name], protocol, self) for name in weights}
+
+    def _make_genesis_block(self):
+        genesis_block = BlockchainProtocol.Message(
+            None,
+            dict(),
+            None,
+            0,
+            -1
+        )
+        return genesis_block
 
     def __len__(self):
         return len(self.validators)
