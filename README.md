@@ -31,7 +31,7 @@ make install
 ### Standard
 Standard simulations are marked up for use as follows:
 
-NOTE: after each viewgraph appears, you must manually exit the window for the simulation to continue to run!
+
 ```
 make run-[rand | rrob | full | nofinal | binary]
 ```
@@ -46,7 +46,7 @@ make run-[rand | rrob | full | nofinal | binary]
 
 `binary:` unlike the above message propagation schemes, this changes the protocol to cbc-casper with binary data structures! Instead of a blockchain, this protocol just comes to consensus on a single bit.
 
-The number of validators, the number of messages that propagate per round, and the report interval can be edited in `casper/settings.py`.
+By default, a gif and associated images of the simulation will be saved in `graphs/graph_num_0/`. These settings can be modified, along with the number of validators, the number of messages that propagate per round, and the report interval in the `config.ini`.
 
 ### Advanced
 Advanced simulations can be run with a little command line wizardy.
