@@ -13,8 +13,9 @@ class Network(object):
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
-        assert message.hash in self.global_view.justified_messages, ("...expected only to propagate messages "
-                                                      "from the global view")
+        assert message.hash in self.global_view.justified_messages, (
+            "...expected only to propagate messages "
+            "from the global view")
         assert validator in self.validator_set, "...expected a known validator"
 
         validator.receive_messages(set([message]))
@@ -38,6 +39,6 @@ class Network(object):
             validator.receive_messages(messages)
 
     def random_initialization(self):
-        """Generates starting messages for all validators with None as an estiamte."""
+        """Generates starting messages for all validators with None as an estimate."""
         for validator in self.validator_set:
             self.get_message_from_validator(validator)
