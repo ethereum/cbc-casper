@@ -52,8 +52,8 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-            '--display', type=bool, default=config.getboolean("DisplayRounds"),
-            help='display simulations round by round'
+        '--display', type=bool, default=config.getboolean("DisplayRounds"),
+        help='display simulations round by round'
     )
     parser.add_argument(
         '--save', type=bool, default=config.getboolean("Save"),
