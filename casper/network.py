@@ -26,16 +26,13 @@ class Network(object):
         return new_message
 
     def view_initialization(self, view):
-        """
-        Initalizes all validators with all messages in some view.
-        NOTE: This method is not currently tested or called anywhere in repo
-        """
-        self.global_view = view.messages
+        """Initalizes all validators with all messages in some view."""
+        messages = view.justified_messages.values()
 
-        latest = view.latest_messages
+        self.global_view.add_messages(messages)
 
-        for validator in latest:
-            validator.receive_messages(set([latest[validator]]))
+        for validator in self.validator_set:
+            validator.receive_messages(messages)
 
     def random_initialization(self):
         """Generates starting messages for all validators with None as an estiamte."""

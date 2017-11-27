@@ -1,7 +1,6 @@
 """The blockchain view module extends a view for blockchain data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.binary.bet import Bet
 import casper.binary.binary_estimator as estimator
 
 
@@ -10,7 +9,6 @@ class BinaryView(AbstractView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
-        self.Message = Bet
         self.last_finalized_estimate = None
         self.first = True
 
@@ -22,7 +20,6 @@ class BinaryView(AbstractView):
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""
-        # check estimate safety on the most
         for bet in self.latest_messages.values():
             oracle = CliqueOracle(bet, self, validator_set)
             fault_tolerance, _ = oracle.check_estimate_safety()

@@ -1,12 +1,12 @@
 """The message module defines an abstract message class  """
 import random as r
-from casper.justification import Justification
 
 
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
     def __init__(self, estimate, justification, sender, sequence_number, display_height):
-        assert isinstance(justification, Justification), "expected justification a Justification!"
+        assert isinstance(justification, dict), "expected justification a Justification!"
+
         self.sender = sender
         self.estimate = estimate
         self.justification = justification
@@ -32,4 +32,4 @@ class Message(object):
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
-        pass
+        raise NotImplementedError

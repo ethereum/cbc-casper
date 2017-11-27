@@ -12,8 +12,7 @@ def test_new_view():
     view = AbstractView()
 
     assert not any(view.justified_messages)
-    assert not view.latest_messages
-    assert not view.justification().latest_messages
+    assert not any(view.latest_messages)
 
 
 def test_justification_stores_hash():
@@ -23,13 +22,13 @@ def test_justification_stores_hash():
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
-    assert len(justification.latest_messages) == 2
-    assert not isinstance(justification.latest_messages[validator_0], Block)
-    assert not isinstance(justification.latest_messages[validator_1], Block)
-    assert justification.latest_messages[validator_0] == test_lang.blocks['A'].hash
-    assert justification.latest_messages[validator_1] == test_lang.blocks['B'].hash
+    assert len(justification) == 2
+    assert not isinstance(justification[validator_0], Block)
+    assert not isinstance(justification[validator_1], Block)
+    assert justification[validator_0] == test_lang.blocks['A'].hash
+    assert justification[validator_1] == test_lang.blocks['B'].hash
 
 
 def test_justification_includes_justified_messages():
@@ -39,19 +38,19 @@ def test_justification_includes_justified_messages():
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
-    assert len(justification.latest_messages) == 1
-    assert validator_0 not in justification.latest_messages
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].hash
+    assert len(justification) == 1
+    assert validator_0 not in justification
+    assert justification[validator_1] == test_lang.blocks['C'].hash
 
     test_lang.parse('S1-B')
 
-    justification = validator_1.view.justification()
+    justification = validator_1.justification()
 
-    assert len(justification.latest_messages) == 2
-    assert justification.latest_messages[validator_0] == test_lang.blocks['B'].hash
-    assert justification.latest_messages[validator_1] == test_lang.blocks['C'].hash
+    assert len(justification) == 2
+    assert justification[validator_0] == test_lang.blocks['B'].hash
+    assert justification[validator_1] == test_lang.blocks['C'].hash
 
 
 def test_add_justified_message():

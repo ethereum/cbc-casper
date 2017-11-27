@@ -49,13 +49,13 @@ class AdversaryOracle(AbstractOracle):
 
                 for val2 in self.validator_set:
                     # if they have seen nothing from some validator, assume the worst
-                    if val2 not in val_latest_message.justification.latest_messages:
+                    if val2 not in val_latest_message.justification:
                         viewables[validator][val2] = ModelBet(AdversaryOracle.ADV_ESTIMATE, val2)
                         continue
 
                     # If they have seen something from other validators, do a free block check
                     # If there is a free block, assume they will see that (side-effects free!)
-                    message_hash = val_latest_message.justification.latest_messages[val2]
+                    message_hash = val_latest_message.justification[val2]
                     val2_msg_in_v_view = self.view.justified_messages[message_hash]
                     if utils.exists_free_message(
                             self.candidate_estimate,

@@ -64,8 +64,8 @@ class BinaryPlotTool(PlotTool):
         for validator in new_messages:
             message = new_messages[validator]
 
-            if validator in message.justification.latest_messages:
-                last_message = self.view.justified_messages[message.justification.latest_messages[validator]]
+            if validator in message.justification:
+                last_message = self.view.justified_messages[message.justification[validator]]
                 self.self_communications.append([last_message, message])
 
     def _update_message_labels(self, new_messages):

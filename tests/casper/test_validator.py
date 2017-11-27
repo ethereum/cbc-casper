@@ -3,7 +3,6 @@
 import pytest
 
 from casper.blockchain.block import Block
-from casper.justification import Justification
 from casper.validator import Validator
 
 
@@ -30,9 +29,9 @@ def test_new_validator(name, weight, error):
     assert validator.weight == weight
 
 
-def test_check_estimate_safety_without_validator_set():
+def test_check_estimate_safety_without_validator_set(empty_just):
     validator = Validator("cool", 10.2)
-    block = Block(None, Justification(), validator, 0, 0)
+    block = Block(None, empty_just, validator, 0, 0)
     validator.receive_messages(set([block]))
 
     with pytest.raises(TypeError):

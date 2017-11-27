@@ -60,7 +60,7 @@ class TestLangCBC(object):
         messages_needed = set()
 
         current_block_hashes = set()
-        for block_hash in block.justification.latest_messages.values():
+        for block_hash in block.justification.values():
             if block_hash not in validator.view.pending_messages and \
                block_hash not in validator.view.justified_messages:
                 current_block_hashes.add(block_hash)
@@ -72,7 +72,7 @@ class TestLangCBC(object):
                 block = self.network.global_view.justified_messages[block_hash]
                 messages_needed.add(block)
 
-                for other_hash in block.justification.latest_messages.values():
+                for other_hash in block.justification.values():
                     if other_hash not in validator.view.pending_messages and \
                        other_hash not in validator.view.justified_messages:
                         next_hashes.add(other_hash)
@@ -110,7 +110,7 @@ class TestLangCBC(object):
             self.network.propagate_message_to_validator(block, validator)
 
         assert block.hash not in validator.view.pending_messages
-        assert block.hash not in validator.view.missing_message_dependencies
+        assert block.hash not in validator.view.num_missing_dependencies
         assert self.blocks[block_name].hash in validator.view.justified_messages
 
     def send_only_block(self, validator, block_name):

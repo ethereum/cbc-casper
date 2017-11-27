@@ -70,7 +70,7 @@ class PlotTool(object):
         edge = []
         if edges == []:
             for message in nodes:
-                for msg_in_justification in message.justification.latest_messages.values():
+                for msg_in_justification in message.justification.values():
                     if msg_in_justification is not None:
                         edge.append((msg_in_justification, message))
 

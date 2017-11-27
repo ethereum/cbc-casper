@@ -69,17 +69,12 @@ def test_ignore_zero_weight_block(test_lang_runner):
     test_lang_runner(test_string, {0: 10, 1: 9, 2: 8, 3: 0.5})
 
 
-def test_reverse_message_arrival_order_forkchoice_four_val(test_lang_runner):
+def test_reverse_message_arrival_order_forkchoice(test_lang_runner):
     test_string = (
         "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D B1-E S0-E "
         "S2-E H2-E S3-A S3-B S3-C S3-D S3-E H3-E"
     )
     test_lang_runner(test_string, {0: 5, 1: 6, 2: 7, 3: 8.1})
-
-
-@pytest.mark.skip(reason="test not yet implemented")
-def test_different_message_arrival_order_forkchoice_many_val():
-    pass
 
 
 @pytest.mark.parametrize(
