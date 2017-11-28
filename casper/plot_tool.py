@@ -32,12 +32,10 @@ class PlotTool(object):
 
         self.report_number = 0
 
-
     def _create_graph_folder(self):
         graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
         # if there isn't a graph folder, make one!
         if not os.path.isdir(graph_path):
-            print("graphs directory not found; making one at: ", graph_path, sep="")
             os.makedirs(graph_path)
 
         # find the next name for the next plot!
@@ -83,7 +81,7 @@ class PlotTool(object):
         for message in nodes:
             # Index of val in list may have some small performance concerns.
             positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
-                                 (float)(len(validator_set) + 1), 0.2 + 0.1*message.display_height
+                                 (float)(len(validator_set) + 1), 0.2 + 0.1 * message.display_height
 
         node_color_map = {}
         for message in nodes:
@@ -92,9 +90,8 @@ class PlotTool(object):
             elif message_colors[message] == len(validator_set) - 1:
                 node_color_map[message] = "Black"
             else:
-                node_color_map[message] = COLOURS[int(len(COLOURS) * message_colors[message] / \
-                                          len(validator_set))]
-
+                node_color_map[message] = COLOURS[int(len(COLOURS) * message_colors[message] /
+                                                      len(validator_set))]
 
         color_values = [node_color_map.get(node) for node in nodes]
 
@@ -128,9 +125,8 @@ class PlotTool(object):
         ax.text(-0.05, 0.1, "Weights: ", fontsize=20)
 
         for validator in validator_set:
-            xpos = (float)(validator.name + 1)/(float)(len(validator_set) + 1) - 0.01
+            xpos = (float)(validator.name + 1) / (float)(len(validator_set) + 1) - 0.01
             ax.text(xpos, 0.1, (str)((int)(validator.weight)), fontsize=20)
-
 
     def next_viewgraph(
             self,
@@ -187,14 +183,12 @@ class PlotTool(object):
         for file_name in file_names:
             images.append(Image.open(self.graph_path + file_name))
 
-
         size = (xsize, ysize)
         iterator = 0
         for image in images:
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(self.thumbnail_path + str(1000 + iterator) + "thumbnail.png", "PNG")
             iterator += 1
-
 
     def make_gif(self, frame_count_limit=IMAGE_LIMIT, gif_name="mygif.gif", frame_duration=0.4):
         """Make a GIF visualization of view graph."""

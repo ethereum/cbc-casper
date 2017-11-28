@@ -1,5 +1,6 @@
 """The forkchoice module implements the estimator function a blockchain"""
 
+
 def get_estimate_from_latest_messages(latest_bets, default=None):
     """Picks the highest weight estimate (0 or 1) given some latest bets."""
 
