@@ -1,6 +1,6 @@
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.validator_set import ValidatorSet
 from simulations.utils import (
     generate_random_gaussian_validator_set,

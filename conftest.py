@@ -1,6 +1,6 @@
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.network import Network
 from casper.validator import Validator
 

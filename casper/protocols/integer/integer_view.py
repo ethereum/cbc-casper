@@ -3,8 +3,8 @@ import random as r
 
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.integer.bet import Bet
-import casper.integer.integer_estimator as estimator
+from casper.protocols.integer.bet import Bet
+import casper.protocols.integer.integer_estimator as estimator
 
 
 class IntegerView(AbstractView):

@@ -1,10 +1,10 @@
 """The block testing module ..."""
 import pytest
 
-from casper.integer.bet import Bet
+from casper.protocols.integer.bet import Bet
 from casper.validator_set import ValidatorSet
 from casper.justification import Justification
-import casper.integer.integer_estimator as estimator
+import casper.protocols.integer.integer_estimator as estimator
 
 
 @pytest.mark.parametrize(
