@@ -8,5 +8,10 @@ class BinaryView(IntegerView):
     def __init__(self, messages=None):
         super().__init__(messages)
 
-        self.minimum = 0
-        self.maximum = 1
+    @property
+    def minimum(self):
+        return 0
+
+    @property
+    def maximum(self):
+        return 1

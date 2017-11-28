@@ -13,8 +13,14 @@ class IntegerView(AbstractView):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
-        self.minimum = 0
-        self.maximum = 100
+
+    @property
+    def minimum(self):
+        return 0
+
+    @property
+    def maximum(self):
+        return 100
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
