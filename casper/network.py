@@ -6,10 +6,8 @@ class Network(object):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set
-        if protocol == BlockchainProtocol:
-            self.global_view = protocol.View(set(), self.validator_set.genesis_block)
-        else:
-            self.global_view = protocol.View(set())
+        initial_message = protocol.initial_message(None)
+        self.global_view = protocol.View(set(), initial_message)
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
@@ -26,6 +24,7 @@ class Network(object):
 
         new_message = validator.make_new_message()
         self.global_view.add_messages(set([new_message]))
+        assert new_message.hash in self.global_view.justified_messages
 
         return new_message
 

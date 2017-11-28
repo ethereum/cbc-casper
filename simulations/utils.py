@@ -96,9 +96,7 @@ def generate_random_gaussian_validator_set(
         for i in names
     }
 
-    genesis_block = create_genesis_block()
-
-    return ValidatorSet(weights, protocol, genesis_block)
+    return ValidatorSet(weights, protocol)
 
 
 def validator_generator(config, protocol):
@@ -125,13 +123,3 @@ def validator_generator(config, protocol):
             return ValidatorSet(jitter_weights, protocol)
 
         return weights_generator
-
-def create_genesis_block():
-    genesis_block = BlockchainProtocol.Message(
-        None,
-        dict(),
-        None,
-        0,
-        -1
-    )
-    return genesis_block

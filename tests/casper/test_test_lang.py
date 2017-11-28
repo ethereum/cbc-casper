@@ -45,7 +45,6 @@ def test_init_validators_create_blocks():
     for validator in test_lang.network.validator_set:
         assert len(validator.view.justified_messages) == 1
         assert len(validator.view.latest_messages) == 1
-        assert validator.view.latest_messages[validator].estimate is test_lang.validator_set.genesis_block
 
 
 @pytest.mark.parametrize(

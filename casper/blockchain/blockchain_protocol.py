@@ -7,3 +7,9 @@ class BlockchainProtocol(Protocol):
     View = BlockchainView
     Message = Block
     PlotTool = BlockchainPlotTool
+
+    genesis_block = Block(None, dict(), None, 0, -1)
+
+    @staticmethod
+    def initial_message(validator):
+        return BlockchainProtocol.genesis_block
