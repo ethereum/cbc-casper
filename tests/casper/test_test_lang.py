@@ -37,14 +37,13 @@ def test_init_creates_network():
     assert isinstance(test_lang.network, Network)
 
 
-def test_init_validators_create_blocks():
+def test_init_validators_have_no_blocks():
     test_lang = TestLangCBC(TEST_WEIGHT)
 
-    assert len(test_lang.network.global_view.justified_messages) == len(TEST_WEIGHT)
+    assert len(test_lang.network.global_view.justified_messages) == 0
 
     for validator in test_lang.network.validator_set:
-        assert len(validator.view.justified_messages) == 1
-        assert len(validator.view.latest_messages) == 1
+        assert len(validator.view.justified_messages) == 0
 
 
 @pytest.mark.parametrize(
@@ -158,21 +157,20 @@ def test_parse_only_valid_val_and_blocks_split_strings(test_strings, val_weights
         test_lang.parse(test_string)
 
 
-# NOTE: network.global_view.messages starts with 5 messages from random_initialization
 @pytest.mark.parametrize(
     'test_string, num_blocks, exception',
     [
-        ('B0-A', 6, ''),
-        ('B0-A S1-A', 6, ''),
-        ('B0-A S1-A U1-A B1-B', 7, ''),
-        ('B0-A S1-A H1-A B1-B', 7, ''),
-        ('B0-A RR0-B RR0-C C0-A B0-D', 17, ''),
-        ('B0-A B1-B B2-C B3-D B4-E', 10, ''),
-        ('B0-A S1-A S2-A S3-A S4-A', 6, ''),
-        ('RR0-A RR0-B', 15, ''),
-        ('B0-A B1-A', 6, 'already exists'),
-        ('B0-A S1-A S2-A S3-A S4-A B4-B B4-A', 6, 'already exists'),
-        ('RR0-A RR0-A', 15, 'already exists'),
+        ('B0-A', 1, ''),
+        ('B0-A S1-A', 1, ''),
+        ('B0-A S1-A U1-A B1-B', 2, ''),
+        ('B0-A S1-A H1-A B1-B', 2, ''),
+        ('B0-A RR0-B RR0-C C0-A B0-D', 12, ''),
+        ('B0-A B1-B B2-C B3-D B4-E', 5, ''),
+        ('B0-A S1-A S2-A S3-A S4-A', 1, ''),
+        ('RR0-A RR0-B', 10, ''),
+        ('B0-A B1-A', 1, 'already exists'),
+        ('B0-A S1-A S2-A S3-A S4-A B4-B B4-A', 1, 'already exists'),
+        ('RR0-A RR0-A', 10, 'already exists'),
     ]
 )
 def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, exception):
@@ -192,16 +190,16 @@ def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, 
 @pytest.mark.parametrize(
     'test_string, block_justification',
     [
-        ('B0-A', {'A': {0: None}}),
-        ('B0-A S1-A B1-B', {'B': {0: 'A', 1: None}}),
-        ('RR0-A', {'A': {i: None for i in range(5)}}),
+        ('B0-A', {'A': {}}),
+        ('B0-A S1-A B1-B', {'B': {0: 'A'}}),
+        ('RR0-A', {'A': {i: None for i in range(1, 5)}}),
         (
             'RR0-A B0-B S1-B B1-C',
             {'C': {0: 'B', 1: None, 2: None, 3: None, 4: None}}
         ),
         (
             'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
-            {'E': {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: None}}
+            {'E': {0: 'A', 1: 'B', 2: 'C', 3: 'D'}}
         ),
         (
             'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E S0-E B0-F',
@@ -252,17 +250,17 @@ def test_send_block_sends_only_existing_blocks(test_string, exception):
     [
         (
             'B0-A S1-A',
-            {0: 2, 1: 3},
+            {0: 1, 1: 1},
             {0: ['A'], 1: ['A']}
         ),
         (
             'B0-A S1-A S2-A S3-A S4-A',
-            {0: 2, 1: 3, 2: 3, 3: 3, 4: 3},
+            {0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
             {i: ['A'] for i in range(5)}
         ),
         (
             'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
-            {0: 2, 1: 4, 2: 6, 3: 8, 4: 10},
+            {0: 1, 1: 2, 2: 3, 3: 4, 4: 5},
             {
                 0: ['A'],
                 1: ['A', 'B'],
@@ -273,7 +271,7 @@ def test_send_block_sends_only_existing_blocks(test_string, exception):
         ),
         (
             'B0-A B0-B B0-C B0-D B0-E',
-            {0: 6, 1: 1, 2: 1, 3: 1, 4: 1},
+            {0: 5, 1: 0, 2: 0, 3: 0, 4: 0},
             {0: ['A', 'B', 'C', 'D', 'E'], 1: [], 2: [], 3: [], 4: []}
         ),
     ]
@@ -294,7 +292,7 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
     [
         (
             'RR0-A',
-            {0: 10, 1: 4, 2: 6, 3: 8, 4: 10},
+            {0: 5, 1: 2, 2: 3, 3: 4, 4: 5},
             {
                 0: [0, 1, 2, 3, 4],
                 1: [0, 1],
@@ -305,12 +303,12 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
         ),
         (
             'RR0-A RR0-B',
-            {0: 15, 1: 12, 2: 13, 3: 14, 4: 15},
+            {0: 10, 1: 7, 2: 8, 3: 9, 4: 10},
             {i: list(range(5)) for i in range(5)}
         ),
         (
             'B0-A S1-A B1-B RR1-C',
-            {0: 12, 1: 12, 2: 7, 3: 9, 4: 11},
+            {0: 7, 1: 7, 2: 4, 3: 5, 4: 6},
             {
                 0: [0, 1, 2, 3, 4],
                 1: [0, 1, 2, 3, 4],
@@ -321,7 +319,7 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
         ),
         (
             'RR0-A B0-B S1-B RR1-C',
-            {0: 16, 1: 16, 2: 13, 3: 14, 4: 15},
+            {0: 11, 1: 11, 2: 8, 3: 9, 4: 10},
             {i: list(range(5)) for i in range(5)}
         ),
     ]

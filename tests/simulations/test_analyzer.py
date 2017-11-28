@@ -30,7 +30,7 @@ def test_num_messages(validator_set, mode, messages_generated_per_round):
     analyzer = Analyzer(simulation_runner)
 
     # due to random_initialization
-    assert analyzer.num_messages() == len(validator_set)
+    assert analyzer.num_messages() == 0
 
     for i in range(10):
         simulation_runner.step()

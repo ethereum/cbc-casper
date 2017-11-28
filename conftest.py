@@ -56,5 +56,4 @@ def validator():
 @pytest.fixture
 def network(validator_set):
     network = Network(validator_set)
-    network.random_initialization()
     return network

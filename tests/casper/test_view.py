@@ -158,10 +158,10 @@ def test_multiple_messages_arriving_resolve():
 
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    assert len(validator_1.view.justified_messages) == 3
+    assert len(validator_1.view.justified_messages) == 1
     assert len(validator_1.view.pending_messages) == 1
     assert test_lang.blocks['F'] in validator_1.view.pending_messages.values()
 
     validator_1.receive_messages(test_lang.network.global_view.justified_messages.values())
 
-    assert len(validator_1.view.justified_messages) == 8
+    assert len(validator_1.view.justified_messages) == 6

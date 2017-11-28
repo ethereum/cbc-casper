@@ -107,7 +107,11 @@ def test_simulation_runner_send_messages(
         False
     )
 
-    assert len(simulation_runner.network.global_view.justified_messages) == len(validator_set)
+    if protocol == BlockchainProtocol:
+        assert len(simulation_runner.network.global_view.justified_messages) == 0
+    if protocol == BinaryProtocol:
+        assert len(simulation_runner.network.global_view.justified_messages) == len(validator_set)
+
 
     for i in range(10):
         simulation_runner.step()

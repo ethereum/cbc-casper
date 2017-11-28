@@ -7,7 +7,8 @@ class Network(object):
     def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set
         initial_message = protocol.initial_message(None)
-        self.global_view = protocol.View(set(), initial_message)
+        val_initial_messages = self.collect_initial_messages()
+        self.global_view = protocol.View(val_initial_messages, initial_message)
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
@@ -37,7 +38,10 @@ class Network(object):
         for validator in self.validator_set:
             validator.receive_messages(messages)
 
-    def random_initialization(self):
-        """Generates starting messages for all validators with None as an estimate."""
+    def collect_initial_messages(self):
+        initial_messages = set()
+
         for validator in self.validator_set:
-            self.get_message_from_validator(validator)
+            initial_messages.update(validator.view.justified_messages.values())
+
+        return initial_messages

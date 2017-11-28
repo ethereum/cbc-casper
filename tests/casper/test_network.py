@@ -12,13 +12,6 @@ def test_new_network(validator_set):
     assert not any(network.global_view.justified_messages)
 
 
-def test_random_initialization(validator_set):
-    network = Network(validator_set)
-
-    assert not any(network.global_view.justified_messages)
-    network.random_initialization()
-    assert len(network.global_view.justified_messages) == len(validator_set)
-
 
 def test_get_message_from_validator(network):
     validator = r.sample(network.validator_set.validators, 1)[0]
@@ -36,15 +29,15 @@ def test_propagate_message_to_validator(network):
     message = network.get_message_from_validator(from_validator)
     network.propagate_message_to_validator(message, to_validator)
 
-    assert message in to_validator.view.pending_messages.values()
+    assert message in to_validator.view.justified_messages.values()
 
 
 @pytest.mark.parametrize(
     'test_string, num_messages',
     [
-        ('RR0-A RR0-B', 9),
-        ('B0-A S1-A B1-B S2-B', 5),
-        ('B0-A S1-A RR1-B', 7),
+        ('RR0-A RR0-B', 6),
+        ('B0-A S1-A B1-B S2-B', 2),
+        ('B0-A S1-A RR1-B', 4),
     ]
 )
 def test_view_initialization(test_string, num_messages, validator_set):
