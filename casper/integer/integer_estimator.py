@@ -1,5 +1,4 @@
-"""The forkchoice module implements the estimator function a blockchain"""
-import random as r
+"""The integer estimator module implements the estimator function integer consensus"""
 
 
 def get_estimate_from_latest_messages(latest_bets):
@@ -7,6 +6,8 @@ def get_estimate_from_latest_messages(latest_bets):
 
     sorted_estimates = sorted(set(latest_bets[v].estimate for v in latest_bets))
     half_seen_weight = sum(v.weight for v in latest_bets) / 2
+
+    assert sum(v.weight for v in latest_bets) > 0
 
     total_estimate_weight = 0
     for _, estimate in enumerate(sorted_estimates):
@@ -18,6 +19,3 @@ def get_estimate_from_latest_messages(latest_bets):
         total_estimate_weight += estimate_weight
         if total_estimate_weight >= half_seen_weight:
             return estimate
-
-    assert sum(v.weight for v in latest_bets) == 0
-    return r.randint(0, 100)

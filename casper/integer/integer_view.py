@@ -1,8 +1,11 @@
 """The blockchain view module extends a view for blockchain data structures """
+import random as r
+
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 from casper.integer.bet import Bet
 import casper.integer.integer_estimator as estimator
+
 
 class IntegerView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
@@ -10,6 +13,8 @@ class IntegerView(AbstractView):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
+        self.minimum = 0
+        self.maximum = 100
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -42,7 +47,10 @@ class IntegerView(AbstractView):
     def make_new_message(self, validator):
         """Make a new bet!"""
         justification = self.justification()
-        estimate = self.estimate()
+        if any(self.messages):
+            estimate = self.estimate()
+        else:
+            estimate = r.randint(self.minimum, self.maximum)
 
         new_message = Bet(estimate, justification, validator)
         self.add_messages(set([new_message]))
