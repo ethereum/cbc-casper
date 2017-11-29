@@ -1,5 +1,4 @@
 def get_estimate_from_latest_messages(latest_bets):
-    """Picks the highest weight estimate (0 or 1) given some latest bets."""
     sample_list = list(latest_bets.values())[0].estimate
     elem_weights = {elem: 0 for elem in sample_list}
     for validator in latest_bets:
