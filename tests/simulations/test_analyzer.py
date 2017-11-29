@@ -34,7 +34,7 @@ def test_num_messages(validator_set, mode, messages_generated_per_round):
 
     for i in range(10):
         simulation_runner.step()
-        assert analyzer.num_messages() == \
+        assert analyzer.num_messages() <= \
             len(validator_set) + (i + 1) * messages_generated_per_round
 
 

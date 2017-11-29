@@ -4,6 +4,9 @@ import pytest
 
 from casper.blockchain.block import Block
 from casper.validator import Validator
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.binary.binary_protocol import BinaryProtocol
+
 
 EMPTY_JUST = dict()
 
@@ -30,10 +33,9 @@ def test_new_validator(name, weight, error):
     assert validator.weight == weight
 
 
-def test_check_estimate_safety_without_validator_set():
-    validator = Validator("cool", 10.2)
-    block = Block(None, EMPTY_JUST, validator, 0, 0)
-    validator.receive_messages(set([block]))
+def test_validator_created_with_genesis():
+    validator = Validator(0, 1, BlockchainProtocol)
+    assert validator.view.last_finalized_block is not None
 
-    with pytest.raises(TypeError):
-        validator.update_safe_estimates()
+    validator = Validator(0, 1, BinaryProtocol)
+    assert validator.my_latest_message() is not None
