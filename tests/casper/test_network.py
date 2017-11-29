@@ -52,4 +52,6 @@ def test_view_initialization(test_string, num_messages, validator_set):
     network.view_initialization(test_lang.network.global_view)
 
     for validator in validator_set:
-        assert len(validator.view.justified_messages) + len(validator.view.pending_messages) == num_messages
+        view = validator.view
+        total_messages = len(view.justified_messages) + len(view.pending_messages)
+        assert total_messages == num_messages

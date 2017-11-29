@@ -5,9 +5,6 @@ import pytest
 from casper.network import Network
 from simulations.testing_language import TestLangCBC
 
-TEST_STRING = 'B0-A'
-TEST_WEIGHT = {i: 5 - i for i in range(5)}
-
 
 def test_init():
     TestLangCBC({0: 1})
@@ -31,8 +28,8 @@ def test_initialize_validator_set(weights, num_val, total_weight):
     assert validator_set.weight() == total_weight
 
 
-def test_init_creates_network():
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_init_creates_network(test_weight):
+    test_lang = TestLangCBC(test_weight)
 
     assert isinstance(test_lang.network, Network)
 
@@ -65,8 +62,8 @@ def test_init_validators_have_no_blocks():
         ('A0-A S1-A', KeyError),
     ]
 )
-def test_parse_only_valid_tokens(test_string, error):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_parse_only_valid_tokens(test_string, test_weight, error):
+    test_lang = TestLangCBC(test_weight)
 
     if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
@@ -86,8 +83,8 @@ def test_parse_only_valid_tokens(test_string, error):
         (['B1-A', 'RR0-AB1-A'], ValueError),
     ]
 )
-def test_parse_only_valid_tokens_split_strings(test_strings, error):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_parse_only_valid_tokens_split_strings(test_strings, test_weight, error):
+    test_lang = TestLangCBC(test_weight)
 
     if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
@@ -102,22 +99,22 @@ def test_parse_only_valid_tokens_split_strings(test_strings, error):
 @pytest.mark.parametrize(
     'test_string, val_weights, exception',
     [
-        ('B0-A B1-B B2-C B3-D B4-E', TEST_WEIGHT, ''),
-        ('B0-A S1-A S2-A S3-A S4-A', TEST_WEIGHT, ''),
+        ('B0-A B1-B B2-C B3-D B4-E', {i: 5 - i for i in range(5)}, ''),
+        ('B0-A S1-A S2-A S3-A S4-A', {i: 5 - i for i in range(5)}, ''),
         ('B0-A S1-A U1-A', {0: 1, 1: 2}, ''),
         ('B0-A S1-A H1-A', {0: 2, 1: 1}, ''),
         ('RR0-A RR0-B C0-A', {0: 2, 1: 1}, ''),
-        ('B5-A', TEST_WEIGHT, 'Validator'),
+        ('B5-A', {i: 5 - i for i in range(5)}, 'Validator'),
         ('B0-A S1-A', {0: 1}, 'Validator'),
         ('B0-A S1-A S2-A S3-A S4-A', {0: 0}, 'Validator'),
-        ('B4-A S5-A', TEST_WEIGHT, 'Validator'),
+        ('B4-A S5-A', {i: 5 - i for i in range(5)}, 'Validator'),
         ('B0-A S1-A U2-A', {0: 1, 1: 2}, 'Validator'),
         ('B0-A S1-A H2-A', {0: 2, 1: 1}, 'Validator'),
         ('RR0-A RR0-B C2-A', {0: 2, 1: 1}, 'Validator'),
-        ('B0-A S1-B', TEST_WEIGHT, 'Block'),
-        ('B0-A S1-A U1-B', TEST_WEIGHT, 'Block'),
-        ('B0-A S1-A H1-B', TEST_WEIGHT, 'Block'),
-        ('B0-A RR0-B RR0-C C0-D', TEST_WEIGHT, 'Block'),
+        ('B0-A S1-B', {i: 5 - i for i in range(5)}, 'Block'),
+        ('B0-A S1-A U1-B', {i: 5 - i for i in range(5)}, 'Block'),
+        ('B0-A S1-A H1-B', {i: 5 - i for i in range(5)}, 'Block'),
+        ('B0-A RR0-B RR0-C C0-D', {i: 5 - i for i in range(5)}, 'Block'),
     ]
 )
 def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
@@ -134,14 +131,14 @@ def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
 @pytest.mark.parametrize(
     'test_strings, val_weights, exception',
     [
-        (['B0-A B1-B', 'B2-C B3-D B4-E'], TEST_WEIGHT, ''),
-        (['B0-A', 'S1-A S2-A S3-A S4-A'], TEST_WEIGHT, ''),
+        (['B0-A B1-B', 'B2-C B3-D B4-E'], {i: 5 - i for i in range(5)}, ''),
+        (['B0-A', 'S1-A S2-A S3-A S4-A'], {i: 5 - i for i in range(5)}, ''),
         (['B0-A S1-A', 'U1-A'], {0: 1, 1: 2}, ''),
         (['B0-A', 'S1-A', 'S2-A', 'S3-A', 'S4-A'], {0: 0}, 'Validator'),
-        (['B4-A', 'S5-A'], TEST_WEIGHT, 'Validator'),
+        (['B4-A', 'S5-A'], {i: 5 - i for i in range(5)}, 'Validator'),
         (['RR0-A', 'RR0-B', 'C2-A'], {0: 2, 1: 1}, 'Validator'),
-        (['B0-A', 'S1-A', 'U1-B'], TEST_WEIGHT, 'Block'),
-        (['B0-A', 'RR0-B', 'RR0-C', 'C0-D'], TEST_WEIGHT, 'Block'),
+        (['B0-A', 'S1-A', 'U1-B'], {i: 5 - i for i in range(5)}, 'Block'),
+        (['B0-A', 'RR0-B', 'RR0-C', 'C0-D'], {i: 5 - i for i in range(5)}, 'Block'),
     ]
 )
 def test_parse_only_valid_val_and_blocks_split_strings(test_strings, val_weights, exception):
@@ -173,8 +170,13 @@ def test_parse_only_valid_val_and_blocks_split_strings(test_strings, val_weights
         ('RR0-A RR0-A', 10, 'already exists'),
     ]
 )
-def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, exception):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_make_blocks_makes_new_blocks_adds_global_view(
+        test_string,
+        test_weight,
+        num_blocks,
+        exception
+        ):
+    test_lang = TestLangCBC(test_weight)
 
     if exception:
         with pytest.raises(Exception, match=exception):
@@ -207,9 +209,10 @@ def test_make_blocks_makes_new_blocks_adds_global_view(test_string, num_blocks, 
         ),
     ]
 )
-def test_make_block_builds_on_entire_view(test_string, block_justification):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_make_block_builds_on_entire_view(test_string, block_justification, test_weight):
+    test_lang = TestLangCBC(test_weight)
     test_lang.parse(test_string)
+    global_view = test_lang.network.global_view
 
     for b in block_justification:
         block = test_lang.blocks[b]
@@ -220,7 +223,7 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
 
             if block_in_justification:
                 message_hash = block.justification[validator]
-                justification_message = test_lang.network.global_view.justified_messages[message_hash]
+                justification_message = global_view.justified_messages[message_hash]
                 assert test_lang.blocks[block_in_justification] == justification_message
 
 
@@ -234,8 +237,8 @@ def test_make_block_builds_on_entire_view(test_string, block_justification):
         ('RR0-A RR0-B S0-A', 'has already seen block'),
     ]
 )
-def test_send_block_sends_only_existing_blocks(test_string, exception):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_send_block_sends_only_existing_blocks(test_string, test_weight, exception):
+    test_lang = TestLangCBC(test_weight)
 
     if exception:
         with pytest.raises(Exception, match=exception):
@@ -276,8 +279,13 @@ def test_send_block_sends_only_existing_blocks(test_string, exception):
         ),
     ]
 )
-def test_send_block_updates_val_view(test_string, num_messages_per_view, message_keys):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_send_block_updates_val_view(
+        test_string,
+        test_weight,
+        num_messages_per_view,
+        message_keys
+        ):
+    test_lang = TestLangCBC(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in num_messages_per_view:
@@ -324,8 +332,13 @@ def test_send_block_updates_val_view(test_string, num_messages_per_view, message
         ),
     ]
 )
-def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_val_seen):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_round_robin_updates_val_view(
+        test_string,
+        num_messages_per_view,
+        other_val_seen,
+        test_weight
+        ):
+    test_lang = TestLangCBC(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in num_messages_per_view:
@@ -352,8 +365,8 @@ def test_round_robin_updates_val_view(test_string, num_messages_per_view, other_
         ),
     ]
 )
-def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_head_equals_block_checks_forkchoice(test_string, test_weight, val_forkchoice):
+    test_lang = TestLangCBC(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in val_forkchoice:
@@ -369,17 +382,17 @@ def test_head_equals_block_checks_forkchoice(test_string, val_forkchoice):
         ('RR0-A RR0-B RR0-C RR0-D RR0-E RR0-F U0-A', 'failed no-safety assert'),
     ]
 )
-def test_no_safety(test_string, error):
+def test_no_safety(test_string, test_weight, error):
     if test_string == 'NOFINAL':
         test_string = ''
         for i in range(100):
-            test_string += 'B' + str(i % len(TEST_WEIGHT)) + '-' + str(i) + ' ' + \
-                'B' + str((i + 1) % len(TEST_WEIGHT)) + '-' + str(100 + i) + ' ' + \
-                'S' + str((i + 2) % len(TEST_WEIGHT)) + '-' + str(100 + i) + ' ' +\
-                'S' + str((i + 1) % len(TEST_WEIGHT)) + '-' + str(i) + ' '
+            test_string += 'B' + str(i % len(test_weight)) + '-' + str(i) + ' ' + \
+                'B' + str((i + 1) % len(test_weight)) + '-' + str(100 + i) + ' ' + \
+                'S' + str((i + 2) % len(test_weight)) + '-' + str(100 + i) + ' ' +\
+                'S' + str((i + 1) % len(test_weight)) + '-' + str(i) + ' '
         test_string += 'U0-0'
 
-    test_lang = TestLangCBC(TEST_WEIGHT)
+    test_lang = TestLangCBC(test_weight)
 
     if error:
         with pytest.raises(Exception, match=error):

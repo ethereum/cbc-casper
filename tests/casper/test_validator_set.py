@@ -123,7 +123,6 @@ def test_get_validator_by_name(weights):
         assert validator == returned_val
 
 
-
 @pytest.mark.parametrize(
     'weights',
     [

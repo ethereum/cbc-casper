@@ -8,7 +8,6 @@ from casper.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.binary.binary_protocol import BinaryProtocol
 
 
-EMPTY_JUST = dict()
 
 @pytest.mark.parametrize(
     'name, weight, error',
