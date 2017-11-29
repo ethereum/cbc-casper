@@ -9,18 +9,15 @@ import casper.protocols.integer.integer_estimator as estimator
 
 class IntegerView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
-    def __init__(self, messages=None):
+    def __init__(self, messages=None, minimum=0, maximum=100):
         super().__init__(messages)
 
+        if maximum < minimum:
+            raise ValueError("maxium must be greater than or equal to minimum.")
+
         self.last_finalized_estimate = None
-
-    @property
-    def minimum(self):
-        return 0
-
-    @property
-    def maximum(self):
-        return 100
+        self.minimum = minimum
+        self.maximum = maximum
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
