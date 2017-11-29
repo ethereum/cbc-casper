@@ -34,8 +34,8 @@ def test_init_creates_network(test_weight):
     assert isinstance(test_lang.network, Network)
 
 
-def test_init_validators_have_no_blocks():
-    test_lang = TestLangCBC(TEST_WEIGHT)
+def test_init_validators_have_no_blocks(test_weight):
+    test_lang = TestLangCBC(test_weight)
 
     assert len(test_lang.network.global_view.justified_messages) == 0
 
