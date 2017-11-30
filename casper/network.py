@@ -7,7 +7,7 @@ class Network(object):
     def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set
         initial_message = protocol.initial_message(None)
-        val_initial_messages = self.collect_initial_messages()
+        val_initial_messages = self._collect_initial_messages()
         self.global_view = protocol.View(val_initial_messages, initial_message)
 
     def propagate_message_to_validator(self, message, validator):
@@ -38,7 +38,7 @@ class Network(object):
         for validator in self.validator_set:
             validator.receive_messages(messages)
 
-    def collect_initial_messages(self):
+    def _collect_initial_messages(self):
         initial_messages = set()
 
         for validator in self.validator_set:

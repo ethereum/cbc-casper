@@ -65,7 +65,7 @@ class SimulationRunner:
                 message = last_message
             else:
                 message = self.network.get_message_from_validator(sender)
-                
+
             self.network.propagate_message_to_validator(message, receiver)
             sent_messages[sender] = message
 

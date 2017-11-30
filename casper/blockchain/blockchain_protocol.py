@@ -3,13 +3,16 @@ from casper.blockchain.block import Block
 from casper.blockchain.blockchain_plot_tool import BlockchainPlotTool
 from casper.protocol import Protocol
 
+
 class BlockchainProtocol(Protocol):
     View = BlockchainView
     Message = Block
     PlotTool = BlockchainPlotTool
 
-    genesis_block = Block(None, dict(), None, 0, -1)
+    genesis_block = None
 
-    @staticmethod
-    def initial_message(validator):
-        return BlockchainProtocol.genesis_block
+    @classmethod
+    def initial_message(cls, validator):
+        if not cls.genesis_block:
+            cls.genesis_block = Block(None, dict(), validator, -1, 0)
+        return cls.genesis_block

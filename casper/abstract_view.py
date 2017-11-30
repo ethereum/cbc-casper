@@ -1,4 +1,4 @@
-"""The view module ... """
+"""The parent view module that specific protocol views inherit from"""
 
 
 class AbstractView(object):
@@ -17,7 +17,6 @@ class AbstractView(object):
         self.latest_messages = dict()               # validator => message
 
         self.add_messages(messages)
-
 
     def estimate(self):
         '''Must be defined in child class.

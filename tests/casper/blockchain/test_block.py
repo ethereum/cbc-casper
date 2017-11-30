@@ -14,11 +14,8 @@ def test_equality_of_copies_off_genesis(validator, empty_just):
     block = Block(None, empty_just, validator, 0, 0)
 
     shallow_copy = copy.copy(block)
-    deep_copy = copy.deepcopy(block)
 
     assert block == shallow_copy
-    assert block == deep_copy
-    assert shallow_copy == deep_copy
 
 
 def test_equality_of_copies_of_non_genesis(report):

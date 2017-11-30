@@ -32,7 +32,6 @@ class PlotTool(object):
 
         self.report_number = 0
 
-
     def _create_graph_folder(self):
         graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
         # if there isn't a graph folder, make one!
@@ -81,8 +80,15 @@ class PlotTool(object):
         sorted_validators = validator_set.sorted_by_name()
         for message in nodes:
             # Index of val in list may have some small performance concerns.
-            positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
-                                 (float)(len(validator_set) + 1), 0.2 + 0.1*message.display_height
+            if message.estimate is not None:
+                xslot = sorted_validators.index(message.sender) + 1
+            else:
+                xslot = (len(validator_set) + 1) / 2.0
+
+            positions[message] = (
+                (float)(xslot) / (float)(len(validator_set) + 1),
+                0.2 + 0.1*message.display_height
+            )
 
         node_color_map = {}
         for message in nodes:
