@@ -1,5 +1,5 @@
 """The binary view module extends a view for binary data structures """
-from casper.protocols.binary.bet import Bet
+from casper.protocols.binary.bet import Bet  # NOQA
 from casper.protocols.integer.integer_view import IntegerView
 
 
