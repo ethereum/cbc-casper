@@ -1,8 +1,8 @@
 import sys
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.binary.binary_protocol import BinaryProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.binary.binary_protocol import BinaryProtocol
 
 from casper.network import Network
 from simulations.simulation_runner import SimulationRunner

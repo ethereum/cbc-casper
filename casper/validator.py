@@ -1,6 +1,6 @@
 """The validator module contains the Validator class, which creates/sends/recieves messages """
 import numbers
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""

@@ -1,9 +1,9 @@
-"""The Bet module implements the message data structure for binary consensus"""
+"""The Bet module implements the message data structure for integer consensus"""
 from casper.message import Message
 
 
 class Bet(Message):
-    """Message data structure for blockchain consensus"""
+    """Message data structure for integer consensus"""
 
     def __init__(self, estimate, justification, sender):
         # Do some type checking for safety!
