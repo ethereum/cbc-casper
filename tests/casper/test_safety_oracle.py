@@ -1,5 +1,6 @@
 """The safety oracle testing module ... """
 
+
 def test_round_robin_safety(test_lang_runner):
     test_string = (
         'R B0-A S1-A RR1-B RR1-C RR1-D RR1-E S2-E '

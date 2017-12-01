@@ -2,6 +2,7 @@
 import numbers
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
+
 class Validator(object):
     """A validator has a view from which it generates new messages and detects finalized blocks."""
     def __init__(self, name, weight, protocol=BlockchainProtocol, validator_set=None):

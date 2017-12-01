@@ -20,6 +20,7 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
+            flake8 --ignore E501 casper/ casper.py
             pytest
       - store_artifacts:
           path: test-reports/
