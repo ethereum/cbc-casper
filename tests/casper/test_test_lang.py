@@ -1,9 +1,9 @@
 """The language testing module ... """
-
 import pytest
 
 from casper.network import Network
 from simulations.testing_language import TestLangCBC
+from casper.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 def test_init():
@@ -34,13 +34,13 @@ def test_init_creates_network(test_weight):
     assert isinstance(test_lang.network, Network)
 
 
-def test_init_validators_have_no_blocks(test_weight):
+def test_init_validators_have_only_genesis(test_weight):
     test_lang = TestLangCBC(test_weight)
 
-    assert len(test_lang.network.global_view.justified_messages) == 0
+    assert len(test_lang.network.global_view.justified_messages) == 1
 
     for validator in test_lang.network.validator_set:
-        assert len(validator.view.justified_messages) == 0
+        assert len(validator.view.justified_messages) == 1
 
 
 @pytest.mark.parametrize(
@@ -157,17 +157,17 @@ def test_parse_only_valid_val_and_blocks_split_strings(test_strings, val_weights
 @pytest.mark.parametrize(
     'test_string, num_blocks, exception',
     [
-        ('B0-A', 1, ''),
-        ('B0-A S1-A', 1, ''),
-        ('B0-A S1-A U1-A B1-B', 2, ''),
-        ('B0-A S1-A H1-A B1-B', 2, ''),
-        ('B0-A RR0-B RR0-C C0-A B0-D', 12, ''),
-        ('B0-A B1-B B2-C B3-D B4-E', 5, ''),
-        ('B0-A S1-A S2-A S3-A S4-A', 1, ''),
-        ('RR0-A RR0-B', 10, ''),
-        ('B0-A B1-A', 1, 'already exists'),
-        ('B0-A S1-A S2-A S3-A S4-A B4-B B4-A', 1, 'already exists'),
-        ('RR0-A RR0-A', 10, 'already exists'),
+        ('B0-A', 2, ''),
+        ('B0-A S1-A', 2, ''),
+        ('B0-A S1-A U1-A B1-B', 3, ''),
+        ('B0-A S1-A H1-A B1-B', 3, ''),
+        ('B0-A RR0-B RR0-C C0-A B0-D', 13, ''),
+        ('B0-A B1-B B2-C B3-D B4-E', 6, ''),
+        ('B0-A S1-A S2-A S3-A S4-A', 2, ''),
+        ('RR0-A RR0-B', 11, ''),
+        ('B0-A B1-A', None, 'already exists'),
+        ('B0-A S1-A S2-A S3-A S4-A B4-B B4-A', None, 'already exists'),
+        ('RR0-A RR0-A', None, 'already exists'),
     ]
 )
 def test_make_blocks_makes_new_blocks_adds_global_view(
@@ -192,7 +192,7 @@ def test_make_blocks_makes_new_blocks_adds_global_view(
 @pytest.mark.parametrize(
     'test_string, block_justification',
     [
-        ('B0-A', {'A': {}}),
+        ('B0-A', {'A': {0: "GEN"}}),
         ('B0-A S1-A B1-B', {'B': {0: 'A'}}),
         ('RR0-A', {'A': {i: None for i in range(1, 5)}}),
         (
@@ -216,7 +216,7 @@ def test_make_block_builds_on_entire_view(test_string, block_justification, test
 
     for b in block_justification:
         block = test_lang.blocks[b]
-        assert len(block.justification) == len(block_justification[b].keys())
+        assert len(block.justification) == len(block_justification[b])
         for validator_name in block_justification[b]:
             block_in_justification = block_justification[b][validator_name]
             validator = test_lang.validator_set.get_validator_by_name(validator_name)
@@ -224,7 +224,11 @@ def test_make_block_builds_on_entire_view(test_string, block_justification, test
             if block_in_justification:
                 message_hash = block.justification[validator]
                 justification_message = global_view.justified_messages[message_hash]
-                assert test_lang.blocks[block_in_justification] == justification_message
+
+                if block_in_justification == "GEN":
+                    assert global_view.genesis_block == justification_message
+                else:
+                    assert test_lang.blocks[block_in_justification] == justification_message
 
 
 @pytest.mark.parametrize(
@@ -253,17 +257,17 @@ def test_send_block_sends_only_existing_blocks(test_string, test_weight, excepti
     [
         (
             'B0-A S1-A',
-            {0: 1, 1: 1},
+            {0: 2, 1: 2},
             {0: ['A'], 1: ['A']}
         ),
         (
             'B0-A S1-A S2-A S3-A S4-A',
-            {0: 1, 1: 1, 2: 1, 3: 1, 4: 1},
+            {0: 2, 1: 2, 2: 2, 3: 2, 4: 2},
             {i: ['A'] for i in range(5)}
         ),
         (
             'B0-A S1-A B1-B S2-B B2-C S3-C B3-D S4-D B4-E',
-            {0: 1, 1: 2, 2: 3, 3: 4, 4: 5},
+            {0: 2, 1: 3, 2: 4, 3: 5, 4: 6},
             {
                 0: ['A'],
                 1: ['A', 'B'],
@@ -274,7 +278,7 @@ def test_send_block_sends_only_existing_blocks(test_string, test_weight, excepti
         ),
         (
             'B0-A B0-B B0-C B0-D B0-E',
-            {0: 5, 1: 0, 2: 0, 3: 0, 4: 0},
+            {0: 6, 1: 1, 2: 1, 3: 1, 4: 1},
             {0: ['A', 'B', 'C', 'D', 'E'], 1: [], 2: [], 3: [], 4: []}
         ),
     ]
@@ -300,7 +304,7 @@ def test_send_block_updates_val_view(
     [
         (
             'RR0-A',
-            {0: 5, 1: 2, 2: 3, 3: 4, 4: 5},
+            {0: 6, 1: 3, 2: 4, 3: 5, 4: 6},
             {
                 0: [0, 1, 2, 3, 4],
                 1: [0, 1],
@@ -311,12 +315,12 @@ def test_send_block_updates_val_view(
         ),
         (
             'RR0-A RR0-B',
-            {0: 10, 1: 7, 2: 8, 3: 9, 4: 10},
+            {0: 11, 1: 8, 2: 9, 3: 10, 4: 11},
             {i: list(range(5)) for i in range(5)}
         ),
         (
             'B0-A S1-A B1-B RR1-C',
-            {0: 7, 1: 7, 2: 4, 3: 5, 4: 6},
+            {0: 8, 1: 8, 2: 5, 3: 6, 4: 7},
             {
                 0: [0, 1, 2, 3, 4],
                 1: [0, 1, 2, 3, 4],
@@ -327,7 +331,7 @@ def test_send_block_updates_val_view(
         ),
         (
             'RR0-A B0-B S1-B RR1-C',
-            {0: 11, 1: 11, 2: 8, 3: 9, 4: 10},
+            {0: 12, 1: 12, 2: 9, 3: 10, 4: 11},
             {i: list(range(5)) for i in range(5)}
         ),
     ]
@@ -346,6 +350,7 @@ def test_round_robin_updates_val_view(
 
         assert len(validator.view.justified_messages) == num_messages_per_view[validator_name]
         assert len(validator.view.latest_messages) == len(other_val_seen[validator_name])
+
         for other_validator_name in other_val_seen[validator_name]:
             other_validator = test_lang.validator_set.get_validator_by_name(other_validator_name)
 

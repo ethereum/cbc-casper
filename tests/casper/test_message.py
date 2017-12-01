@@ -17,11 +17,8 @@ def test_equality_of_copies_off_genesis(validator, empty_just):
     message = Message(None, empty_just, validator, 0, 0)
 
     shallow_copy = copy.copy(message)
-    deep_copy = copy.deepcopy(message)
 
     assert message == shallow_copy
-    assert message == deep_copy
-    assert shallow_copy == deep_copy
 
 
 def test_non_equality_of_copies_off_genesis(empty_just):

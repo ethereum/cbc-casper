@@ -29,13 +29,14 @@ def test_num_messages(validator_set, mode, messages_generated_per_round):
     )
     analyzer = Analyzer(simulation_runner)
 
-    # due to random_initialization
-    assert analyzer.num_messages() == 0
+    assert analyzer.num_messages() == 1
+    potential_extra_messages = len(validator_set) - 1
 
     for i in range(10):
         simulation_runner.step()
-        assert analyzer.num_messages() <= \
-            len(validator_set) + (i + 1) * messages_generated_per_round
+        messages_generated = 1 + (i + 1) * messages_generated_per_round
+
+        assert analyzer.num_messages() <= messages_generated + potential_extra_messages
 
 
 @pytest.mark.skip(reason="test not written")

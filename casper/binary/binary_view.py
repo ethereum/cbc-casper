@@ -12,9 +12,6 @@ class BinaryView(AbstractView):
         self.last_finalized_estimate = None
         self.first = True
 
-        if first_message:
-            self.add_messages(set([first_message]))
-
     def estimate(self):
         """Returns the current forkchoice in this view"""
         return estimator.get_estimate_from_latest_messages(
