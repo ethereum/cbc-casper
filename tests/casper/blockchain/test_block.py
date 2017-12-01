@@ -14,11 +14,8 @@ def test_equality_of_copies_off_genesis(validator, empty_just):
     block = Block(None, empty_just, validator, 0, 0)
 
     shallow_copy = copy.copy(block)
-    deep_copy = copy.deepcopy(block)
 
     assert block == shallow_copy
-    assert block == deep_copy
-    assert shallow_copy == deep_copy
 
 
 def test_equality_of_copies_of_non_genesis(report):
@@ -98,12 +95,12 @@ def test_is_in_blockchain__test_lang(report):
         (
             "B0-A S1-A B1-B S0-B B0-C S1-C B1-D S0-D H0-D",
             {0: 1, 1: 10},
-            {"A": 2, "B": 2, "C": 3, "D": 4}
+            {"A": 2, "B": 3, "C": 4, "D": 5}
         ),
         (
             "B0-A S1-A B0-B S1-B B1-C S0-C S2-C B2-D S0-D B0-E B1-F S0-F H0-E",
             {0: 11, 1: 10, 2: 500},
-            {"A": 2, "B": 3, "C": 4, "D": 2, "E": 3, "F": 5}
+            {"A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 5}
         ),
     ]
 )

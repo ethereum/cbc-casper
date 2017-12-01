@@ -76,23 +76,24 @@ def test_simulation_runner_step(simulation_runner):
 
 
 @pytest.mark.parametrize(
-    'protocol, mode, messages_generated_per_round',
+    'protocol, mode, messages_generated_per_round, potential_extra_messages',
     [
-        (BlockchainProtocol, 'rand', 1),
-        (BlockchainProtocol, 'rrob', 1),
-        (BlockchainProtocol, 'full', 5),
-        (BlockchainProtocol, 'nofinal', 2),
-        (BinaryProtocol, 'rand', 1),
-        (BinaryProtocol, 'rrob', 1),
-        (BinaryProtocol, 'full', 5),
-        (BinaryProtocol, 'nofinal', 2),
+        (BlockchainProtocol, 'rand', 1, 4),
+        (BlockchainProtocol, 'rrob', 1, 4),
+        (BlockchainProtocol, 'full', 5, 4),
+        (BlockchainProtocol, 'nofinal', 2, 2),
+        (BinaryProtocol, 'rand', 1, 0),
+        (BinaryProtocol, 'rrob', 1, 0),
+        (BinaryProtocol, 'full', 5, 0),
+        (BinaryProtocol, 'nofinal', 2, 0),
     ]
 )
 def test_simulation_runner_send_messages(
         generate_validator_set,
         protocol,
         mode,
-        messages_generated_per_round
+        messages_generated_per_round,
+        potential_extra_messages
         ):
     msg_gen = utils.message_maker(mode)
     validator_set = generate_validator_set(protocol)
@@ -107,9 +108,13 @@ def test_simulation_runner_send_messages(
         False
     )
 
-    assert len(simulation_runner.network.global_view.justified_messages) == len(validator_set)
+    if protocol == BlockchainProtocol:
+        assert len(simulation_runner.network.global_view.justified_messages) == 1
+    if protocol == BinaryProtocol:
+        assert len(simulation_runner.network.global_view.justified_messages) == len(validator_set)
 
+    initial_message_length = len(simulation_runner.network.global_view.justified_messages)
     for i in range(10):
         simulation_runner.step()
-        assert len(simulation_runner.network.global_view.justified_messages) == \
-            (i + 1) * messages_generated_per_round + len(validator_set)
+        assert len(simulation_runner.network.global_view.justified_messages) <= \
+            initial_message_length + potential_extra_messages + (i+1)*messages_generated_per_round

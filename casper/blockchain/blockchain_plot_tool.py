@@ -12,12 +12,15 @@ class BlockchainPlotTool(PlotTool):
         super().__init__(display, save, 's')
         self.view = view
         self.validator_set = validator_set
+        self.genesis_block = self.view.genesis_block
         self.message_fault_tolerance = dict()
 
         self.blockchain = []
         self.communications = []
         self.block_fault_tolerance = {}
         self.message_labels = {}
+
+        self.message_labels[self.genesis_block] = "G"
 
     def update(self, message_paths=None, sent_messages=None, new_messages=None):
         """Updates displayable items with new messages and paths"""
@@ -27,6 +30,8 @@ class BlockchainPlotTool(PlotTool):
             sent_messages = dict()
         if new_messages is None:
             new_messages = dict()
+
+        self._track_genesis_linked_messages(sent_messages)
 
         self._update_communications(message_paths, sent_messages, new_messages)
         self._update_blockchain(new_messages)
@@ -67,6 +72,18 @@ class BlockchainPlotTool(PlotTool):
             vals_chain_edges.append(utils.edge(chain, 2, 'blue', 'solid'))
 
         return vals_chain_edges
+
+    def _track_genesis_linked_messages(self, sent_messages):
+        """Genesis linked messages won't be tracked by communications
+        and need to be manually checked and added"""
+        for sender in sent_messages:
+            message = sent_messages[sender]
+            if message.estimate == self.genesis_block:
+                edge = [self.genesis_block, message]
+                if edge not in self.communications:
+                    self.communications.append(edge)
+
+                self.message_labels[message] = message.sequence_number
 
     def _update_communications(self, message_paths, sent_messages, new_messages):
         for sender, receiver in message_paths:

@@ -6,12 +6,15 @@ class Network(object):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set
-        self.global_view = protocol.View(set())
+        initial_message = protocol.initial_message(None)
+        val_initial_messages = self._collect_initial_messages()
+        self.global_view = protocol.View(val_initial_messages, initial_message)
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
-        assert message.hash in self.global_view.justified_messages, ("...expected only to propagate messages "
-                                                      "from the global view")
+        assert message.hash in self.global_view.justified_messages, (
+            "...expected only to propagate messages "
+            "from the global view")
         assert validator in self.validator_set, "...expected a known validator"
 
         validator.receive_messages(set([message]))
@@ -22,6 +25,7 @@ class Network(object):
 
         new_message = validator.make_new_message()
         self.global_view.add_messages(set([new_message]))
+        assert new_message.hash in self.global_view.justified_messages
 
         return new_message
 
@@ -34,7 +38,10 @@ class Network(object):
         for validator in self.validator_set:
             validator.receive_messages(messages)
 
-    def random_initialization(self):
-        """Generates starting messages for all validators with None as an estiamte."""
+    def _collect_initial_messages(self):
+        initial_messages = set()
+
         for validator in self.validator_set:
-            self.get_message_from_validator(validator)
+            initial_messages.update(validator.view.justified_messages.values())
+
+        return initial_messages

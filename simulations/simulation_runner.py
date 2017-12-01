@@ -30,7 +30,6 @@ class SimulationRunner:
             self.report_interval = 1
 
         self.network = Network(validator_set, protocol)
-        self.network.random_initialization()
 
         self.plot_tool = protocol.PlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()
@@ -48,8 +47,7 @@ class SimulationRunner:
         """ run one round of the simulation """
         self.round += 1
         message_paths = self.msg_gen(self.validator_set)
-
-        affected_validators = {j for i, j in message_paths}
+        affected_validators = {j for _, j in message_paths}
 
         sent_messages = self._send_messages_along_paths(message_paths)
         new_messages = self._make_new_messages(affected_validators)
@@ -61,9 +59,13 @@ class SimulationRunner:
 
     def _send_messages_along_paths(self, message_paths):
         sent_messages = {}
-        # Send most recent message of sender to receive
         for sender, receiver in message_paths:
-            message = sender.my_latest_message()
+            last_message = sender.my_latest_message()
+            if last_message:
+                message = last_message
+            else:
+                message = self.network.get_message_from_validator(sender)
+
             self.network.propagate_message_to_validator(message, receiver)
             sent_messages[sender] = message
 

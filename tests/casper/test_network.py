@@ -9,15 +9,7 @@ from simulations.testing_language import TestLangCBC
 def test_new_network(validator_set):
     network = Network(validator_set)
     assert network.validator_set == validator_set
-    assert not any(network.global_view.justified_messages)
-
-
-def test_random_initialization(validator_set):
-    network = Network(validator_set)
-
-    assert not any(network.global_view.justified_messages)
-    network.random_initialization()
-    assert len(network.global_view.justified_messages) == len(validator_set)
+    assert len(network.global_view.justified_messages) == 1
 
 
 def test_get_message_from_validator(network):
@@ -36,15 +28,15 @@ def test_propagate_message_to_validator(network):
     message = network.get_message_from_validator(from_validator)
     network.propagate_message_to_validator(message, to_validator)
 
-    assert message in to_validator.view.pending_messages.values()
+    assert message in to_validator.view.justified_messages.values()
 
 
 @pytest.mark.parametrize(
     'test_string, num_messages',
     [
-        ('RR0-A RR0-B', 9),
-        ('B0-A S1-A B1-B S2-B', 5),
-        ('B0-A S1-A RR1-B', 7),
+        ('RR0-A RR0-B', 7),
+        ('B0-A S1-A B1-B S2-B', 3),
+        ('B0-A S1-A RR1-B', 5),
     ]
 )
 def test_view_initialization(test_string, num_messages, validator_set):

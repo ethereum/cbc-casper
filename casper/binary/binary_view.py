@@ -6,7 +6,7 @@ import casper.binary.binary_estimator as estimator
 
 class BinaryView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
-    def __init__(self, messages=None):
+    def __init__(self, messages=None, first_message=None):
         super().__init__(messages)
 
         self.last_finalized_estimate = None

@@ -6,13 +6,14 @@ import casper.blockchain.forkchoice as forkchoice
 
 class BlockchainView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
-    def __init__(self, messages=None):
-        super().__init__(messages)
-
+    def __init__(self, messages=None, genesis_block=None):
         self.children = dict()
-        self.last_finalized_block = None
+        self.last_finalized_block = genesis_block
+        self.genesis_block = genesis_block
 
-        self._initialize_message_caches()
+        self._initialize_message_caches(messages)
+
+        super().__init__(messages)
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -48,10 +49,8 @@ class BlockchainView(AbstractView):
 
         self._update_when_added_cache(message)
 
-    def _initialize_message_caches(self):
-        self.when_added = {}
-        for message in self.justified_messages.values():
-            self.when_added[message] = 0
+    def _initialize_message_caches(self, messages):
+        self.when_added = {message: 0 for message in messages}
         self.when_finalized = {}
 
     def _update_when_added_cache(self, message):

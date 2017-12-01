@@ -15,9 +15,23 @@ class Validator(object):
 
         self.name = name
         self.weight = weight
-        self.view = protocol.View(set())
         self.validator_set = validator_set
         self.protocol = protocol
+
+        initial_message = protocol.initial_message(self)
+        self.view = protocol.View(set([initial_message]), initial_message)
+
+    def __eq__(self, val):
+        if val is None:
+            return False
+        if not isinstance(val, Validator):
+            return False
+        return hash(self) == hash(val)
+
+    def __hash__(self):
+        # defined differently than self.hash to avoid confusion with builtin
+        # use of __hash__ in dictionaries, sets, etc
+        return hash(self.name)
 
     def receive_messages(self, messages):
         """Allows the validator to receive protocol messages."""

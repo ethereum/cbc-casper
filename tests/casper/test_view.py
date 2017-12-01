@@ -40,8 +40,9 @@ def test_justification_includes_justified_messages():
 
     justification = validator_1.justification()
 
-    assert len(justification) == 1
-    assert validator_0 not in justification
+    assert len(justification) == 2
+    assert test_lang.blocks["A"].hash not in justification.values()
+    assert test_lang.network.global_view.genesis_block.hash in justification.values()
     assert justification[validator_1] == test_lang.blocks['C'].hash
 
     test_lang.parse('S1-B')
@@ -158,10 +159,10 @@ def test_multiple_messages_arriving_resolve():
 
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
 
-    assert len(validator_1.view.justified_messages) == 3
+    assert len(validator_1.view.justified_messages) == 2
     assert len(validator_1.view.pending_messages) == 1
     assert test_lang.blocks['F'] in validator_1.view.pending_messages.values()
 
     validator_1.receive_messages(test_lang.network.global_view.justified_messages.values())
 
-    assert len(validator_1.view.justified_messages) == 8
+    assert len(validator_1.view.justified_messages) == 7
