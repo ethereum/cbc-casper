@@ -12,7 +12,7 @@ class BlockchainPlotTool(PlotTool):
         super().__init__(display, save, 's')
         self.view = view
         self.validator_set = validator_set
-        self.genesis_block = self.view.last_finalized_block
+        self.genesis_block = self.view.genesis_block
         self.message_fault_tolerance = dict()
 
         self.blockchain = []
