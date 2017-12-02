@@ -3,7 +3,7 @@ from casper.message import Message
 
 
 class Bet(Message):
-    """Message data structure for blockchain consensus"""
+    """Message data structure for binary consensus"""
 
     def __init__(self, estimate, justification, sender):
         # Do some type checking for safety!

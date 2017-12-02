@@ -2,13 +2,14 @@
 import itertools
 import random as r
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.binary.binary_protocol import BinaryProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.binary.binary_protocol import BinaryProtocol
+from casper.protocols.integer.integer_protocol import IntegerProtocol
 
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
-PROTOCOLS = ['blockchain', 'binary']
+PROTOCOLS = ['blockchain', 'binary', 'integer']
 
 
 def select_protocol(protocol):
@@ -16,6 +17,8 @@ def select_protocol(protocol):
         return BlockchainProtocol
     if protocol == 'binary':
         return BinaryProtocol
+    if protocol == 'integer':
+        return IntegerProtocol
 
 
 def message_maker(mode):

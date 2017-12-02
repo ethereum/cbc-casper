@@ -1,8 +1,8 @@
 """The forkchoice testing module ... """
-import random as r
 import pytest
+import random as r
 
-import casper.blockchain.forkchoice as forkchoice
+import casper.protocols.blockchain.forkchoice as forkchoice
 
 
 def test_single_validator_correct_forkchoice(test_lang_runner):
