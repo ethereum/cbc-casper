@@ -5,7 +5,7 @@ from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
 
 
-class BinaryPlotTool(PlotTool):
+class IntegerPlotTool(PlotTool):
     """The module contains functions for plotting a binary data structure"""
 
     def __init__(self, display, save, view, validator_set):

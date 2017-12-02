@@ -2,7 +2,7 @@
 
 import pytest
 
-from casper.blockchain.block import Block
+from casper.protocols.blockchain.block import Block
 from casper.justification import Justification
 from casper.validator import Validator
 
