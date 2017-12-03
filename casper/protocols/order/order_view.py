@@ -1,10 +1,10 @@
 """The blockchain view module extends a view for blockchain data structures """
+import random as r
+
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.order.bet import Bet
-import casper.order.order_estimator as estimator
-
-import random as r
+from casper.protocols.order.bet import Bet
+import casper.protocols.order.order_estimator as estimator
 
 
 class OrderView(AbstractView):

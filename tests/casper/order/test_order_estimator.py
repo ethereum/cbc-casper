@@ -1,10 +1,10 @@
 """test order estimator"""
 import pytest
 
-from casper.order.bet import Bet
+from casper.protocols.order.bet import Bet
 from casper.validator_set import ValidatorSet
 from casper.justification import Justification
-import casper.order.order_estimator as estimator
+import casper.protocols.order.order_estimator as estimator
 
 
 @pytest.mark.parametrize(
