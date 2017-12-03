@@ -5,7 +5,7 @@ import random as r
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
-from casper.order.order_protocol import OrderProtocol
+from casper.protocols.order.order_protocol import OrderProtocol
 
 from casper.validator_set import ValidatorSet
 
