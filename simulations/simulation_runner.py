@@ -41,6 +41,7 @@ class SimulationRunner:
             self.step()
 
         if self.save:
+            print("making gif")
             self.plot_tool.make_gif()
 
     def step(self):

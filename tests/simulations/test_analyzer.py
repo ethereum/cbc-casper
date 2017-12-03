@@ -1,6 +1,6 @@
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 from simulations.analyzer import Analyzer
 from simulations.simulation_runner import SimulationRunner

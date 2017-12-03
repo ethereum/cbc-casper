@@ -3,8 +3,8 @@ import copy
 
 import pytest
 
-from casper.blockchain.block import Block
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.block import Block
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.validator import Validator
 
 from simulations.testing_language import TestLangCBC

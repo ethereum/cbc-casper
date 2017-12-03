@@ -1,7 +1,8 @@
 """The blockchain view module extends a view for blockchain data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-import casper.blockchain.forkchoice as forkchoice
+from casper.protocols.blockchain.block import Block
+import casper.protocols.blockchain.forkchoice as forkchoice
 
 
 class BlockchainView(AbstractView):

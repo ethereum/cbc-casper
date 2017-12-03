@@ -1,5 +1,5 @@
 """The network module contains a network class allowing for message passing """
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 class Network(object):

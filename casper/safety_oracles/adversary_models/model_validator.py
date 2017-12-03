@@ -30,7 +30,6 @@ class ModelValidator(object):
 
         self.latest_observed_bets[bet.sender] = bet
 
-
     def make_new_latest_bet(self):
         """This function attempts to make a new latest bet for
         this validator (self) with a given estimate."""

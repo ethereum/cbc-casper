@@ -52,10 +52,12 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-        '--hide-display', help='hide simulation display', action='store_true'
+        '--display', type=bool, default=config.getboolean("DisplayRounds"),
+        help='display simulations round by round'
     )
     parser.add_argument(
-        '--save', help='hide simulation display', action='store_true'
+        '--save', type=bool, default=config.getboolean("Save"),
+        help='save the simulation in graphs/ directory'
     )
 
     args = parser.parse_args()
@@ -67,7 +69,7 @@ def main():
     )
 
     msg_gen = message_maker(args.mode)
-    display = not args.hide_display
+    display = args.display
 
     simulation_runner = SimulationRunner(
         validator_set,
