@@ -1,12 +1,10 @@
 """The blockchain view module extends a view for blockchain data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.protocols.order.bet import Bet
 import casper.protocols.order.order_estimator as estimator
 
 
 class OrderView(AbstractView):
-    LIST = ["dog", "frog", "horse", "pig", "rat", "whale", "cat"]
 
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None, first_message=None):

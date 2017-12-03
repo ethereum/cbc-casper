@@ -87,9 +87,8 @@ class PlotTool(object):
 
             positions[message] = (
                 (float)(xslot) / (float)(len(validator_set) + 1),
-                0.2 + 0.1*message.display_height
+                0.2 + 0.1 * message.display_height
             )
-
 
         node_color_map = {}
         for message in nodes:

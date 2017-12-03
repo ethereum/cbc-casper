@@ -11,7 +11,6 @@ class BinaryProtocol(Protocol):
     Message = Bet
     PlotTool = BinaryPlotTool
 
-
     @staticmethod
     def initial_message(validator):
         if not validator:
