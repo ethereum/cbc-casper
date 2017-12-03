@@ -80,7 +80,6 @@ class PlotTool(object):
         sorted_validators = validator_set.sorted_by_name()
         for message in nodes:
             # Index of val in list may have some small performance concerns.
-<<<<<<< HEAD
             if message.estimate is not None:
                 xslot = sorted_validators.index(message.sender) + 1
             else:
@@ -90,10 +89,7 @@ class PlotTool(object):
                 (float)(xslot) / (float)(len(validator_set) + 1),
                 0.2 + 0.1*message.display_height
             )
-=======
-            positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
-                                 (float)(len(validator_set) + 1), 0.2 + 0.1 * message.display_height
->>>>>>> develop
+
 
         node_color_map = {}
         for message in nodes:

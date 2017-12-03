@@ -1,10 +1,9 @@
 """test order estimator"""
 import pytest
 
-from casper.order.bet import Bet
+from casper.protocols.order.bet import Bet
 from casper.validator_set import ValidatorSet
-from casper.justification import Justification
-import casper.order.order_estimator as estimator
+import casper.protocols.order.order_estimator as estimator
 
 
 @pytest.mark.parametrize(
@@ -55,14 +54,14 @@ import casper.order.order_estimator as estimator
 
     ]
 )
-def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate):
+def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, empty_just):
     validator_set = ValidatorSet(weights)
 
     latest_messages = dict()
     for val_name in latest_estimates:
         validator = validator_set.get_validator_by_name(val_name)
         latest_messages[validator] = Bet(
-            latest_estimates[val_name], Justification(), validator
+            latest_estimates[val_name], empty_just, validator, 1, 1
         )
 
     assert estimate == estimator.get_estimate_from_latest_messages(latest_messages)

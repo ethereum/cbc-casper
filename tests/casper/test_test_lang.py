@@ -3,7 +3,7 @@ import pytest
 
 from casper.network import Network
 from simulations.testing_language import TestLangCBC
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 def test_init():
