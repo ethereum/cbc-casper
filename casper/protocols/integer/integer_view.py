@@ -1,11 +1,11 @@
-"""The blockchain view module extends a view for blockchain data structures """
+"""The integer view module extends a view for integer data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 import casper.protocols.integer.integer_estimator as estimator
 
 
 class IntegerView(AbstractView):
-    """A view class that also keeps track of a last_finalized_block and children"""
+    """A view class for integer values that also keeps track of a last_finalized_estimate"""
     def __init__(self, messages=None, first_message=None):
         super().__init__(messages)
 
