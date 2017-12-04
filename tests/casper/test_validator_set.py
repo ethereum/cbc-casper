@@ -88,8 +88,8 @@ def test_validator_weights(weights, expected_weights):
         ({i: i for i in range(10)}, 45, None),
         ({i: 9 - i for i in range(9, -1, -1)}, 45, None),
         ({i: r.random() for i in range(10)}, None, None),
-        ({i: i*2 for i in range(10)}, 12, set([0, 1, 2, 3])),
-        ({i: i*2 for i in range(10)}, 12, [0, 1, 2, 3]),
+        ({i: i * 2 for i in range(10)}, 12, set([0, 1, 2, 3])),
+        ({i: i * 2 for i in range(10)}, 12, [0, 1, 2, 3]),
     ]
 )
 def test_weight(weights, expected_weight, validator_names):

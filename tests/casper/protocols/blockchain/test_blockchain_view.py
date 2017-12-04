@@ -1,7 +1,7 @@
 """The BlockchainView testing module..."""
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from simulations.testing_language import TestLangCBC
 
 

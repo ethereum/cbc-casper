@@ -1,16 +1,16 @@
-"""The blockchain view module extends a view for blockchain data structures """
+"""The order view module extends a view for ordering list data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-import casper.binary.binary_estimator as estimator
+import casper.protocols.order.order_estimator as estimator
 
 
-class BinaryView(AbstractView):
-    """A view class that also keeps track of a last_finalized_block and children"""
+class OrderView(AbstractView):
+    """A view class for order consensus that also keeps track of a last_finalized_estimate"""
     def __init__(self, messages=None, first_message=None):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
-        self.first = True
+        self.last_fault_tolerance = 0
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
@@ -27,5 +27,6 @@ class BinaryView(AbstractView):
             if fault_tolerance > 0:
                 if self.last_finalized_estimate:
                     assert not self.last_finalized_estimate.conflicts_with(bet)
+                self.last_fault_tolerance = fault_tolerance
                 self.last_finalized_estimate = bet
                 break

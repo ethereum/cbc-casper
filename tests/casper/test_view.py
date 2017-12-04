@@ -1,7 +1,7 @@
 import pytest
 
 from casper.abstract_view import AbstractView
-from casper.blockchain.block import Block
+from casper.protocols.blockchain.block import Block
 from simulations.testing_language import TestLangCBC
 
 

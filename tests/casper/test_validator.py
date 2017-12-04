@@ -2,10 +2,10 @@
 
 import pytest
 
-from casper.blockchain.block import Block
+from casper.protocols.blockchain.block import Block
 from casper.validator import Validator
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.binary.binary_protocol import BinaryProtocol
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.binary.binary_protocol import BinaryProtocol
 
 
 

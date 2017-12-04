@@ -1,8 +1,8 @@
 """The forkchoice testing module ... """
-import random as r
 import pytest
+import random as r
 
-import casper.blockchain.forkchoice as forkchoice
+import casper.protocols.blockchain.forkchoice as forkchoice
 
 
 def test_single_validator_correct_forkchoice(test_lang_runner):
@@ -28,8 +28,8 @@ def test_many_val_round_robin_forkchoice(test_lang_runner):
     test_string = ""
     for i in range(100):
         test_string += "B" + str(i % 10) + "-" + str(i) + " " \
-                     + "S" + str((i+1) % 10) + "-" + str(i) + " " \
-                     + "H" + str((i+1) % 10) + "-" + str(i) + " "
+                     + "S" + str((i + 1) % 10) + "-" + str(i) + " " \
+                     + "H" + str((i + 1) % 10) + "-" + str(i) + " "
     test_string = test_string[:-1]
 
     test_lang_runner(
