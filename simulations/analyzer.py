@@ -94,7 +94,7 @@ class Analyzer:
         return float(num_unsafe_messages) / (num_unsafe_messages + num_safe_messages)
 
     def messages(self):
-        return self.global_view.messages
+        return set(self.global_view.justified_messages.values())
 
     def safe_messages(self):
         if not self.global_view.last_finalized_block:

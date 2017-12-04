@@ -1,46 +1,35 @@
 """The message module defines an abstract message class  """
 import random as r
-from casper.justification import Justification
 
 
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
-    def __eq__(self, message):
-        if message is None:
-            return False
-        return self.__hash__() == message.__hash__()
-
-    def __ne__(self, message):
-        return not self.__eq__(message)
-
-    def __init__(self, estimate, justification, sender):
-        assert isinstance(justification, Justification), "justification should be a Justification!"
+    def __init__(self, estimate, justification, sender, sequence_number, display_height):
+        assert isinstance(justification, dict), "expected justification a Justification!"
 
         self.sender = sender
         self.estimate = estimate
         self.justification = justification
-
-        if self.sender in self.justification.latest_messages:
-            latest_message = self.justification.latest_messages[self.sender]
-            self.sequence_number = latest_message.sequence_number + 1
-        else:
-            self.sequence_number = 0
-
-        # The "display_height" of bets are used for visualization of views
-        if not any(self.justification.latest_messages):
-            self.display_height = 0
-        else:
-            max_height = max(
-                self.justification.latest_messages[validator].display_height
-                for validator in self.justification.latest_messages
-            )
-            self.display_height = max_height + 1
-
-        self.salt = r.randint(0, 1000000)
+        self.sequence_number = sequence_number
+        self.display_height = display_height
+        self.header = r.random()
 
     def __hash__(self):
-        return hash(str(self.sender.name) + str(self.sequence_number) + str(self.salt))
+        # defined differently than self.hash to avoid confusion with builtin
+        # use of __hash__ in dictionaries, sets, etc
+        return hash(self.hash)
+
+    def __eq__(self, message):
+        if message is None:
+            return False
+        if not isinstance(message, Message):
+            return False
+        return self.hash == message.hash
+
+    @property
+    def hash(self):
+        return hash(str(self.header))
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
-        pass
+        raise NotImplementedError

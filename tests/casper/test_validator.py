@@ -3,8 +3,10 @@
 import pytest
 
 from casper.protocols.blockchain.block import Block
-from casper.justification import Justification
 from casper.validator import Validator
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.binary.binary_protocol import BinaryProtocol
+
 
 
 @pytest.mark.parametrize(
@@ -30,9 +32,9 @@ def test_new_validator(name, weight, error):
     assert validator.weight == weight
 
 
-def test_check_estimate_safety_without_validator_set():
-    validator = Validator("cool", 10.2)
-    block = Block(None, Justification(), validator)
+def test_validator_created_with_genesis():
+    validator = Validator(0, 1, BlockchainProtocol)
+    assert validator.view.last_finalized_block is not None
 
-    with pytest.raises(AttributeError):
-        validator.check_estimate_safety(block)
+    validator = Validator(0, 1, BinaryProtocol)
+    assert validator.my_latest_message() is not None

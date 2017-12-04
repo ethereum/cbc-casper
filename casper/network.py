@@ -4,17 +4,27 @@ from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 class Network(object):
     """Simulates a network that allows for message passing between validators."""
-    def __init__(self, validator_set, protocol=BlockchainProtocol):
+    def __init__(self, validator_set, protocol=BlockchainProtocol, force_justify_messages=False):
         self.validator_set = validator_set
-        self.global_view = protocol.View(set())
+        self.global_view = protocol.View(
+            self._collect_initial_messages(),
+            protocol.initial_message(None)
+        )
+
+        self.force_justify_messages = force_justify_messages
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
-        assert message in self.global_view.messages, ("...expected only to propagate messages "
-                                                      "from the global view")
+        assert message.hash in self.global_view.justified_messages, (
+            "...expected only to propagate messages "
+            "from the global view")
         assert validator in self.validator_set, "...expected a known validator"
 
         validator.receive_messages(set([message]))
+
+        # HACK TO SEND ALL MESSAGES BEFORE NETWORK REWORK
+        if self.force_justify_messages:
+            self._propagate_messages_needed_to_justify(message, validator)
 
     def get_message_from_validator(self, validator):
         """Get a message from a validator."""
@@ -22,23 +32,52 @@ class Network(object):
 
         new_message = validator.make_new_message()
         self.global_view.add_messages(set([new_message]))
+        assert new_message.hash in self.global_view.justified_messages
 
         return new_message
 
     def view_initialization(self, view):
-        """
-        Initalizes all validators with all messages in some view.
-        NOTE: This method is not currently tested or called anywhere in repo
-        """
-        self.global_view = view.messages
+        """Initalizes all validators with all messages in some view."""
+        messages = view.justified_messages.values()
 
-        latest = view.latest_messages
+        self.global_view.add_messages(messages)
 
-        for validator in latest:
-            validator.receive_messages(set([latest[validator]]))
-
-    def random_initialization(self):
-        """Generates starting messages for all validators with None as an estiamte."""
         for validator in self.validator_set:
-            new_bet = self.get_message_from_validator(validator)
-            self.global_view.add_messages(set([new_bet]))
+            validator.receive_messages(messages)
+
+    def _collect_initial_messages(self):
+        initial_messages = set()
+
+        for validator in self.validator_set:
+            initial_messages.update(validator.view.justified_messages.values())
+
+        return initial_messages
+
+    def _propagate_messages_needed_to_justify(self, message, validator):
+        validator.receive_messages(self._messages_needed_to_justify(message, validator))
+        assert message.hash in validator.view.justified_messages
+
+    def _messages_needed_to_justify(self, message, validator):
+        messages_needed = set()
+
+        current_message_hashes = set()
+        for message_hash in message.justification.values():
+            if message_hash not in validator.view.pending_messages and \
+               message_hash not in validator.view.justified_messages:
+                current_message_hashes.add(message_hash)
+
+        while any(current_message_hashes):
+            next_hashes = set()
+
+            for message_hash in current_message_hashes:
+                current_message = self.global_view.justified_messages[message_hash]
+                messages_needed.add(current_message)
+
+                for other_hash in current_message.justification.values():
+                    if other_hash not in validator.view.pending_messages and \
+                       other_hash not in validator.view.justified_messages:
+                        next_hashes.add(other_hash)
+
+            current_message_hashes = next_hashes
+
+        return messages_needed

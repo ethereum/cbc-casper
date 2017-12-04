@@ -1,12 +1,12 @@
-"""The integer plot tool implements functions for plotting integer consensus"""
+"""The binary plot tool implements functions for plotting binary consensus"""
 
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
 
 
-class IntegerPlotTool(PlotTool):
-    """The module contains functions for plotting an integer data structure"""
+class BinaryPlotTool(PlotTool):
+    """The module contains functions for plotting a binary data structure"""
 
     def __init__(self, display, save, view, validator_set):
         super().__init__(display, save, 'o')

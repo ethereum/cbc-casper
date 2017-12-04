@@ -24,9 +24,6 @@ class TestLangCBC(object):
         self.display = display
         self.network = Network(self.validator_set, protocol)
 
-        # This seems to be misnamed. Just generates starting blocks.
-        self.network.random_initialization()
-
         self.plot_tool = PlotTool(display, False, 's')
         self.blocks = dict()
         self.blockchain = []
@@ -36,7 +33,8 @@ class TestLangCBC(object):
         # Register token handlers.
         self.handlers = dict()
         self.handlers['B'] = self.make_block
-        self.handlers['S'] = self.send_block
+        self.handlers['S'] = self.send_all_blocks
+        self.handlers['P'] = self.send_only_block
         self.handlers['C'] = self.check_safety
         self.handlers['U'] = self.no_safety
         self.handlers['H'] = self.check_head_equals_block
@@ -55,6 +53,31 @@ class TestLangCBC(object):
         if block_name in self.blocks:
             raise ValueError('Block {} already exists'.format(block_name))
 
+    def _blocks_needed_to_justify(self, block, validator):
+        messages_needed = set()
+
+        current_block_hashes = set()
+        for block_hash in block.justification.values():
+            if block_hash not in validator.view.pending_messages and \
+               block_hash not in validator.view.justified_messages:
+                current_block_hashes.add(block_hash)
+
+        while any(current_block_hashes):
+            next_hashes = set()
+
+            for block_hash in current_block_hashes:
+                block = self.network.global_view.justified_messages[block_hash]
+                messages_needed.add(block)
+
+                for other_hash in block.justification.values():
+                    if other_hash not in validator.view.pending_messages and \
+                       other_hash not in validator.view.justified_messages:
+                        next_hashes.add(other_hash)
+
+            current_block_hashes = next_hashes
+
+        return messages_needed
+
     def parse(self, test_string):
         """Parse the test_string, and run the test"""
         for token in test_string.split(' '):
@@ -69,18 +92,32 @@ class TestLangCBC(object):
 
             self.handlers[letter](validator, name)
 
-    def send_block(self, validator, block_name):
+    def send_all_blocks(self, validator, block_name):
+        """Send some validator a block, and all unseen messages in its justification."""
+        self._validate_validator(validator)
+        self._validate_block_exists(block_name)
+
+        block = self.blocks[block_name]
+        if block.hash in validator.view.justified_messages:
+            raise Exception("Validator has already seen block")
+        self.network.propagate_message_to_validator(block, validator)
+
+        blocks_to_send = self._blocks_needed_to_justify(block, validator)
+        for block in blocks_to_send:
+            self.network.propagate_message_to_validator(block, validator)
+
+        assert block.hash not in validator.view.pending_messages
+        assert block.hash not in validator.view.num_missing_dependencies
+        assert self.blocks[block_name].hash in validator.view.justified_messages
+
+    def send_only_block(self, validator, block_name):
         """Send some validator a block."""
         self._validate_validator(validator)
         self._validate_block_exists(block_name)
 
         block = self.blocks[block_name]
-
-        if block in validator.view.messages:
-            raise Exception(
-                'Validator {} has already seen block {}'
-                .format(validator, block_name)
-            )
+        if block.hash in validator.view.justified_messages:
+            raise Exception("Validator has already seen block")
 
         self.network.propagate_message_to_validator(block, validator)
 
@@ -115,7 +152,7 @@ class TestLangCBC(object):
             receiver = validators[(i + 1) % len(validators)]
 
             self.make_block(maker, name)
-            self.send_block(receiver, name)
+            self.send_all_blocks(receiver, name)
 
     def check_safety(self, validator, block_name):
         """Check that some validator detects safety on a block."""
@@ -137,7 +174,7 @@ class TestLangCBC(object):
         block = self.blocks[block_name]
         validator.update_safe_estimates()
 
-        #NOTE: This should never fail
+        # NOTE: This should never fail
         assert validator.view.last_finalized_block is None or \
             block.conflicts_with(validator.view.last_finalized_block), \
             "Block {} failed no-safety assert".format(block_name)

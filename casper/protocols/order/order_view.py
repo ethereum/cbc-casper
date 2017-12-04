@@ -1,17 +1,12 @@
-"""The blockchain view module extends a view for blockchain data structures """
-import random as r
-
+"""The order view module extends a view for order data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
-from casper.protocols.order.bet import Bet
 import casper.protocols.order.order_estimator as estimator
 
 
 class OrderView(AbstractView):
-    LIST = ["dog", "frog", "horse", "pig", "rat", "whale", "cat"]
-
-    """A view class that also keeps track of a last_finalized_block and children"""
-    def __init__(self, messages=None):
+    """A view class that also keeps track of a last_finalized_estimate"""
+    def __init__(self, messages=None, first_message=None):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
@@ -22,41 +17,6 @@ class OrderView(AbstractView):
         return estimator.get_estimate_from_latest_messages(
             self.latest_messages
         )
-
-    def add_messages(self, showed_messages):
-        """Updates views latest_messages and children based on new messages"""
-
-        if not showed_messages:
-            return
-
-        for message in showed_messages:
-            assert isinstance(message, Bet), "expected only to add a Bet!"
-
-        # find any not-seen messages
-        newly_discovered_messages = self.get_new_messages(showed_messages)
-
-        # add these new messages to the messages in view
-        self.messages.update(newly_discovered_messages)
-
-        # update views most recently seen messages
-        for message in newly_discovered_messages:
-            if message.sender not in self.latest_messages:
-                self.latest_messages[message.sender] = message
-            elif self.latest_messages[message.sender].sequence_number < message.sequence_number:
-                self.latest_messages[message.sender] = message
-
-    def make_new_message(self, validator):
-        """Make a new bet!"""
-        justification = self.justification()
-        if any(self.messages):
-            estimate = self.estimate()
-        else:
-            estimate = r.sample(self.LIST, len(self.LIST))
-
-        new_message = Bet(estimate, justification, validator)
-        self.add_messages(set([new_message]))
-
-        return new_message
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""

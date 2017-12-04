@@ -41,7 +41,7 @@ class PlotTool(object):
         # find the next name for the next plot!
         graph_num = 0
         while True:
-            new_plot = graph_path + 'graph_num_' + str(graph_num)
+            new_plot = graph_path + 'graph_num_' + str(graph_num).zfill(3)
             graph_num += 1
             if not os.path.isdir(new_plot):
                 os.makedirs(new_plot)
@@ -56,7 +56,7 @@ class PlotTool(object):
 
         graph = nx.Graph()
 
-        nodes = view.messages
+        nodes = view.justified_messages.values()
 
         fig_size = plt.rcParams["figure.figsize"]
         fig_size[0] = 20
@@ -69,7 +69,7 @@ class PlotTool(object):
         edge = []
         if edges == []:
             for message in nodes:
-                for msg_in_justification in message.justification.latest_messages.values():
+                for msg_in_justification in message.justification.values():
                     if msg_in_justification is not None:
                         edge.append((msg_in_justification, message))
 
@@ -80,8 +80,15 @@ class PlotTool(object):
         sorted_validators = validator_set.sorted_by_name()
         for message in nodes:
             # Index of val in list may have some small performance concerns.
-            positions[message] = (float)(sorted_validators.index(message.sender) + 1) / \
-                                 (float)(len(validator_set) + 1), 0.2 + 0.1 * message.display_height
+            if message.estimate is not None:
+                xslot = sorted_validators.index(message.sender) + 1
+            else:
+                xslot = (len(validator_set) + 1) / 2.0
+
+            positions[message] = (
+                (float)(xslot) / (float)(len(validator_set) + 1),
+                0.2 + 0.1 * message.display_height
+            )
 
         node_color_map = {}
         for message in nodes:

@@ -25,6 +25,11 @@ def random_gaussian_validator_set_from_protocol(protocol=BlockchainProtocol):
     return generate_random_gaussian_validator_set(protocol)
 
 
+@pytest.fixture(autouse=True)
+def reset_blockchain_protocol(request):
+    BlockchainProtocol.genesis_block = None
+
+
 @pytest.fixture
 def report(request):
     return request.config.getoption("--report")
@@ -56,5 +61,4 @@ def validator():
 @pytest.fixture
 def network(validator_set):
     network = Network(validator_set)
-    network.random_initialization()
     return network
