@@ -1,4 +1,6 @@
-"""The order plot tool implements functions for plotting order consensus"""
+"""The order plot tool implements functions for plotting order consensus
+NOTE: currently only prints to terminal instead of plotting
+"""
 
 from casper.plot_tool import PlotTool
 
