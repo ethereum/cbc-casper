@@ -59,6 +59,10 @@ def main():
         '--save', type=bool, default=config.getboolean("Save"),
         help='save the simulation in graphs/ directory'
     )
+    parser.add_argument(
+        '--full-prop', type=bool, default=config.getboolean("FullProp"),
+        help='force full propagation of all messages in justification of message when sending'
+    )
 
     args = parser.parse_args()
     protocol = select_protocol(args.protocol)
@@ -79,6 +83,7 @@ def main():
         report_interval=args.report_interval,
         display=display,
         save=args.save,
+        full_prop=args.full_prop
     )
     simulation_runner.run()
 
