@@ -6,9 +6,11 @@ class Network(object):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol, force_full_propagation=False):
         self.validator_set = validator_set
-        initial_message = protocol.initial_message(None)
-        val_initial_messages = self._collect_initial_messages()
-        self.global_view = protocol.View(val_initial_messages, initial_message)
+        self.global_view = protocol.View(
+            self._collect_initial_messages(),
+            protocol.initial_message(None)
+        )
+
         self.force_full_propagation = force_full_propagation
 
     def propagate_message_to_validator(self, message, validator):

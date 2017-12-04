@@ -20,6 +20,15 @@ from simulations.utils import (
 )
 
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def default_configuration():
     config = ConfigParser()
     config.read("config.ini")
@@ -52,15 +61,15 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-        '--display', type=bool, default=config.getboolean("DisplayRounds"),
+        '--display', action="store_true",
         help='display simulations round by round'
     )
     parser.add_argument(
-        '--save', type=bool, default=config.getboolean("Save"),
+        '--save', type=str2bool, default=config.getboolean("Save"),
         help='save the simulation in graphs/ directory'
     )
     parser.add_argument(
-        '--full-prop', type=bool, default=config.getboolean("FullProp"),
+        '--full-prop', type=str2bool, default=config.getboolean("FullProp"),
         help='force full propagation of all messages in justification of message when sending'
     )
 
@@ -73,7 +82,6 @@ def main():
     )
 
     msg_gen = message_maker(args.mode)
-    display = args.display
 
     simulation_runner = SimulationRunner(
         validator_set,
@@ -81,7 +89,7 @@ def main():
         protocol,
         total_rounds=args.rounds,
         report_interval=args.report_interval,
-        display=display,
+        display=args.display,
         save=args.save,
         full_prop=args.full_prop
     )

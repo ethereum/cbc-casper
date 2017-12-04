@@ -41,7 +41,7 @@ class PlotTool(object):
         # find the next name for the next plot!
         graph_num = 0
         while True:
-            new_plot = graph_path + 'graph_num_' + str(graph_num)
+            new_plot = graph_path + 'graph_num_' + str(graph_num).zfill(3)
             graph_num += 1
             if not os.path.isdir(new_plot):
                 os.makedirs(new_plot)
