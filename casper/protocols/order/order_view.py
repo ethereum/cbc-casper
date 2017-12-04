@@ -1,12 +1,12 @@
-"""The order view module extends a view for ordering list data structures """
+"""The order view module extends a view for order data structures """
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 import casper.protocols.order.order_estimator as estimator
 
 
 class OrderView(AbstractView):
-    """A view class for order consensus that also keeps track of a last_finalized_estimate"""
-    def __init__(self, messages=None, first_message=None):
+    """A view class that also keeps track of a last_finalized_estimate"""
+    def __init__(self, messages=None):
         super().__init__(messages)
 
         self.last_finalized_estimate = None
@@ -20,6 +20,7 @@ class OrderView(AbstractView):
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on most recent created by this view"""
+        # check estimate safety on the most
         for bet in self.latest_messages.values():
             oracle = CliqueOracle(bet, self, validator_set)
             fault_tolerance, _ = oracle.check_estimate_safety()
