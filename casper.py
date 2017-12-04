@@ -69,7 +69,7 @@ def main():
         help='save the simulation in graphs/ directory'
     )
     parser.add_argument(
-        '--full-prop', type=str2bool, default=config.getboolean("FullProp"),
+        '--justify-messages', type=str2bool, default=config.getboolean("JustifyMessages"),
         help='force full propagation of all messages in justification of message when sending'
     )
 
@@ -91,7 +91,7 @@ def main():
         report_interval=args.report_interval,
         display=args.display,
         save=args.save,
-        full_prop=args.full_prop
+        force_justify_messages=args.justify_messages
     )
     simulation_runner.run()
 

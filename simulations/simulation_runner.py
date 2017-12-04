@@ -13,7 +13,7 @@ class SimulationRunner:
             report_interval,
             display,
             save,
-            full_prop=False
+            force_justify_messages=False
     ):
         self.validator_set = validator_set
         self.msg_gen = msg_gen
@@ -30,7 +30,7 @@ class SimulationRunner:
         else:
             self.report_interval = 1
 
-        self.network = Network(validator_set, protocol, full_prop)
+        self.network = Network(validator_set, protocol, force_justify_messages)
 
         self.plot_tool = protocol.PlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()

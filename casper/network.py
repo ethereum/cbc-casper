@@ -4,14 +4,14 @@ from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 class Network(object):
     """Simulates a network that allows for message passing between validators."""
-    def __init__(self, validator_set, protocol=BlockchainProtocol, force_full_propagation=False):
+    def __init__(self, validator_set, protocol=BlockchainProtocol, force_justify_messages=False):
         self.validator_set = validator_set
         self.global_view = protocol.View(
             self._collect_initial_messages(),
             protocol.initial_message(None)
         )
 
-        self.force_full_propagation = force_full_propagation
+        self.force_justify_messages = force_justify_messages
 
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
@@ -23,8 +23,8 @@ class Network(object):
         validator.receive_messages(set([message]))
 
         # HACK TO SEND ALL MESSAGES BEFORE NETWORK REWORK
-        if self.force_full_propagation:
-            self._propagate_blocks_needed_to_justify(message, validator)
+        if self.force_justify_messages:
+            self._propagate_messages_needed_to_justify(message, validator)
 
     def get_message_from_validator(self, validator):
         """Get a message from a validator."""
@@ -53,7 +53,7 @@ class Network(object):
 
         return initial_messages
 
-    def _propagate_blocks_needed_to_justify(self, message, validator):
+    def _propagate_messages_needed_to_justify(self, message, validator):
         validator.receive_messages(self._messages_needed_to_justify(message, validator))
         assert message.hash in validator.view.justified_messages
 
