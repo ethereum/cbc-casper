@@ -3,6 +3,6 @@ from casper.protocols.integer.integer_view import IntegerView
 
 
 class BinaryView(IntegerView):
-    """A view class that also keeps track of a last_finalized_block and children"""
+    """A view class that also keeps track of a messages about a bit"""
     def __init__(self, messages=None, first_message=None):
         super().__init__(messages)
