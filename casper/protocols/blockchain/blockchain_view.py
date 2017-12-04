@@ -6,6 +6,7 @@ from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 from casper.protocols.blockchain.block import Block
 import casper.protocols.blockchain.forkchoice as forkchoice
+import casper.utils as utils
 
 
 class BlockchainView(AbstractView):
@@ -14,7 +15,7 @@ class BlockchainView(AbstractView):
         super().__init__(messages)
 
         self.children = dict()
-        self.minimal_children = dict()
+        self.minimal_children = {None: set()}
         self.last_finalized_block = None
 
         # cache info about message events
@@ -37,13 +38,6 @@ class BlockchainView(AbstractView):
             self.latest_messages
         )
         if regular_forkchoice != minimal_forkchoice:
-            print("\n")
-            print("minimal_children:" + str(self.minimal_children))
-            print("minimal_forkchoice:" + str(minimal_forkchoice))
-
-            print("children:" + str(self.children))
-            print("regular_forkchoice:" + str(regular_forkchoice))
-
             assert False
 
         return regular_forkchoice
@@ -162,9 +156,6 @@ class BlockchainView(AbstractView):
         # find any not-seen messages
         newly_discovered_messages = self.get_new_messages(showed_messages)
 
-        # add these new messages to the messages in view
-        self.messages.update(newly_discovered_messages)
-
         for message in newly_discovered_messages:
             # update views most recently seen messages
             if message.sender not in self.latest_messages:
@@ -178,6 +169,10 @@ class BlockchainView(AbstractView):
 
         self.add_to_children(newly_discovered_messages)
 
+        # add these new messages to the messages in view
+        self.messages.update(newly_discovered_messages)
+
+
     def add_to_children(self, new_messages):
         oldest_messages = {
             message for message in new_messages
@@ -186,6 +181,8 @@ class BlockchainView(AbstractView):
 
         while any(oldest_messages):
             for message in oldest_messages:
+                assert message not in self.messages
+                assert message.estimate not in oldest_messages and message.estimate not in new_messages
                 self.update_minimal_tree(message, self.latest_messages, self.minimal_children)
                 if message.estimate not in self.children:
                     self.children[message.estimate] = set()
@@ -199,44 +196,42 @@ class BlockchainView(AbstractView):
 
 
     def update_minimal_tree(self, new_message, latest_messages, minimal_children):
-        root = new_message
-        while root and root not in minimal_children:
-            root = root.estimate
-
-        if root not in minimal_children:
-            assert root is None
-            minimal_children[root] = set()
-            minimal_children[root].add(new_message)
-            return
-
+        root = self.get_youngest_ancestor_in_tree(new_message, minimal_children)
+        assert root != new_message
+        assert root in minimal_children
 
         added = False
         for child in minimal_children[root]:
-            if new_message.is_in_blockchain(child):
+            if new_message == child or added:
+                # we have already seen this message and added it!
+                return
+            common_ancestor = self.get_common_ancestor(child, new_message)
+
+            if common_ancestor == child:
+                added = True
+                assert child.is_in_blockchain(new_message)
                 assert child not in minimal_children
                 minimal_children[child] = set()
                 minimal_children[child].add(new_message)
-                added = True
-                break
 
-            common_ancestor = self.get_common_ancestor(child, new_message)
-            if common_ancestor != root:
+            elif common_ancestor != root:
                 added = True
                 minimal_children[root].remove(child)
                 minimal_children[root].add(common_ancestor)
                 minimal_children[common_ancestor] = set()
                 minimal_children[common_ancestor].add(new_message)
                 minimal_children[common_ancestor].add(child)
-                break
 
         if not added:
             minimal_children[root].add(new_message)
 
         if new_message.sender not in new_message.justification.latest_messages:
+            # there is no previous message, and so we don't need to update the tree!
+            # NOTE: I'm not actually sure this is the case :)
             return
 
-        last_message_from_val = new_message.justification.latest_messages[new_message.sender]
-        common_ancestor = self.get_common_ancestor(new_message, last_message_from_val)
+        last_message = new_message.justification.latest_messages[new_message.sender]
+        common_ancestor = self.get_common_ancestor(new_message, last_message)
 
         # old message should be removed from tree during this function call, sometimes (there are cases where it is not)!
         self.reduce_tree(common_ancestor, latest_messages, minimal_children)
@@ -261,10 +256,11 @@ class BlockchainView(AbstractView):
             message_one = self.estimate_at_height(message_one, message_two.height)
 
         while message_one:
-            message_one = message_one.estimate
-            message_two = message_two.estimate
             if message_one == message_two:
                 return message_one
+            message_one = message_one.estimate
+            message_two = message_two.estimate
+
 
         return None
 
