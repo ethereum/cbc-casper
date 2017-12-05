@@ -9,9 +9,9 @@ class AbstractView(object):
         if messages is None:
             messages = set()
 
-        self.add_messages(messages)
-
         self.messages = set()
+
+        self.add_messages(messages)
         self.latest_messages = dict()
 
     def __str__(self):

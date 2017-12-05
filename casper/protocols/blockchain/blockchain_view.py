@@ -38,6 +38,8 @@ class BlockchainView(AbstractView):
             self.latest_messages
         )
         if regular_forkchoice != minimal_forkchoice:
+            print("self.minimal_children: " + str(self.minimal_children))
+            print("self.children: " + str(self.children))
             assert False
 
         return regular_forkchoice
@@ -167,7 +169,7 @@ class BlockchainView(AbstractView):
             if message not in self.when_added:
                 self.when_added[message] = len(self.messages)
 
-        self.add_to_children(newly_discovered_messages)
+        self.add_to_children(copy.copy(newly_discovered_messages))
 
         # add these new messages to the messages in view
         self.messages.update(newly_discovered_messages)
