@@ -83,3 +83,6 @@ def network(validator_set):
     return network
 
 
+@pytest.fixture
+def global_view(network):
+    return network.global_view

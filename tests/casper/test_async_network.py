@@ -23,6 +23,14 @@ def test_send(network, from_validator, to_validator):
     assert network.message_queues[to_validator].qsize() == 1
 
 
+def test_send_adds_to_global_view(network, global_view, from_validator, to_validator):
+    message = from_validator.make_new_message()
+    num_justified = len(global_view.justified_messages)
+    network.send(to_validator, message)
+
+    assert len(global_view.justified_messages) == num_justified + 1
+
+
 def test_send_zero_delay(network, from_validator, to_validator):
     network.delay = zero
     message = from_validator.make_new_message()

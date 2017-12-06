@@ -47,42 +47,38 @@ class SimulationRunner:
 
     def step(self):
         """ run one round of the simulation """
+        """ this becomes, who is going to make a message and send to the network """
+        """ rather than what explicit paths happen """
         self.round += 1
-        message_paths = self.msg_gen(self.validator_set)
-        affected_validators = {j for _, j in message_paths}
+        new_messages = self._generate_new_messages()
+        received_messages = self._receive_messages()
+        self._update_safe_estimates(received_messages.keys())
 
-        sent_messages = self._send_messages_along_paths(message_paths)
-        new_messages = self._make_new_messages(affected_validators)
-        self._check_for_new_safety(affected_validators)
-
-        self.plot_tool.update(message_paths, sent_messages, new_messages)
+        self.plot_tool.update(new_messages, received_messages)
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
-    def _send_messages_along_paths(self, message_paths):
-        sent_messages = {}
-        for sender, receiver in message_paths:
-            last_message = sender.my_latest_message()
-            if last_message:
-                message = last_message
-            else:
-                message = self.network.get_message_from_validator(sender)
+        self.network.time += 1
 
-            self.network.propagate_message_to_validator(message, receiver)
-            sent_messages[sender] = message
-
-        return sent_messages
-
-    def _make_new_messages(self, validators):
-        messages = {}
+    def _generate_new_messages(self):
+        validators = self.msg_gen(self.validator_set)
+        new_messages = []
         for validator in validators:
-            message = self.network.get_message_from_validator(validator)
-            messages[validator] = message
+            message = validator.make_new_message()
+            self.network.send_to_all(message)
+            new_messages.append(message)
 
-        return messages
+    def _receive_messages(self):
+        received_messages = {}
+        for validator in self.validator_set:
+            messages = self.network.receive_all(validator)
+            if messages:
+                validator.receive_messages(set(messages))
+                received_messages[validator] = messages
+        return received_messages
 
-    def _check_for_new_safety(self, affected_validators):
-        for validator in affected_validators:
+    def _update_safe_estimates(self, validators):
+        for validator in validators:
             validator.update_safe_estimates()
-
         self.network.global_view.update_safe_estimates(self.validator_set)
+

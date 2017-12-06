@@ -1,4 +1,5 @@
 """The network module contains a network class allowing for message passing """
+import random as r
 from utils.priority_queue import PriorityQueue
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
@@ -23,9 +24,12 @@ class Network(object):
     # async network rework
     #
     def delay(self, sender, receiver):
-        return 1
+        return r.choice([i for i in range(3)])
 
     def send(self, validator, message):
+        self.global_view.add_messages(
+            set([message])
+        )
         self.message_queues[validator].put((
             self.time + self.delay(message.sender, validator),
             message
@@ -58,37 +62,37 @@ class Network(object):
     #
     # legacy sync network
     #
-    def propagate_message_to_validator(self, message, validator):
-        """Propagate a message to a validator."""
-        assert message.hash in self.global_view.justified_messages, (
-            "...expected only to propagate messages "
-            "from the global view")
-        assert validator in self.validator_set, "...expected a known validator"
+    # def propagate_message_to_validator(self, message, validator):
+        # """Propagate a message to a validator."""
+        # assert message.hash in self.global_view.justified_messages, (
+            # "...expected only to propagate messages "
+            # "from the global view")
+        # assert validator in self.validator_set, "...expected a known validator"
 
-        validator.receive_messages(set([message]))
+        # validator.receive_messages(set([message]))
 
         # HACK TO SEND ALL MESSAGES BEFORE NETWORK REWORK
-        if self.force_justify_messages:
-            self._propagate_messages_needed_to_justify(message, validator)
+        # if self.force_justify_messages:
+            # self._propagate_messages_needed_to_justify(message, validator)
 
-    def get_message_from_validator(self, validator):
-        """Get a message from a validator."""
-        assert validator in self.validator_set, "...expected a known validator"
+    # def get_message_from_validator(self, validator):
+        # """Get a message from a validator."""
+        # assert validator in self.validator_set, "...expected a known validator"
 
-        new_message = validator.make_new_message()
-        self.global_view.add_messages(set([new_message]))
-        assert new_message.hash in self.global_view.justified_messages
+        # new_message = validator.make_new_message()
+        # self.global_view.add_messages(set([new_message]))
+        # assert new_message.hash in self.global_view.justified_messages
 
-        return new_message
+        # return new_message
 
-    def view_initialization(self, view):
-        """Initalizes all validators with all messages in some view."""
-        messages = view.justified_messages.values()
+    # def view_initialization(self, view):
+        # """Initalizes all validators with all messages in some view."""
+        # messages = view.justified_messages.values()
 
-        self.global_view.add_messages(messages)
+        # self.global_view.add_messages(messages)
 
-        for validator in self.validator_set:
-            validator.receive_messages(messages)
+        # for validator in self.validator_set:
+            # validator.receive_messages(messages)
 
     def _collect_initial_messages(self):
         initial_messages = set()
@@ -98,31 +102,31 @@ class Network(object):
 
         return initial_messages
 
-    def _propagate_messages_needed_to_justify(self, message, validator):
-        validator.receive_messages(self._messages_needed_to_justify(message, validator))
-        assert message.hash in validator.view.justified_messages
+    # def _propagate_messages_needed_to_justify(self, message, validator):
+        # validator.receive_messages(self._messages_needed_to_justify(message, validator))
+        # assert message.hash in validator.view.justified_messages
 
-    def _messages_needed_to_justify(self, message, validator):
-        messages_needed = set()
+    # def _messages_needed_to_justify(self, message, validator):
+        # messages_needed = set()
 
-        current_message_hashes = set()
-        for message_hash in message.justification.values():
-            if message_hash not in validator.view.pending_messages and \
-               message_hash not in validator.view.justified_messages:
-                current_message_hashes.add(message_hash)
+        # current_message_hashes = set()
+        # for message_hash in message.justification.values():
+            # if message_hash not in validator.view.pending_messages and \
+               # message_hash not in validator.view.justified_messages:
+                # current_message_hashes.add(message_hash)
 
-        while any(current_message_hashes):
-            next_hashes = set()
+        # while any(current_message_hashes):
+            # next_hashes = set()
 
-            for message_hash in current_message_hashes:
-                current_message = self.global_view.justified_messages[message_hash]
-                messages_needed.add(current_message)
+            # for message_hash in current_message_hashes:
+                # current_message = self.global_view.justified_messages[message_hash]
+                # messages_needed.add(current_message)
 
-                for other_hash in current_message.justification.values():
-                    if other_hash not in validator.view.pending_messages and \
-                       other_hash not in validator.view.justified_messages:
-                        next_hashes.add(other_hash)
+                # for other_hash in current_message.justification.values():
+                    # if other_hash not in validator.view.pending_messages and \
+                       # other_hash not in validator.view.justified_messages:
+                        # next_hashes.add(other_hash)
 
-            current_message_hashes = next_hashes
+            # current_message_hashes = next_hashes
 
-        return messages_needed
+        # return messages_needed
