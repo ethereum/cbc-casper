@@ -70,7 +70,10 @@ class Network(object):
             # "from the global view")
         # assert validator in self.validator_set, "...expected a known validator"
 
-        # validator.receive_messages(set([message]))
+        # self.send(validator, message)
+        # received_message = self.receive(validator)
+        # if received_:
+            # validator.receive_messages(set([message]))
 
         # HACK TO SEND ALL MESSAGES BEFORE NETWORK REWORK
         # if self.force_justify_messages:
