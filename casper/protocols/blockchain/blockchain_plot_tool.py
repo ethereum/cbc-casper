@@ -17,8 +17,13 @@ class BlockchainPlotTool(PlotTool):
 
         self.blockchain = []
         self.communications = []
+
         self.block_fault_tolerance = {}
         self.message_labels = {}
+        self.justifications = {
+            validator: []
+            for validator in validator_set
+        }
 
         self.message_labels[self.genesis_block] = "G"
 
@@ -32,6 +37,7 @@ class BlockchainPlotTool(PlotTool):
         # self._track_genesis_linked_messages(sent_messages)
 
         self._update_communications(received_messages)
+        self._update_new_justifications(new_messages)
         self._update_blockchain(new_messages)
         self._update_block_fault_tolerance()
         self._update_message_labels(new_messages)
@@ -70,6 +76,19 @@ class BlockchainPlotTool(PlotTool):
             vals_chain_edges.append(utils.edge(chain, 2, 'blue', 'solid'))
 
         return vals_chain_edges
+
+    def _update_new_justifications(self, new_messages):
+        for message in new_messages:
+            validator = message.sender
+            for validator in message.justification:
+                last_message = self.view.justified_messages[message.justification[validator]]
+                # only show if new justification
+                if last_message not in self.justifications[validator]:
+                    self.communications.append([last_message, message])
+                    self.justifications[validator].append(last_message)
+                # always show self as justification
+                # elif last_message.sender == message.sender:
+                    # self.self_communications.append([last_message, message])
 
     def _track_genesis_linked_messages(self, sent_messages):
         """Genesis linked messages won't be tracked by communications

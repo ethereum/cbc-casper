@@ -1,6 +1,7 @@
 import sys
 
 from casper.network import Network
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 class SimulationRunner:
@@ -38,6 +39,8 @@ class SimulationRunner:
     def run(self):
         """ run simulation total_rounds if specified
             otherwise, run indefinitely """
+        self._send_initial_messages()
+
         while self.round < self.total_rounds:
             self.step()
 
@@ -67,6 +70,7 @@ class SimulationRunner:
             message = validator.make_new_message()
             self.network.send_to_all(message)
             new_messages.append(message)
+        return new_messages
 
     def _receive_messages(self):
         received_messages = {}
@@ -81,4 +85,10 @@ class SimulationRunner:
         for validator in validators:
             validator.update_safe_estimates()
         self.network.global_view.update_safe_estimates(self.validator_set)
+
+    def _send_initial_messages(self):
+        """ ensures that initial messages are attempted to be propogated.
+            requirement for any protocol where initial message is not shared """
+        for validator in self.validator_set:
+            self.network.send_to_all(validator.initial_message)
 

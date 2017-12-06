@@ -24,6 +24,7 @@ class Network(object):
     # async network rework
     #
     def delay(self, sender, receiver):
+        # return 1
         return r.choice([i for i in range(3)])
 
     def send(self, validator, message):
