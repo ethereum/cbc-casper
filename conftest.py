@@ -1,3 +1,4 @@
+import random as r
 import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
@@ -54,11 +55,31 @@ def validator_set():
 
 
 @pytest.fixture
-def validator():
-    return Validator("Name", 15.5)
+def validator(validator_set):
+    return r.choice(list(validator_set.validators))
+
+
+@pytest.fixture
+def to_from_validators(validator_set):
+    return r.sample(
+        validator_set.validators,
+        2
+    )
+
+
+@pytest.fixture
+def to_validator(to_from_validators):
+    return to_from_validators[0]
+
+
+@pytest.fixture
+def from_validator(to_from_validators):
+    return to_from_validators[1]
 
 
 @pytest.fixture
 def network(validator_set):
     network = Network(validator_set)
     return network
+
+

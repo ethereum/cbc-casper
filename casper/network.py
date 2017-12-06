@@ -1,4 +1,5 @@
 """The network module contains a network class allowing for message passing """
+from utils.priority_queue import PriorityQueue
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
@@ -10,9 +11,53 @@ class Network(object):
             self._collect_initial_messages(),
             protocol.initial_message(None)
         )
+        self.message_queues = {
+            validator: PriorityQueue()
+            for validator in self.validator_set
+        }
+        self.time = 0
 
         self.force_justify_messages = force_justify_messages
 
+    #
+    # async network rework
+    #
+    def delay(self, sender, receiver):
+        return 1
+
+    def send(self, validator, message):
+        self.message_queues[validator].put((
+            self.time + self.delay(message.sender, validator),
+            message
+        ))
+
+    def receive(self, validator):
+        queue = self.message_queues[validator]
+        if queue.qsize() == 0:
+            return None
+        if queue.peek()[0] > self.time:
+            return None
+
+        return queue.get()[1]
+
+    def receive_all(self, validator):
+        messages = []
+        message = self.receive(validator)
+        while message:
+            messages.append(message)
+            message = self.receive(validator)
+
+        return messages
+
+    def send_to_all(self, message):
+        for validator in self.validator_set:
+            if validator == message.sender:
+                continue
+            self.send(validator, message)
+
+    #
+    # legacy sync network
+    #
     def propagate_message_to_validator(self, message, validator):
         """Propagate a message to a validator."""
         assert message.hash in self.global_view.justified_messages, (
