@@ -16,6 +16,7 @@ from simulations.utils import (
     message_maker,
     select_protocol,
     MESSAGE_MODES,
+    NETWORKS,
     PROTOCOLS
 )
 
@@ -47,6 +48,11 @@ def main():
         '--protocol', type=str, default=config.get("DefaultProtocol"),
         choices=PROTOCOLS,
         help='specifies the protocol for the simulation'
+    )
+    parser.add_argument(
+        '--network', type=str, default=config.get("DefaultNetwork"),
+        choices=NETWORKS,
+        help='specifies the network model for the simulation'
     )
     parser.add_argument(
         '--validators', type=int, default=config.getint("NumValidators"),

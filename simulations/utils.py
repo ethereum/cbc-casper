@@ -1,7 +1,12 @@
 """The simulution utils module ... """
-import itertools
 import random as r
 
+from casper.networks import (
+    ConstantDelayNetwork,
+    GaussianDelayNetwork,
+    LinearDelayNetwork,
+    SynchronousNetwork
+)
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
@@ -10,8 +15,19 @@ from casper.protocols.order.order_protocol import OrderProtocol
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
-
+NETWORKS = ['sync', 'constant', 'linear', 'gaussian']
 PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
+
+
+def select_network(network):
+    if network == 'sync':
+        return SynchronousNetwork
+    if network == 'constant':
+        return ConstantDelayNetwork
+    if network == 'linear':
+        return LinearDelayNetwork
+    if network == 'gaussian':
+        return GaussianDelayNetwork
 
 
 def select_protocol(protocol):
