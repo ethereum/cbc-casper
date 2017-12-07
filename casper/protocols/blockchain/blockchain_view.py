@@ -51,7 +51,7 @@ class BlockchainView(AbstractView):
 
     def _initialize_message_caches(self, messages):
         self.when_added = {message: 0 for message in messages}
-        self.when_finalized = {}
+        self.when_finalized = {self.genesis_block: 0}
 
     def _update_when_added_cache(self, message):
         if message not in self.when_added:

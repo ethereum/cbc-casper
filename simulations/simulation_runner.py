@@ -1,6 +1,5 @@
 import sys
 
-
 class SimulationRunner:
     def __init__(
             self,
@@ -88,4 +87,3 @@ class SimulationRunner:
             requirement for any protocol where initial message is not shared """
         for validator in self.validator_set:
             self.network.send_to_all(validator.initial_message)
-

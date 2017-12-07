@@ -1,6 +1,7 @@
 {
     "msg_mode": "rand",
     "protocol": "binary",
+    "network": "linear",
     "num_simulations": 5,
     "rounds_per_sim": 40,
     "report_interval": 10,
