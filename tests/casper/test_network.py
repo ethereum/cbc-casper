@@ -1,22 +1,7 @@
 """The network testing module ... """
 from casper.network import Network
-CONSTANT = 10
 
 
-#
-# Helpers
-#
-def constant(sender, receiver):
-    return CONSTANT
-
-
-def zero(sender, receiver):
-    return 0
-
-
-#
-# Tests
-#
 def test_new_network(validator_set):
     network = Network(validator_set)
     assert network.validator_set == validator_set
