@@ -3,6 +3,10 @@ import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.network import Network
+from casper.networks import (
+    ConstantDelayNetwork,
+    SynchronousNetwork
+)
 from casper.validator import Validator
 
 from simulations.testing_language import TestLangCBC
@@ -79,8 +83,17 @@ def from_validator(to_from_validators):
 
 @pytest.fixture
 def network(validator_set):
-    network = Network(validator_set)
-    return network
+    return SynchronousNetwork(validator_set)
+
+
+@pytest.fixture
+def synchronous_network(validator_set):
+    return SynchronousNetwork(validator_set)
+
+
+@pytest.fixture
+def constant_delay_network(validator_set):
+    return ConstantDelayNetwork(validator_set)
 
 
 @pytest.fixture
