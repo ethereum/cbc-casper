@@ -1,8 +1,5 @@
 import sys
 
-from casper.networks import StepNetwork
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-
 
 class SimulationRunner:
     def __init__(
@@ -10,11 +7,11 @@ class SimulationRunner:
             validator_set,
             msg_gen,
             protocol,
+            network,
             total_rounds,
             report_interval,
             display,
             save,
-            force_justify_messages=False
     ):
         self.validator_set = validator_set
         self.msg_gen = msg_gen
@@ -31,7 +28,7 @@ class SimulationRunner:
         else:
             self.report_interval = 1
 
-        self.network = StepNetwork(validator_set, protocol, force_justify_messages)
+        self.network = network
 
         self.plot_tool = protocol.PlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()

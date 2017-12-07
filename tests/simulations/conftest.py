@@ -6,6 +6,15 @@ import simulations.utils as utils
 
 
 @pytest.fixture
-def simulation_runner(validator_set):
+def simulation_runner(validator_set, network):
     msg_gen = utils.message_maker('rand')
-    return SimulationRunner(validator_set, msg_gen, BlockchainProtocol, 20, 20, False, False)
+    return SimulationRunner(
+        validator_set,
+        msg_gen,
+        BlockchainProtocol,
+        network,
+        20,
+        20,
+        False,
+        False
+    )

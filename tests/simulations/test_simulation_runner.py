@@ -5,6 +5,7 @@ from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
 from casper.network import Network
+from casper.networks import StepNetwork
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
 
@@ -21,11 +22,13 @@ import simulations.utils as utils
 def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, report_interval):
     msg_gen = utils.message_maker(mode)
     validator_set = generate_validator_set(protocol)
+    network = StepNetwork(validator_set, protocol)
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         protocol,
+        network,
         rounds,
         report_interval,
         False,
@@ -97,11 +100,13 @@ def test_simulation_runner_send_messages(
         ):
     msg_gen = utils.message_maker(mode)
     validator_set = generate_validator_set(protocol)
+    network = StepNetwork(validator_set, protocol)
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         protocol,
+        network,
         100,
         20,
         False,

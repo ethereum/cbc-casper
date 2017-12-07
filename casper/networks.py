@@ -24,12 +24,12 @@ class LinearDelayNetwork(Network):
     MAX_DELAY = 5
 
     def delay(self, sender, receiver):
-        return r.choice([i+1 for i in range(self.MAX_DELAY)])
+        return r.randint(1, self.MAX_DELAY)
 
 
 class GaussianDelayNetwork(Network):
-    MU = 5
-    SIGMA = 2
+    MU = 20
+    SIGMA = 10
     MIN_DELAY = 1
 
     def delay(self, sender, receiver):

@@ -59,13 +59,13 @@ class IntegerPlotTool(PlotTool):
 
     def _update_new_justifications(self, new_messages):
         for message in new_messages:
-            validator = message.sender
+            sender = message.sender
             for validator in message.justification:
                 last_message = self.view.justified_messages[message.justification[validator]]
                 # only show if new justification
-                if last_message not in self.justifications[validator]:
+                if last_message not in self.justifications[sender]:
                     self.self_communications.append([last_message, message])
-                    self.justifications[validator].append(last_message)
+                    self.justifications[sender].append(last_message)
                 # always show self as justification
                 elif last_message.sender == message.sender:
                     self.self_communications.append([last_message, message])
