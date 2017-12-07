@@ -13,8 +13,7 @@ class IntegerPlotTool(PlotTool):
         self.view = view
         self.validator_set = validator_set
 
-        self.communications = []
-        self.self_communications = []
+        self.new_justifications = []
         self.bet_fault_tolerance = {}
         self.message_labels = {}
         self.justifications = {
@@ -24,12 +23,10 @@ class IntegerPlotTool(PlotTool):
 
         self.first_time = True
 
-    def update(self, new_messages=None, received_messages=None):
+    def update(self, new_messages=None):
         """Updates displayable items with new messages and paths"""
         if new_messages is None:
             new_messages = []
-        if received_messages is None:
-            received_messages = {}
 
         self._update_new_justifications(new_messages)
         self._update_message_fault_tolerance()
@@ -42,8 +39,7 @@ class IntegerPlotTool(PlotTool):
             self.first_time = False
 
         edgelist = []
-        edgelist.append(utils.edge(self.communications, 1, 'black', 'solid'))
-        edgelist.append(utils.edge(self.self_communications, 1, 'black', 'solid'))
+        edgelist.append(utils.edge(self.new_justifications, 1, 'black', 'solid'))
 
         self.next_viewgraph(
             self.view,
@@ -64,11 +60,11 @@ class IntegerPlotTool(PlotTool):
                 last_message = self.view.justified_messages[message.justification[validator]]
                 # only show if new justification
                 if last_message not in self.justifications[sender]:
-                    self.self_communications.append([last_message, message])
+                    self.new_justifications.append([last_message, message])
                     self.justifications[sender].append(last_message)
                 # always show self as justification
                 elif last_message.sender == message.sender:
-                    self.self_communications.append([last_message, message])
+                    self.new_justifications.append([last_message, message])
 
     def _update_message_labels(self, new_messages):
         for message in new_messages:

@@ -27,12 +27,10 @@ class BlockchainPlotTool(PlotTool):
 
         self.message_labels[self.genesis_block] = "G"
 
-    def update(self, new_messages=None, received_messages=None):
+    def update(self, new_messages=None):
         """Updates displayable items with new messages and paths"""
         if new_messages is None:
             new_messages = []
-        if received_messages is None:
-            received_messages = {}
 
         self._update_new_justifications(new_messages)
         self._update_blockchain(new_messages)
@@ -83,9 +81,6 @@ class BlockchainPlotTool(PlotTool):
                 if last_message not in self.justifications[sender]:
                     self.communications.append([last_message, message])
                     self.justifications[sender].append(last_message)
-
-    def _update_communications(self, received_messages):
-        pass
 
     def _update_blockchain(self, new_messages):
         for message in new_messages:
