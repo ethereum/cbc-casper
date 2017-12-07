@@ -28,8 +28,8 @@ class LinearDelayNetwork(Network):
 
 
 class GaussianDelayNetwork(Network):
-    MU = 20
-    SIGMA = 10
+    MU = 10
+    SIGMA = 5
     MIN_DELAY = 1
 
     def delay(self, sender, receiver):
