@@ -19,14 +19,14 @@ class Network(object):
 
         self.force_justify_messages = force_justify_messages
 
-    #
-    # async network rework
-    #
     def delay(self, sender, receiver):
         '''Must be defined in child class.
         Returns delay of next message for sender to receiver'''
         raise NotImplementedError
 
+    #
+    # Validator API to Network
+    #
     def send(self, validator, message):
         self.global_view.add_messages(
             set([message])
@@ -61,7 +61,7 @@ class Network(object):
             self.send(validator, message)
 
     #
-    # legacy sync network
+    # helpers
     #
     def _collect_initial_messages(self):
         initial_messages = set()
