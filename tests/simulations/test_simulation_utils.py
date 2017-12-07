@@ -51,7 +51,6 @@ def test_round_robin_message_maker(validator_set):
 
     assert msg_gen.next_sender_index == 0
     senders = validator_set.sorted_by_name()
-    # receivers = senders[1:] + senders[0:1]
 
     for i in range(3):
         for j in range(len(validator_set)):
