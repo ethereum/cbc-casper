@@ -94,7 +94,7 @@ available schemes are "rand", "rrob", "full", and "nofinal".
 "blockchain", "integner", and "binary".
 
 `network` (string): Specifies the network model test. Available networks are
-"sync", "constant", "linear", and "gaussian".
+"no-delay", "constant", "linear", and "gaussian".
 
 `num_simulations` (number): Specifies the number of simulations to run. Each
 simulation starts with a fresh setup -- messages, validators, etc.

@@ -3,7 +3,7 @@ import re
 import random as r
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.networks import SynchronousNetwork
+from casper.networks import NoDelayNetwork
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
@@ -22,7 +22,7 @@ class TestLangCBC(object):
 
         self.validator_set = ValidatorSet(val_weights, protocol)
         self.display = display
-        self.network = SynchronousNetwork(self.validator_set, protocol)
+        self.network = NoDelayNetwork(self.validator_set, protocol)
 
         self.plot_tool = PlotTool(display, False, 's')
         self.blocks = dict()

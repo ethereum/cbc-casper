@@ -3,7 +3,7 @@ import random as r
 from casper.network import Network
 
 
-class SynchronousNetwork(Network):
+class NoDelayNetwork(Network):
     def delay(self, sender, receiver):
         return 0
 

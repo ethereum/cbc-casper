@@ -24,13 +24,13 @@ def test_send_adds_to_global_view(network, global_view, from_validator, to_valid
     assert len(global_view.justified_messages) == num_justified + 1
 
 
-def test_send_zero_delay(synchronous_network, from_validator, to_validator):
+def test_send_zero_delay(no_delay_network, from_validator, to_validator):
     message = from_validator.make_new_message()
-    synchronous_network.send(to_validator, message)
+    no_delay_network.send(to_validator, message)
 
-    message_queue = synchronous_network.message_queues[to_validator]
+    message_queue = no_delay_network.message_queues[to_validator]
     assert message_queue.qsize() == 1
-    assert message_queue.peek()[0] == synchronous_network.time
+    assert message_queue.peek()[0] == no_delay_network.time
 
 
 def test_send_constant_delay(constant_delay_network, from_validator, to_validator):

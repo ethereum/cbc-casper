@@ -5,7 +5,7 @@ from casper.networks import (
     ConstantDelayNetwork,
     GaussianDelayNetwork,
     LinearDelayNetwork,
-    SynchronousNetwork
+    NoDelayNetwork
 )
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
@@ -20,8 +20,8 @@ PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
 
 
 def select_network(network):
-    if network == 'sync':
-        return SynchronousNetwork
+    if network == 'no-delay':
+        return NoDelayNetwork
     if network == 'constant':
         return ConstantDelayNetwork
     if network == 'linear':

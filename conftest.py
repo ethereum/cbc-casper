@@ -2,12 +2,10 @@ import random as r
 import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.network import Network
 from casper.networks import (
     ConstantDelayNetwork,
-    SynchronousNetwork
+    NoDelayNetwork
 )
-from casper.validator import Validator
 
 from simulations.testing_language import TestLangCBC
 from simulations.utils import generate_random_gaussian_validator_set
@@ -83,12 +81,12 @@ def from_validator(to_from_validators):
 
 @pytest.fixture
 def network(validator_set):
-    return SynchronousNetwork(validator_set)
+    return NoDelayNetwork(validator_set)
 
 
 @pytest.fixture
-def synchronous_network(validator_set):
-    return SynchronousNetwork(validator_set)
+def no_delay_network(validator_set):
+    return NoDelayNetwork(validator_set)
 
 
 @pytest.fixture
