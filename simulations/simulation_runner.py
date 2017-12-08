@@ -1,5 +1,6 @@
 import sys
 
+
 class SimulationRunner:
     def __init__(
             self,
@@ -49,9 +50,10 @@ class SimulationRunner:
         """ this becomes, who is going to make a message and send to the network """
         """ rather than what explicit paths happen """
         self.round += 1
-        new_messages = self._generate_new_messages()
         received_messages = self._receive_messages()
         self._update_safe_estimates(received_messages.keys())
+
+        new_messages = self._generate_new_messages()
 
         self.plot_tool.update(new_messages)
         if self.round % self.report_interval == self.report_interval - 1:
@@ -71,7 +73,7 @@ class SimulationRunner:
     def _receive_messages(self):
         received_messages = {}
         for validator in self.validator_set:
-            messages = self.network.receive_all(validator)
+            messages = self.network.receive_all_available(validator)
             if messages:
                 validator.receive_messages(set(messages))
                 received_messages[validator] = messages

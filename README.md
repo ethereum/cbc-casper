@@ -91,7 +91,7 @@ The following are the fields that make up an experiment to be defined in a `.jso
 available schemes are "rand", "rrob", "full", and "nofinal".
 
 `protocol` (string): Specifies the protocol to test. Available protocols are
-"blockchain", "integner", and "binary".
+"blockchain", "integer", and "binary".
 
 `network` (string): Specifies the network model test. Available networks are
 "no-delay", "constant", "linear", and "gaussian".

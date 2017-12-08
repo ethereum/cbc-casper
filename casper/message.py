@@ -19,34 +19,28 @@ class Message(object):
         # use of __hash__ in dictionaries, sets, etc
         return hash(self.hash)
 
-    @staticmethod
-    def is_message(message):
-        if message is None:
-            return False
-        return isinstance(message, Message)
-
     def __eq__(self, message):
-        if not self.is_message(message):
+        if not isinstance(message, Message):
             return False
         return self.hash == message.hash
 
     def __lt__(self, message):
-        if not self.is_message(message):
+        if not isinstance(message, Message):
             return False
         return self.hash < message.hash
 
     def __le__(self, message):
-        if not self.is_message(message):
+        if not isinstance(message, Message):
             return False
         return self.hash <= message.hash
 
     def __gt__(self, message):
-        if not self.is_message(message):
+        if not isinstance(message, Message):
             return False
         return self.hash > message.hash
 
     def __ge__(self, message):
-        if not self.is_message(message):
+        if not isinstance(message, Message):
             return False
         return self.hash >= message.hash
 

@@ -5,17 +5,17 @@ from casper.networks import (
     ConstantDelayNetwork,
     GaussianDelayNetwork,
     LinearDelayNetwork,
-    NoDelayNetwork
+    NoDelayNetwork,
+    StepNetwork
 )
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
 from casper.protocols.order.order_protocol import OrderProtocol
-
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
-NETWORKS = ['sync', 'constant', 'linear', 'gaussian']
+NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
 PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
 
 
@@ -24,6 +24,8 @@ def select_network(network):
         return NoDelayNetwork
     if network == 'constant':
         return ConstantDelayNetwork
+    if network == 'step':
+        return StepNetwork
     if network == 'linear':
         return LinearDelayNetwork
     if network == 'gaussian':

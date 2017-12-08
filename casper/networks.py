@@ -8,16 +8,15 @@ class NoDelayNetwork(Network):
         return 0
 
 
-class StepNetwork(Network):
-    def delay(self, sender, receiver):
-        return 1
-
-
 class ConstantDelayNetwork(Network):
     CONSTANT = 5
 
     def delay(self, sender, receiver):
         return self.CONSTANT
+
+
+class StepNetwork(ConstantDelayNetwork):
+    CONSTANT = 1
 
 
 class LinearDelayNetwork(Network):

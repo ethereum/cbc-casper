@@ -120,7 +120,7 @@ def test_receive_multiple_after_delay(constant_delay_network, from_validator, to
         messages.remove(message)
 
 
-def test_receive_all_after_delay(constant_delay_network, from_validator, to_validator):
+def test_receive_all_available_after_delay(constant_delay_network, from_validator, to_validator):
     network = constant_delay_network
     num_messages_to_send = 3
     messages = []
@@ -132,5 +132,5 @@ def test_receive_all_after_delay(constant_delay_network, from_validator, to_vali
     assert network.message_queues[to_validator].qsize() == num_messages_to_send
     network.time += network.CONSTANT * 3
 
-    received_messages = network.receive_all(to_validator)
+    received_messages = network.receive_all_available(to_validator)
     assert set(messages) == set(received_messages)

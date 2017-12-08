@@ -5,7 +5,7 @@ from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 class Network(object):
     """Simulates a network that allows for message passing between validators."""
-    def __init__(self, validator_set, protocol=BlockchainProtocol, force_justify_messages=False):
+    def __init__(self, validator_set, protocol=BlockchainProtocol):
         self.validator_set = validator_set
         self.global_view = protocol.View(
             self._collect_initial_messages(),
@@ -16,8 +16,6 @@ class Network(object):
             for validator in self.validator_set
         }
         self.time = 0
-
-        self.force_justify_messages = force_justify_messages
 
     def delay(self, sender, receiver):
         '''Must be defined in child class.
@@ -36,6 +34,12 @@ class Network(object):
             message
         ))
 
+    def send_to_all(self, message):
+        for validator in self.validator_set:
+            if validator == message.sender:
+                continue
+            self.send(validator, message)
+
     def receive(self, validator):
         queue = self.message_queues[validator]
         if queue.qsize() == 0:
@@ -45,7 +49,7 @@ class Network(object):
 
         return queue.get()[1]
 
-    def receive_all(self, validator):
+    def receive_all_available(self, validator):
         messages = []
         message = self.receive(validator)
         while message:
@@ -53,12 +57,6 @@ class Network(object):
             message = self.receive(validator)
 
         return messages
-
-    def send_to_all(self, message):
-        for validator in self.validator_set:
-            if validator == message.sender:
-                continue
-            self.send(validator, message)
 
     #
     # helpers
