@@ -82,7 +82,7 @@ def test_receive_at_delay(constant_delay_network, from_validator, to_validator):
     network.send(to_validator, message)
 
     assert network.message_queues[to_validator].qsize() == 1
-    network.time += network.CONSTANT
+    network.advance_time(network.CONSTANT)
     assert network.message_queues[to_validator].peek()[0] == network.time
 
     assert network.receive(to_validator) is message
@@ -95,7 +95,7 @@ def test_receive_after_delay(constant_delay_network, from_validator, to_validato
     network.send(to_validator, message)
 
     assert network.message_queues[to_validator].qsize() == 1
-    network.time += network.CONSTANT * 3
+    network.advance_time(network.CONSTANT * 3)
     assert network.message_queues[to_validator].peek()[0] < network.time
 
     assert network.receive(to_validator) is message
@@ -112,7 +112,7 @@ def test_receive_multiple_after_delay(constant_delay_network, from_validator, to
         messages.append(message)
 
     assert network.message_queues[to_validator].qsize() == num_messages_to_send
-    network.time += network.CONSTANT * 3
+    network.advance_time(network.CONSTANT * 3)
 
     for i in range(num_messages_to_send):
         message = network.receive(to_validator)
@@ -130,7 +130,7 @@ def test_receive_all_available_after_delay(constant_delay_network, from_validato
         messages.append(message)
 
     assert network.message_queues[to_validator].qsize() == num_messages_to_send
-    network.time += network.CONSTANT * 3
+    network.advance_time(network.CONSTANT * 3)
 
     received_messages = network.receive_all_available(to_validator)
     assert set(messages) == set(received_messages)

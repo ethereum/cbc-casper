@@ -15,12 +15,27 @@ class Network(object):
             validator: PriorityQueue()
             for validator in self.validator_set
         }
-        self.time = 0
+        self._current_time = 0
 
     def delay(self, sender, receiver):
         '''Must be defined in child class.
         Returns delay of next message for sender to receiver'''
         raise NotImplementedError
+
+    #
+    # Network Time API
+    # Example: SimulationRunner
+    # Base model comes with vary simple notion of time advanced forward in clicks by `advance_time`
+    #
+    # For more advanced usage, override `time` property with a real clock
+    # and disregard `advance_time`
+    #
+    @property
+    def time(self):
+        return self._current_time
+
+    def advance_time(self, amount=1):
+        self._current_time += amount
 
     #
     # Validator API to Network

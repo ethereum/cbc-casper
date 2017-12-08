@@ -59,7 +59,7 @@ class SimulationRunner:
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
-        self.network.time += 1
+        self.network.advance_time()
 
     def _generate_new_messages(self):
         validators = self.msg_gen(self.validator_set)
