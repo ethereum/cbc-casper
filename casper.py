@@ -68,7 +68,7 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-        '--display', action="store_true",
+        '--hide-display', action="store_true",
         help='display simulations round by round'
     )
     parser.add_argument(
@@ -99,7 +99,7 @@ def main():
         network=network,
         total_rounds=args.rounds,
         report_interval=args.report_interval,
-        display=args.display,
+        display=(not args.hide_display),
         save=args.save,
     )
     simulation_runner.run()
