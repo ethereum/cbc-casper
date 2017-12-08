@@ -72,7 +72,6 @@ def test_round_robin_message_maker(validator_set):
     ]
 )
 def test_full_message_maker(weights):
-    print(weights)
     validator_set = ValidatorSet(weights)
     msg_gen = message_maker("full")
 

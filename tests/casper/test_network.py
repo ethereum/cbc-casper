@@ -8,6 +8,18 @@ def test_new_network(validator_set):
     assert len(network.global_view.justified_messages) == 1
 
 
+def test_default_time(network):
+    assert network.time == 0
+    network.advance_time()
+    assert network.time == 1
+    network.advance_time()
+    assert network.time == 2
+
+    jump = 50
+    network.advance_time(jump)
+    assert network.time == 2 + jump
+
+
 def test_send(network, from_validator, to_validator):
     message = from_validator.make_new_message()
     assert network.message_queues[to_validator].qsize() == 0
