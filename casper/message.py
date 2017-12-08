@@ -20,11 +20,29 @@ class Message(object):
         return hash(self.hash)
 
     def __eq__(self, message):
-        if message is None:
-            return False
         if not isinstance(message, Message):
             return False
         return self.hash == message.hash
+
+    def __lt__(self, message):
+        if not isinstance(message, Message):
+            return False
+        return self.hash < message.hash
+
+    def __le__(self, message):
+        if not isinstance(message, Message):
+            return False
+        return self.hash <= message.hash
+
+    def __gt__(self, message):
+        if not isinstance(message, Message):
+            return False
+        return self.hash > message.hash
+
+    def __ge__(self, message):
+        if not isinstance(message, Message):
+            return False
+        return self.hash >= message.hash
 
     @property
     def hash(self):

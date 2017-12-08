@@ -3,7 +3,7 @@ import re
 import random as r
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.network import Network
+from casper.networks import NoDelayNetwork
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
@@ -22,7 +22,7 @@ class TestLangCBC(object):
 
         self.validator_set = ValidatorSet(val_weights, protocol)
         self.display = display
-        self.network = Network(self.validator_set, protocol)
+        self.network = NoDelayNetwork(self.validator_set, protocol)
 
         self.plot_tool = PlotTool(display, False, 's')
         self.blocks = dict()
@@ -78,6 +78,12 @@ class TestLangCBC(object):
 
         return messages_needed
 
+    def _propagate_message_to_validator(self, block, validator):
+        self.network.send(validator, block)
+        received_message = self.network.receive(validator)
+        if received_message:
+            validator.receive_messages(set([received_message]))
+
     def parse(self, test_string):
         """Parse the test_string, and run the test"""
         for token in test_string.split(' '):
@@ -100,11 +106,11 @@ class TestLangCBC(object):
         block = self.blocks[block_name]
         if block.hash in validator.view.justified_messages:
             raise Exception("Validator has already seen block")
-        self.network.propagate_message_to_validator(block, validator)
+        self._propagate_message_to_validator(block, validator)
 
         blocks_to_send = self._blocks_needed_to_justify(block, validator)
         for block in blocks_to_send:
-            self.network.propagate_message_to_validator(block, validator)
+            self._propagate_message_to_validator(block, validator)
 
         assert block.hash not in validator.view.pending_messages
         assert block.hash not in validator.view.num_missing_dependencies
@@ -119,14 +125,17 @@ class TestLangCBC(object):
         if block.hash in validator.view.justified_messages:
             raise Exception("Validator has already seen block")
 
-        self.network.propagate_message_to_validator(block, validator)
+        self._propagate_message_to_validator(block, validator)
 
     def make_block(self, validator, block_name):
         """Have some validator produce a block."""
         self._validate_validator(validator)
         self._validate_block_does_not_exist(block_name)
 
-        new_block = self.network.get_message_from_validator(validator)
+        new_block = validator.make_new_message()
+        self.network.global_view.add_messages(
+            set([new_block])
+        )
 
         if new_block.estimate is not None:
             self.blockchain.append([new_block, new_block.estimate])

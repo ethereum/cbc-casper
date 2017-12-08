@@ -16,12 +16,13 @@ import simulations.utils as utils
         ('nofinal', 2),
     ]
 )
-def test_num_messages(validator_set, mode, messages_generated_per_round):
+def test_num_messages(validator_set, network, mode, messages_generated_per_round):
     msg_gen = utils.message_maker(mode)
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         BlockchainProtocol,
+        network,
         100,
         20,
         False,

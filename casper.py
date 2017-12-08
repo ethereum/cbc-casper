@@ -14,8 +14,10 @@ from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
     message_maker,
+    select_network,
     select_protocol,
     MESSAGE_MODES,
+    NETWORKS,
     PROTOCOLS
 )
 
@@ -49,6 +51,11 @@ def main():
         help='specifies the protocol for the simulation'
     )
     parser.add_argument(
+        '--network', type=str, default=config.get("DefaultNetwork"),
+        choices=NETWORKS,
+        help='specifies the network model for the simulation'
+    )
+    parser.add_argument(
         '--validators', type=int, default=config.getint("NumValidators"),
         help='specifies the number of validators in validator set'
     )
@@ -61,7 +68,7 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-        '--display', action="store_true",
+        '--hide-display', action="store_true",
         help='display simulations round by round'
     )
     parser.add_argument(
@@ -75,23 +82,25 @@ def main():
 
     args = parser.parse_args()
     protocol = select_protocol(args.protocol)
+    network_type = select_network(args.network)
 
     validator_set = generate_random_gaussian_validator_set(
         protocol,
         args.validators
     )
+    network = network_type(validator_set, protocol)
 
     msg_gen = message_maker(args.mode)
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        protocol,
+        protocol=protocol,
+        network=network,
         total_rounds=args.rounds,
         report_interval=args.report_interval,
-        display=args.display,
+        display=(not args.hide_display),
         save=args.save,
-        force_justify_messages=args.justify_messages
     )
     simulation_runner.run()
 

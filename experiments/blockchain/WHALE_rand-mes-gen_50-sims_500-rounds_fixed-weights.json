@@ -1,6 +1,7 @@
 {
     "msg_mode": "rand",
     "protocol": "blockchain",
+    "network": "sync",
     "num_simulations": 50,
     "rounds_per_sim": 500,
     "report_interval": 20,

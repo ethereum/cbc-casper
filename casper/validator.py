@@ -18,8 +18,8 @@ class Validator(object):
         self.validator_set = validator_set
         self.protocol = protocol
 
-        initial_message = protocol.initial_message(self)
-        self.view = protocol.View(set([initial_message]), initial_message)
+        self.initial_message = protocol.initial_message(self)
+        self.view = protocol.View(set([self.initial_message]), self.initial_message)
 
     def __eq__(self, val):
         if val is None:

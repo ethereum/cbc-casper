@@ -1,17 +1,35 @@
 """The simulution utils module ... """
-import itertools
 import random as r
 
+from casper.networks import (
+    ConstantDelayNetwork,
+    GaussianDelayNetwork,
+    LinearDelayNetwork,
+    NoDelayNetwork,
+    StepNetwork
+)
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
 from casper.protocols.order.order_protocol import OrderProtocol
-
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
-
+NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
 PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
+
+
+def select_network(network):
+    if network == 'no-delay':
+        return NoDelayNetwork
+    if network == 'constant':
+        return ConstantDelayNetwork
+    if network == 'step':
+        return StepNetwork
+    if network == 'linear':
+        return LinearDelayNetwork
+    if network == 'gaussian':
+        return GaussianDelayNetwork
 
 
 def select_protocol(protocol):
@@ -31,27 +49,23 @@ def message_maker(mode):
     if mode == "rand":
 
         def random(validator_set, num_messages=1):
-            """Each round, some randomly selected validators propagate their most recent
-            message to other randomly selected validators, who then create new messages."""
-            pairs = list(itertools.permutations(validator_set, 2))
-            return r.sample(pairs, num_messages)
+            """Each round, some randomly selected validator makes a message"""
+            return r.sample(validator_set.validators, 1)
+            # pairs = list(itertools.permutations(validator_set, 2))
+            # return r.sample(pairs, num_messages)
 
         return random
 
     if mode == "rrob":
 
         def round_robin(validator_set):
-            """Each round, the creator of the last round's block sends it to the next
-            receiver, who then creates a block."""
+            """Each round, the next validator in a set order makes a message"""
             sorted_validators = validator_set.sorted_by_name()
             sender_index = round_robin.next_sender_index
             round_robin.next_sender_index = (sender_index + 1) % len(validator_set)
-            receiver_index = round_robin.next_sender_index
+            # receiver_index = round_robin.next_sender_index
 
-            return [[
-                sorted_validators[sender_index],
-                sorted_validators[receiver_index]
-            ]]
+            return [sorted_validators[sender_index]]
 
         round_robin.next_sender_index = 0
         return round_robin
@@ -59,10 +73,8 @@ def message_maker(mode):
     if mode == "full":
 
         def full_propagation(validator_set):
-            """Each round, all validators receive all other validators previous
-            messages, and then all create messages."""
-            pairs = list(itertools.permutations(validator_set, 2))
-            return pairs
+            """Each round, all validators make all messages"""
+            return validator_set.validators
 
         return full_propagation
 

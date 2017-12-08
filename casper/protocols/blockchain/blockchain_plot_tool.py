@@ -17,23 +17,22 @@ class BlockchainPlotTool(PlotTool):
 
         self.blockchain = []
         self.communications = []
+
         self.block_fault_tolerance = {}
         self.message_labels = {}
+        self.justifications = {
+            validator: []
+            for validator in validator_set
+        }
 
         self.message_labels[self.genesis_block] = "G"
 
-    def update(self, message_paths=None, sent_messages=None, new_messages=None):
+    def update(self, new_messages=None):
         """Updates displayable items with new messages and paths"""
-        if message_paths is None:
-            message_paths = []
-        if sent_messages is None:
-            sent_messages = dict()
         if new_messages is None:
-            new_messages = dict()
+            new_messages = []
 
-        self._track_genesis_linked_messages(sent_messages)
-
-        self._update_communications(message_paths, sent_messages, new_messages)
+        self._update_new_justifications(new_messages)
         self._update_blockchain(new_messages)
         self._update_block_fault_tolerance()
         self._update_message_labels(new_messages)
@@ -73,29 +72,23 @@ class BlockchainPlotTool(PlotTool):
 
         return vals_chain_edges
 
-    def _track_genesis_linked_messages(self, sent_messages):
-        """Genesis linked messages won't be tracked by communications
-        and need to be manually checked and added"""
-        for sender in sent_messages:
-            message = sent_messages[sender]
-            if message.estimate == self.genesis_block:
-                edge = [self.genesis_block, message]
-                if edge not in self.communications:
-                    self.communications.append(edge)
-
-                self.message_labels[message] = message.sequence_number
-
-    def _update_communications(self, message_paths, sent_messages, new_messages):
-        for sender, receiver in message_paths:
-            self.communications.append([sent_messages[sender], new_messages[receiver]])
+    def _update_new_justifications(self, new_messages):
+        for message in new_messages:
+            sender = message.sender
+            for validator in message.justification:
+                last_message = self.view.justified_messages[message.justification[validator]]
+                # only show if new justification
+                if last_message not in self.justifications[sender]:
+                    self.communications.append([last_message, message])
+                    self.justifications[sender].append(last_message)
 
     def _update_blockchain(self, new_messages):
-        for message in new_messages.values():
+        for message in new_messages:
             if message.estimate is not None:
                 self.blockchain.append([message, message.estimate])
 
     def _update_message_labels(self, new_messages):
-        for message in new_messages.values():
+        for message in new_messages:
             self.message_labels[message] = message.sequence_number
 
     def _update_block_fault_tolerance(self):
