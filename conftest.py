@@ -2,11 +2,11 @@ import random as r
 import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.networks import (
+
+from simulations.networks.simple_networks import (
     ConstantDelayNetwork,
     NoDelayNetwork
 )
-
 from simulations.testing_language import TestLangCBC
 from simulations.utils import generate_random_gaussian_validator_set
 

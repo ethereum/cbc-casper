@@ -1,18 +1,20 @@
 """The simulution utils module ... """
 import random as r
 
-from casper.networks import (
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.protocols.binary.binary_protocol import BinaryProtocol
+from casper.protocols.integer.integer_protocol import IntegerProtocol
+from casper.protocols.order.order_protocol import OrderProtocol
+from casper.validator_set import ValidatorSet
+
+from simulations.networks.simple_networks import (
     ConstantDelayNetwork,
     GaussianDelayNetwork,
     LinearDelayNetwork,
     NoDelayNetwork,
     StepNetwork
 )
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.protocols.binary.binary_protocol import BinaryProtocol
-from casper.protocols.integer.integer_protocol import IntegerProtocol
-from casper.protocols.order.order_protocol import OrderProtocol
-from casper.validator_set import ValidatorSet
+
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
 NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']

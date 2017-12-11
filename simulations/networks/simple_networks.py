@@ -1,6 +1,6 @@
 import random as r
 
-from casper.network import Network
+from simulations.network import Network
 
 
 class NoDelayNetwork(Network):

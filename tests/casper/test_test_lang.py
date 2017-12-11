@@ -1,9 +1,8 @@
 """The language testing module ... """
 import pytest
 
-from casper.network import Network
 from simulations.testing_language import TestLangCBC
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+from simulations.network import Network
 
 
 def test_init():

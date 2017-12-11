@@ -4,8 +4,8 @@ import pytest
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
-from casper.network import Network
-from casper.networks import StepNetwork
+from simulations.network import Network
+from simulations.networks.simple_networks import StepNetwork
 from simulations.simulation_runner import SimulationRunner
 import simulations.utils as utils
 

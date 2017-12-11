@@ -1,5 +1,5 @@
 """The network testing module ... """
-from casper.network import Network
+from simulations.network import Network
 
 
 def test_new_network(validator_set):

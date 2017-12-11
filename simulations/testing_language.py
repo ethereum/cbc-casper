@@ -3,11 +3,12 @@ import re
 import random as r
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.networks import NoDelayNetwork
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.validator_set import ValidatorSet
 import casper.utils as utils
+
+from simulations.networks.simple_networks import NoDelayNetwork
 
 
 class TestLangCBC(object):
