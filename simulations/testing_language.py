@@ -44,7 +44,7 @@ class TestingLanguage(StateLanguage):
     def round_robin(self, validator, message_name):
         """Have each validator create a message in a perfect round robin."""
         self.check_validator_exists(validator)
-        self.check_message_exists(message_name)
+        self.check_message_not_exists(message_name)
 
         # start round robin at validator speicied by validator in args
         validators = self.validator_set.sorted_by_name()

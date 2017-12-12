@@ -115,10 +115,10 @@ def test_only_add_justified_messages(test_string, justified_messages, unjustifie
         ),
         (
             TEST_WEIGHT,
-            'B0-A S1-A B0-B B0-C B0-D B0-E P1-E',
+            'M0-A SJ1-A M0-B M0-C M0-D M0-E S1-E',
             [['A', 'B', 'C', 'D', 'E'], ['A'], []],
             [[], [], ['E']],
-            'P1-D P1-B P1-C'
+            'S1-D S1-B S1-C'
         ),
     ]
 )
@@ -153,7 +153,7 @@ def test_resolve_message_when_justification_arrives(weight, test_string, justifi
 
 
 def test_multiple_messages_arriving_resolve():
-    test_string = "B0-A S1-A B0-B B0-C B0-D B0-E B0-F P1-F"
+    test_string = "M0-A SJ1-A M0-B M0-C M0-D M0-E M0-F S1-F"
     test_lang = BlockchainTestLang(TEST_WEIGHT)
     test_lang.parse(test_string)
 
