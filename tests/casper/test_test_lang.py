@@ -2,12 +2,12 @@
 import pytest
 
 from casper.network import Network
-from simulations.testing_language import TestLangCBC
+from simulations.blockchain_test_lang import BlockchainTestLang
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 def test_init():
-    TestLangCBC({0: 1})
+    BlockchainTestLang({0: 1})
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ def test_init():
     ]
 )
 def test_initialize_validator_set(weights, num_val, total_weight):
-    test_lang = TestLangCBC(weights)
+    test_lang = BlockchainTestLang(weights)
     validator_set = test_lang.validator_set
 
     assert len(validator_set) == num_val
@@ -29,13 +29,13 @@ def test_initialize_validator_set(weights, num_val, total_weight):
 
 
 def test_init_creates_network(test_weight):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     assert isinstance(test_lang.network, Network)
 
 
 def test_init_validators_have_only_genesis(test_weight):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     assert len(test_lang.network.global_view.justified_messages) == 1
 
@@ -63,7 +63,7 @@ def test_init_validators_have_only_genesis(test_weight):
     ]
 )
 def test_parse_only_valid_tokens(test_string, test_weight, error):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
@@ -84,7 +84,7 @@ def test_parse_only_valid_tokens(test_string, test_weight, error):
     ]
 )
 def test_parse_only_valid_tokens_split_strings(test_strings, test_weight, error):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
@@ -118,7 +118,7 @@ def test_parse_only_valid_tokens_split_strings(test_strings, test_weight, error)
     ]
 )
 def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
-    test_lang = TestLangCBC(val_weights)
+    test_lang = BlockchainTestLang(val_weights)
 
     if exception:
         with pytest.raises(ValueError, match=exception):
@@ -142,7 +142,7 @@ def test_parse_only_valid_val_and_blocks(test_string, val_weights, exception):
     ]
 )
 def test_parse_only_valid_val_and_blocks_split_strings(test_strings, val_weights, exception):
-    test_lang = TestLangCBC(val_weights)
+    test_lang = BlockchainTestLang(val_weights)
 
     if exception:
         with pytest.raises(ValueError, match=exception):
@@ -176,7 +176,7 @@ def test_make_blocks_makes_new_blocks_adds_global_view(
         num_blocks,
         exception
         ):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     if exception:
         with pytest.raises(Exception, match=exception):
@@ -210,7 +210,7 @@ def test_make_blocks_makes_new_blocks_adds_global_view(
     ]
 )
 def test_make_block_builds_on_entire_view(test_string, block_justification, test_weight):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
     test_lang.parse(test_string)
     global_view = test_lang.network.global_view
 
@@ -242,7 +242,7 @@ def test_make_block_builds_on_entire_view(test_string, block_justification, test
     ]
 )
 def test_send_block_sends_only_existing_blocks(test_string, test_weight, exception):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     if exception:
         with pytest.raises(Exception, match=exception):
@@ -289,7 +289,7 @@ def test_send_block_updates_val_view(
         num_messages_per_view,
         message_keys
         ):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in num_messages_per_view:
@@ -342,7 +342,7 @@ def test_round_robin_updates_val_view(
         other_val_seen,
         test_weight
         ):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in num_messages_per_view:
@@ -371,7 +371,7 @@ def test_round_robin_updates_val_view(
     ]
 )
 def test_head_equals_block_checks_forkchoice(test_string, test_weight, val_forkchoice):
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
     test_lang.parse(test_string)
 
     for validator_name in val_forkchoice:
@@ -397,7 +397,7 @@ def test_no_safety(test_string, test_weight, error):
                 'S' + str((i + 1) % len(test_weight)) + '-' + str(i) + ' '
         test_string += 'U0-0'
 
-    test_lang = TestLangCBC(test_weight)
+    test_lang = BlockchainTestLang(test_weight)
 
     if error:
         with pytest.raises(Exception, match=error):

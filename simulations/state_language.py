@@ -14,7 +14,7 @@ class StateLanguage(object):
 
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)([\\{A-Za-z,}]*)'
 
-    def __init__(self, val_weights, protocol=BlockchainProtocol):
+    def __init__(self, val_weights, protocol=BlockchainProtocol, display=False):
 
         self.validator_set = ValidatorSet(val_weights, protocol)
         self.network = NoDelayNetwork(self.validator_set, protocol)
@@ -51,7 +51,7 @@ class StateLanguage(object):
             set([new_message])
         )
 
-        self.plot_tool.update(new_message)
+        self.plot_tool.update([new_message])
 
         self.messages[message_name] = new_message
 
@@ -61,7 +61,7 @@ class StateLanguage(object):
 
         message = self.messages[message_name]
 
-        self.propagate_message_to_validator(message, validator)
+        self.propagate_message_to_validator(validator, message)
 
 
     def make_invalid(self, validator, message_name):
@@ -80,8 +80,8 @@ class StateLanguage(object):
         if message_name in self.messages:
             raise ValueError('Block {} already exists'.format(message_name))
 
-    def propagate_message_to_validator(self, block, validator):
-        self.network.send(validator, block)
+    def propagate_message_to_validator(self, validator, message):
+        self.network.send(validator, message)
         received_message = self.network.receive(validator)
         if received_message:
             validator.receive_messages(set([received_message]))
@@ -90,7 +90,7 @@ class StateLanguage(object):
         self.plot_tool.plot()
 
     def parse(self, protocol_state_string):
-        """Parse the """
+        """Parse the state string!"""
         for token in protocol_state_string.split(' '):
             letter, validator, dash, message, removed_message_names = re.match(
                 self.TOKEN_PATTERN, token
@@ -104,6 +104,7 @@ class StateLanguage(object):
             if letter == 'M':
                 #TODO: parse removed_message_names in this case!
                 removed_message = set()
+                print("Validator: " + str(validator))
                 self.handlers[letter](validator, message, removed_message)
             elif letter == 'P':
                 self.handlers[letter]()

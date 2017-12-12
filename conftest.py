@@ -7,7 +7,7 @@ from casper.networks import (
     NoDelayNetwork
 )
 
-from simulations.testing_language import TestLangCBC
+from simulations.blockchain_test_lang import BlockchainTestLang
 from simulations.utils import generate_random_gaussian_validator_set
 
 
@@ -17,11 +17,11 @@ def pytest_addoption(parser):
 
 
 def run_test_lang_with_reports(test_string, weights):
-    TestLangCBC(weights, BlockchainProtocol, True).parse(test_string)
+    BlockchainTestLang(weights, True).parse(test_string)
 
 
 def run_test_lang_without_reports(test_string, weights):
-    TestLangCBC(weights, BlockchainProtocol, False).parse(test_string)
+    BlockchainTestLang(weights, False).parse(test_string)
 
 
 def random_gaussian_validator_set_from_protocol(protocol=BlockchainProtocol):
