@@ -2,7 +2,7 @@
 import pytest
 
 from casper.network import Network
-from simulations.blockchain_test_lang import BlockchainTestLang
+from testing_languages.blockchain_test_lang import BlockchainTestLang
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
@@ -215,7 +215,7 @@ def test_make_block_builds_on_entire_view(test_string, block_justification, test
     global_view = test_lang.network.global_view
 
     for b in block_justification:
-        block = test_lang.blocks[b]
+        block = test_lang.message[b]
         assert len(block.justification) == len(block_justification[b])
         for validator_name in block_justification[b]:
             block_in_justification = block_justification[b][validator_name]
@@ -228,7 +228,7 @@ def test_make_block_builds_on_entire_view(test_string, block_justification, test
                 if block_in_justification == "GEN":
                     assert global_view.genesis_block == justification_message
                 else:
-                    assert test_lang.blocks[block_in_justification] == justification_message
+                    assert test_lang.message[block_in_justification] == justification_message
 
 
 @pytest.mark.parametrize(

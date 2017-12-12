@@ -104,7 +104,6 @@ class StateLanguage(object):
             if letter == 'M':
                 #TODO: parse removed_message_names in this case!
                 removed_message = set()
-                print("Validator: " + str(validator))
                 self.handlers[letter](validator, message, removed_message)
             elif letter == 'P':
                 self.handlers[letter]()

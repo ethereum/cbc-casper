@@ -7,7 +7,7 @@ from casper.networks import (
     NoDelayNetwork
 )
 
-from simulations.blockchain_test_lang import BlockchainTestLang
+from testing_languages.blockchain_test_lang import BlockchainTestLang
 from simulations.utils import generate_random_gaussian_validator_set
 
 

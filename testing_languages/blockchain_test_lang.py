@@ -2,7 +2,7 @@
 import re
 import random as r
 
-from simulations.testing_language import TestingLanguage
+from testing_languages.testing_language import TestingLanguage
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.networks import NoDelayNetwork
 from casper.plot_tool import PlotTool
