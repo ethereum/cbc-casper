@@ -26,7 +26,7 @@ def test_many_val_round_robin_forkchoice(test_lang_runner):
     validators choose the one chain as their fork choice
     """
     test_string = ""
-    for i in range(100):
+    for i in range(25):
         test_string += "M" + str(i % 10) + "-" + str(i) + " " \
                      + "SJ" + str((i + 1) % 10) + "-" + str(i) + " " \
                      + "CE" + str((i + 1) % 10) + "-" + str(i) + " "

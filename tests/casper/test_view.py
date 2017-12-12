@@ -33,7 +33,7 @@ def test_justification_stores_hash():
 
 def test_justification_includes_justified_messages():
     test_lang = BlockchainTestLang(TEST_WEIGHT)
-    test_lang.parse('M0-A M0-B SJ1-B M1-C')
+    test_lang.parse('M0-A M0-B S1-B M1-C')
 
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)
@@ -42,6 +42,7 @@ def test_justification_includes_justified_messages():
 
     assert len(justification) == 2
     assert test_lang.messages["A"].hash not in justification.values()
+    assert test_lang.messages["B"].hash not in justification.values()
     assert test_lang.network.global_view.genesis_block.hash in justification.values()
     assert justification[validator_1] == test_lang.messages['C'].hash
 
