@@ -13,7 +13,7 @@ from configparser import ConfigParser
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
-    message_maker,
+    message_strategy,
     select_network,
     select_protocol,
     MESSAGE_MODES,
@@ -90,11 +90,9 @@ def main():
     )
     network = network_type(validator_set, protocol)
 
-    msg_gen = message_maker(args.mode)
-
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        message_strategy(args.mode),
         protocol=protocol,
         network=network,
         total_rounds=args.rounds,

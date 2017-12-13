@@ -67,7 +67,7 @@ def test_send_to_all(network, from_validator):
             continue
         message_queue = network.message_queues[validator]
         assert message_queue.qsize() == 1
-        assert message_queue.queue[0][1] == message
+        assert message_queue.peek()[1] == message
 
 
 def test_receive_empty(network, validator):

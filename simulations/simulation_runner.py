@@ -1,11 +1,12 @@
 import sys
+from simulations.validator_client import ValidatorClient
 
 
 class SimulationRunner:
     def __init__(
             self,
             validator_set,
-            msg_gen,
+            msg_strategy,
             protocol,
             network,
             total_rounds,
@@ -14,7 +15,12 @@ class SimulationRunner:
             save,
     ):
         self.validator_set = validator_set
-        self.msg_gen = msg_gen
+        self.validator_clients = [
+            ValidatorClient(validator, network) for validator in validator_set
+        ]
+        for validator_client in self.validator_clients:
+            validator_client.should_make_new_message = msg_strategy
+
         self.save = save
 
         self.round = 0
@@ -49,7 +55,8 @@ class SimulationRunner:
         """ run one round of the simulation """
         """ this becomes, who is going to make a message and send to the network """
         """ rather than what explicit paths happen """
-        self.round += 1
+        self._advance_time()
+
         received_messages = self._receive_messages()
         self._update_safe_estimates(received_messages.keys())
 
@@ -59,25 +66,27 @@ class SimulationRunner:
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
-        self.network.advance_time()
-
-    def _generate_new_messages(self):
-        validators = self.msg_gen(self.validator_set)
-        new_messages = []
-        for validator in validators:
-            message = validator.make_new_message()
-            self.network.send_to_all(message)
-            new_messages.append(message)
-        return new_messages
+    def _advance_time(self):
+        self.round += 1
+        self.network.set_time(self.round)
+        for validator_client in self.validator_clients:
+            validator_client.set_time(self.round)
 
     def _receive_messages(self):
         received_messages = {}
-        for validator in self.validator_set:
-            messages = self.network.receive_all_available(validator)
+        for validator_client in self.validator_clients:
+            messages = validator_client.retrieve_messages()
             if messages:
-                validator.receive_messages(set(messages))
-                received_messages[validator] = messages
+                received_messages[validator_client.validator] = messages
         return received_messages
+
+    def _generate_new_messages(self):
+        new_messages = []
+        for validator_client in self.validator_clients:
+            message = validator_client.make_and_propagate_message()
+            if message:
+                new_messages.append(message)
+        return new_messages
 
     def _update_safe_estimates(self, validators):
         for validator in validators:

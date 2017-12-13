@@ -15,18 +15,18 @@ import simulations.utils as utils
     [
         (BinaryProtocol, 'rand', 10, 2),
         (BlockchainProtocol, 'rand', 10, 1),
-        (BlockchainProtocol, 'rrob', None, None),
-        (BinaryProtocol, 'rrob', None, None),
+        (BlockchainProtocol, 'always', None, None),
+        (BinaryProtocol, 'always', None, None),
     ]
 )
 def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, report_interval):
-    msg_gen = utils.message_maker(mode)
+    msg_strategy = utils.message_strategy(mode)
     validator_set = generate_validator_set(protocol)
     network = StepNetwork(validator_set, protocol)
 
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        msg_strategy,
         protocol,
         network,
         rounds,
@@ -36,7 +36,7 @@ def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, r
     )
 
     assert simulation_runner.validator_set == validator_set
-    assert simulation_runner.msg_gen == msg_gen
+    assert simulation_runner.validator_clients[0].should_make_new_message == msg_strategy
     assert simulation_runner.round == 0
     assert isinstance(simulation_runner.network, Network)
 
@@ -79,32 +79,28 @@ def test_simulation_runner_step(simulation_runner):
 
 
 @pytest.mark.parametrize(
-    'protocol, mode, messages_generated_per_round, potential_extra_messages',
+    'protocol, mode, max_messages_generated_per_round, potential_extra_messages',
     [
-        (BlockchainProtocol, 'rand', 1, 4),
-        (BlockchainProtocol, 'rrob', 1, 4),
-        (BlockchainProtocol, 'full', 5, 4),
-        (BlockchainProtocol, 'nofinal', 2, 2),
-        (BinaryProtocol, 'rand', 1, 0),
-        (BinaryProtocol, 'rrob', 1, 0),
-        (BinaryProtocol, 'full', 5, 0),
-        (BinaryProtocol, 'nofinal', 2, 0),
+        (BlockchainProtocol, 'always', 5, 4),
+        (BlockchainProtocol, 'rand', 5, 4),
+        (BinaryProtocol, 'rand', 5, 0),
+        (BinaryProtocol, 'always', 5, 0),
     ]
 )
 def test_simulation_runner_send_messages(
         generate_validator_set,
         protocol,
         mode,
-        messages_generated_per_round,
+        max_messages_generated_per_round,
         potential_extra_messages
         ):
-    msg_gen = utils.message_maker(mode)
+    msg_strategy = utils.message_strategy(mode)
     validator_set = generate_validator_set(protocol)
     network = StepNetwork(validator_set, protocol)
 
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        msg_strategy,
         protocol,
         network,
         100,
@@ -122,4 +118,5 @@ def test_simulation_runner_send_messages(
     for i in range(10):
         simulation_runner.step()
         assert len(simulation_runner.network.global_view.justified_messages) <= \
-            initial_message_length + potential_extra_messages + (i+1)*messages_generated_per_round
+            initial_message_length + potential_extra_messages + \
+            (i+1)*max_messages_generated_per_round

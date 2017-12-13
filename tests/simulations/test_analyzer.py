@@ -8,19 +8,17 @@ import simulations.utils as utils
 
 
 @pytest.mark.parametrize(
-    'mode, messages_generated_per_round',
+    'mode, max_messages_generated_per_round',
     [
-        ('rand', 1),
-        ('rrob', 1),
-        ('full', 5),
-        ('nofinal', 2),
+        ('rand', 5),
+        ('always', 5),
     ]
 )
-def test_num_messages(validator_set, network, mode, messages_generated_per_round):
-    msg_gen = utils.message_maker(mode)
+def test_num_messages(validator_set, network, mode, max_messages_generated_per_round):
+    msg_strategy = utils.message_strategy(mode)
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        msg_strategy,
         BlockchainProtocol,
         network,
         100,
@@ -35,7 +33,7 @@ def test_num_messages(validator_set, network, mode, messages_generated_per_round
 
     for i in range(10):
         simulation_runner.step()
-        messages_generated = 1 + (i + 1) * messages_generated_per_round
+        messages_generated = 1 + (i + 1) * max_messages_generated_per_round
 
         assert analyzer.num_messages <= messages_generated + potential_extra_messages
 

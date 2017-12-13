@@ -1,11 +1,15 @@
 """The network module contains a network class allowing for message passing """
-from utils.priority_queue import PriorityQueue
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
+from utils.clock import Clock
+from utils.priority_queue import PriorityQueue
 
-class Network(object):
+
+class Network(Clock):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol):
+        super().__init__()
+
         self.validator_set = validator_set
         self.global_view = protocol.View(
             self._collect_initial_messages(),
@@ -15,27 +19,11 @@ class Network(object):
             validator: PriorityQueue()
             for validator in self.validator_set
         }
-        self._current_time = 0
 
     def delay(self, sender, receiver):
         '''Must be defined in child class.
         Returns delay of next message for sender to receiver'''
         raise NotImplementedError
-
-    #
-    # Network Time API
-    # Example: SimulationRunner
-    # Base model comes with vary simple notion of time advanced forward in clicks by `advance_time`
-    #
-    # For more advanced usage, override `time` property with a real clock
-    # and disregard `advance_time`
-    #
-    @property
-    def time(self):
-        return self._current_time
-
-    def advance_time(self, amount=1):
-        self._current_time += amount
 
     #
     # Validator API to Network

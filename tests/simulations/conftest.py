@@ -13,10 +13,10 @@ import simulations.utils as utils
 
 @pytest.fixture
 def simulation_runner(validator_set, network):
-    msg_gen = utils.message_maker('rand')
+    msg_strategy = utils.message_strategy('rand')
     return SimulationRunner(
         validator_set,
-        msg_gen,
+        msg_strategy,
         BlockchainProtocol,
         network,
         20,
@@ -55,5 +55,5 @@ def global_view(network):
 #
 
 @pytest.fixture
-def validator_client(validator):
-    return ValidatorClient(validator)
+def validator_client(validator, network):
+    return ValidatorClient(validator, network)

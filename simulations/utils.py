@@ -16,7 +16,7 @@ from simulations.networks.simple_networks import (
 )
 
 
-MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
+MESSAGE_MODES = ['rand', 'always']
 NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
 PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
 
@@ -45,51 +45,26 @@ def select_protocol(protocol):
         return IntegerProtocol
 
 
-def message_maker(mode):
-    """The message maker defines the logic for running each type of simulation."""
+def message_strategy(mode):
+    """The message strategy defines the logic for a validator_client making a message."""
 
     if mode == "rand":
 
-        def random(validator_set, num_messages=1):
-            """Each round, some randomly selected validator makes a message"""
-            return r.sample(validator_set.validators, 1)
-            # pairs = list(itertools.permutations(validator_set, 2))
-            # return r.sample(pairs, num_messages)
+        def random():
+            """each time asked, 25% chance of making message"""
+            if r.random() <= 0.25:
+                return True
+            return False
 
         return random
 
-    if mode == "rrob":
+    if mode == "always":
 
-        def round_robin(validator_set):
-            """Each round, the next validator in a set order makes a message"""
-            sorted_validators = validator_set.sorted_by_name()
-            sender_index = round_robin.next_sender_index
-            round_robin.next_sender_index = (sender_index + 1) % len(validator_set)
-            # receiver_index = round_robin.next_sender_index
+        def always():
+            """Each time asked, 100% chance of making message"""
+            return True
 
-            return [sorted_validators[sender_index]]
-
-        round_robin.next_sender_index = 0
-        return round_robin
-
-    if mode == "full":
-
-        def full_propagation(validator_set):
-            """Each round, all validators make all messages"""
-            return validator_set.validators
-
-        return full_propagation
-
-    if mode == "nofinal":
-        rrob = message_maker("rrob")
-
-        def no_final(validator_set):
-            """Each round, two simultaneous round-robin message propagations occur at the same
-            time. This results in validators never being able to finalize later blocks (they
-            may finalize initial blocks, depending on validator weight distribution)."""
-            return [rrob(validator_set)[0], rrob(validator_set)[0]]
-
-        return no_final
+        return always
 
     return None
 
