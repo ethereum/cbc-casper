@@ -60,9 +60,9 @@ class SimulationRunner:
         received_messages = self._receive_messages()
         self._update_safe_estimates(received_messages.keys())
 
-        new_messages = self._generate_new_messages()
+        self._generate_new_messages()
 
-        self.plot_tool.update(new_messages)
+        self.plot_tool.update()
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 

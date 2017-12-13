@@ -10,7 +10,8 @@ this manner, yet... :)
 import argparse
 from configparser import ConfigParser
 
-from simulations.simulation_runner import SimulationRunner
+from simulations.threaded_simulation import ThreadedSimulation as SimulationRunner
+# from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
     message_strategy,

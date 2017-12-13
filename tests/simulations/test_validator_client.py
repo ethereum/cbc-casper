@@ -97,3 +97,7 @@ def test_make_and_propagate_message_when_should_not(network, global_view, valida
     message = validator_client.make_and_propagate_message()
     assert not message
     assert len(global_view.justified_messages) == global_justified_messages_length
+
+
+def test_is_thread(validator_client):
+    assert validator_client.start
