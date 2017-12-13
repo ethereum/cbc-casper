@@ -98,7 +98,8 @@ class BlockchainPlotTool(PlotTool):
 
     def _update_message_labels(self, new_messages):
         for message in new_messages:
-            self.message_labels[message] = message.sequence_number
+            if message not in self.message_labels:
+                self.message_labels[message] = message.sequence_number
 
     def _update_block_fault_tolerance(self):
         tip = self.view.estimate()

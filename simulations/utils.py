@@ -51,8 +51,8 @@ def message_strategy(mode):
     if mode == "rand":
 
         def random():
-            """each time asked, 25% chance of making message"""
-            if r.random() <= 0.25:
+            """each time asked, 10% chance of making message"""
+            if r.random() <= 0.10:
                 return True
             return False
 

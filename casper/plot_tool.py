@@ -56,7 +56,7 @@ class PlotTool(object):
 
         graph = nx.Graph()
 
-        nodes = view.justified_messages.values()
+        nodes = list(view.justified_messages.values())
 
         fig_size = plt.rcParams["figure.figsize"]
         fig_size[0] = 20

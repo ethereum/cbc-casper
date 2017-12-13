@@ -34,10 +34,14 @@ class ThreadedSimulation:
             validator_client.start()
 
         for i in range(int(self.length_in_seconds / self.report_seconds)):
-            print("plotting")
+            print("plotting {}".format(i))
             self.plot_tool.update()
             self.plot_tool.plot()
             sleep(self.report_seconds)
+
+        print("shutting down validators")
+        for validator_client in self.validator_clients:
+            validator_client.stop()
 
         print("making gif")
         self.plot_tool.make_gif()

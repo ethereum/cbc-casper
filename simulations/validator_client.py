@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Event
 from utils.clock import Clock
 
 
@@ -10,20 +10,31 @@ class ValidatorClient(Thread, Clock):
         Clock.__init__(self)
         self.validator = validator
         self.network = network
+        self._stop_event = Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    @property
+    def stopped(self):
+        return self._stop_event.is_set()
 
     def run(self):
-        print("running validator_client: {}".format(self.validator.name))
+        print("validator {}:\trunning".format(self.validator.name))
 
         while(True):
             self.advance_process_time()
             self.make_and_propagate_message()
             self.retrieve_messages()
             self.wait_on_new_message()
+            if self.stopped:
+                print("validator {}:\tshutting down".format(self.validator.name))
+                break
 
     def wait_on_new_message(self):
-        print("validator {} waiting...". format(self.validator.name))
+        print("validator {}:\twaiting...". format(self.validator.name))
         self.network.message_events[self.validator].wait(1)
-        print("validator {} awake".format(self.validator.name))
+        print("validator {}:\tawake".format(self.validator.name))
 
     def should_make_new_message(self):
         pass
@@ -44,5 +55,6 @@ class ValidatorClient(Thread, Clock):
     def make_and_propagate_message(self):
         message = self.make_new_message()
         if message:
+            print("validator {}:\tmade new message".format(self.validator.name))
             self.propagate_message(message)
         return message
