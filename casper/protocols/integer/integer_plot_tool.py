@@ -13,7 +13,7 @@ class IntegerPlotTool(PlotTool):
         self.view = view
         self.validator_set = validator_set
 
-        self.new_justifications = []
+        self.communications = []
         self.bet_fault_tolerance = {}
         self.message_labels = {}
         self.justifications = {
@@ -21,25 +21,23 @@ class IntegerPlotTool(PlotTool):
             for validator in validator_set
         }
 
-        self.first_time = True
+        self._update_first_message_labels()
 
-    def update(self, new_messages=None):
+    def update(self):
         """Updates displayable items with new messages and paths"""
-        if new_messages is None:
-            new_messages = []
+        new_messages = self.new_messages()
+        if not new_messages:
+            return
 
         self._update_new_justifications(new_messages)
         self._update_message_fault_tolerance()
         self._update_message_labels(new_messages)
+        self._track_messages(new_messages)
 
     def plot(self):
         """Builds relevant edges to display and creates next viegraph using them"""
-        if self.first_time:
-            self._update_first_message_labels()
-            self.first_time = False
-
         edgelist = []
-        edgelist.append(utils.edge(self.new_justifications, 1, 'black', 'solid'))
+        edgelist.append(utils.edge(self.communications, 1, 'black', 'solid'))
 
         self.next_viewgraph(
             self.view,
@@ -51,23 +49,6 @@ class IntegerPlotTool(PlotTool):
 
     def _update_first_message_labels(self):
         for message in self.view.justified_messages.values():
-            self.message_labels[message] = message.estimate
-
-    def _update_new_justifications(self, new_messages):
-        for message in new_messages:
-            sender = message.sender
-            for validator in message.justification:
-                last_message = self.view.justified_messages[message.justification[validator]]
-                # only show if new justification
-                if last_message not in self.justifications[sender]:
-                    self.new_justifications.append([last_message, message])
-                    self.justifications[sender].append(last_message)
-                # always show self as justification
-                elif last_message.sender == message.sender:
-                    self.new_justifications.append([last_message, message])
-
-    def _update_message_labels(self, new_messages):
-        for message in new_messages:
             self.message_labels[message] = message.estimate
 
     def _update_message_fault_tolerance(self):

@@ -30,6 +30,8 @@ class ThreadedSimulation:
 
     def run(self):
         print("starting simulation")
+        self._send_initial_messages()
+
         for validator_client in self.validator_clients:
             validator_client.start()
 
@@ -45,3 +47,9 @@ class ThreadedSimulation:
 
         print("making gif")
         self.plot_tool.make_gif()
+
+    def _send_initial_messages(self):
+        """ ensures that initial messages are attempted to be propogated.
+            requirement for any protocol where initial message is not shared """
+        for validator in self.validator_set:
+            self.network.send_to_all(validator.initial_message)
