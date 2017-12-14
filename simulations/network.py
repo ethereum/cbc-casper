@@ -25,6 +25,7 @@ class Network(Clock):
             validator: threading.Event()
             for validator in self.validator_set
         }
+        self.plot_tool = protocol.PlotTool(False, True, self.global_view, validator_set)
 
     def delay(self, sender, receiver):
         '''Must be defined in child class.
@@ -43,6 +44,8 @@ class Network(Clock):
             self.time + self.delay(message.sender, validator),
             message
         ))
+
+        # because of delay, this actually doesn't make any sense.
         self.message_events[validator].set()
 
     def send_to_all(self, message):

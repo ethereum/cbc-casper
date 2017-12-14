@@ -1,4 +1,5 @@
 from threading import Thread, Event
+from time import sleep
 from utils.clock import Clock
 
 
@@ -24,8 +25,8 @@ class ValidatorClient(Thread, Clock):
 
         while(True):
             self.advance_process_time()
-            self.make_and_propagate_message()
             self.retrieve_messages()
+            self.make_and_propagate_message()
             self.wait_on_new_message()
             if self.stopped:
                 print("validator {}:\tshutting down".format(self.validator.name))
@@ -33,7 +34,8 @@ class ValidatorClient(Thread, Clock):
 
     def wait_on_new_message(self):
         print("validator {}:\twaiting...". format(self.validator.name))
-        self.network.message_events[self.validator].wait(1)
+        sleep(1)
+        # self.network.message_events[self.validator].wait(1)
         print("validator {}:\tawake".format(self.validator.name))
 
     def should_make_new_message(self):
