@@ -82,7 +82,8 @@ class BlockchainPlotTool(PlotTool):
         return vals_chain_edges
 
     def _update_new_justifications(self, new_messages):
-        for message in new_messages:
+        sorted_messages = sorted(new_messages, key=lambda message: message.sequence_number)
+        for message in sorted_messages:
             sender = message.sender
             for validator in message.justification:
                 last_message = self.view.justified_messages[message.justification[validator]]
