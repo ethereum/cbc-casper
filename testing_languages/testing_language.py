@@ -1,14 +1,9 @@
 """The testing language module ... """
-import re
+import string
 import random as r
 
 from simulations.state_language import StateLanguage
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.networks import NoDelayNetwork
-from casper.plot_tool import PlotTool
-from casper.safety_oracles.clique_oracle import CliqueOracle
-from casper.validator_set import ValidatorSet
-import casper.utils as utils
 
 class TestingLanguage(StateLanguage):
     """Test the blockchain!"""
@@ -19,34 +14,40 @@ class TestingLanguage(StateLanguage):
     def __init__(self, val_weights, protocol=BlockchainProtocol, display=False):
         super().__init__(val_weights, protocol, display)
 
-        self.handlers['SJ'] = self.send_and_justify
-        self.handlers['RR'] = self.round_robin
-
         self.handlers['CE'] = self.check_estimate
         self.handlers['CS'] = self.check_safe
         self.handlers['CU'] = self.check_unsafe
 
-    def send_and_justify(self, validator, message_name):
+    def parse(self, protocol_state_string):
+        """Parse the test_string, and run the test"""
+        for token in protocol_state_string.split(' '):
+            letter, validator_name, message_name = self.parse_token(token)
 
-        self.check_validator_exists(validator)
-        self.check_message_exists(message_name)
+            if letter == 'SJ':
+                token = self._translate_send_justified(validator_name, message_name)
+            if letter == 'RR':
+                token = self._translate_round_robin(validator_name, message_name)
 
-        #TODO: This should use the send_message function!
+            super().parse(token)
+
+    def _translate_send_justified(self, validator_name, message_name):
+        translated_token = ''
+        validator = self.validator_set.get_validator_by_name(int(validator_name))
+
         message = self.messages[message_name]
-        self.propagate_message_to_validator(validator, message)
+        messages_to_send = self._message_names_needed_to_justify(message, validator)
+        messages_to_send.append(message_name)
 
-        messages_to_send = self._message_needed_to_justify(message, validator)
-        for message in messages_to_send:
-            self.propagate_message_to_validator(validator,  message)
+        for m_name in messages_to_send:
+            translated_token += 'S' + validator_name + '-' + m_name + ' '
 
-        assert self.messages[message_name].hash in validator.view.justified_messages
+        return translated_token[:-1]
 
-    def round_robin(self, validator, message_name):
-        """Have each validator create a message in a perfect round robin."""
-        self.check_validator_exists(validator)
-        self.check_message_not_exists(message_name)
+    def _translate_round_robin(self, validator_name, message_name):
+        translated_token = ''
+        validator = self.validator_set.get_validator_by_name(int(validator_name))
 
-        # start round robin at validator speicied by validator in args
+        # start round robin at validator specified by validator in args
         validators = self.validator_set.sorted_by_name()
         start_index = validators.index(validator)
         validators = validators[start_index:] + validators[:start_index]
@@ -55,34 +56,20 @@ class TestingLanguage(StateLanguage):
             if i == len(self.validator_set) - 1:
                 name = message_name
             else:
-                name = r.random()
+                name = self._get_random_message_name()
             maker = validators[i]
             receiver = validators[(i + 1) % len(validators)]
 
-            self.make_message(maker, name)
-            self.send_and_justify(receiver, name)
+            translated_token += 'M' + str(maker.name) + '-' + name + ' '
+            translated_token += 'S' + str(receiver.name) + '-' + name + ' '
 
+        return translated_token[:-1]
 
-    def parse(self, test_string):
-        """Parse the test_string, and run the test"""
-        for token in test_string.split(' '):
-            letter, validator, dash, message, removed_message_names = re.match(
-                self.TOKEN_PATTERN, token
-            ).groups()
+    def _get_random_message_name(self):
+        random_name = ''.join([r.choice(string.ascii_letters) for n in range(10)])
+        return random_name
 
-            if letter + validator + dash + message + removed_message_names != token:
-                raise ValueError("Bad token: %s" % token)
-
-            if letter in ['M', 'I', 'S']:
-                super().parse(token)
-            elif letter == 'P':
-                self.plot()
-            else:
-                validator = self.validator_set.get_validator_by_name(int(validator))
-                self.handlers[letter](validator, message)
-
-
-    def _message_needed_to_justify(self, message, validator):
+    def _message_names_needed_to_justify(self, message, validator):
         messages_needed = set()
 
         current_message_hashes = set()
@@ -105,7 +92,7 @@ class TestingLanguage(StateLanguage):
 
             current_message_hashes = next_hashes
 
-        return messages_needed
+        return [self.message_names[message] for message in messages_needed]
 
     def check_estimate(self, validator, estimate):
         """Must be implemented by child class"""

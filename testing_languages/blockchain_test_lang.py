@@ -30,7 +30,7 @@ class BlockchainTestLang(TestingLanguage):
         head = validator.view.estimate()
 
         assert message == head, "Validator {} does not have " \
-                              "block {} at head".format(validator, estimate)
+                              "block {} at head".format(validator.name, estimate)
 
     def check_safe(self, validator, estimate):
         """Check that some validator does not detect safety on a block."""
