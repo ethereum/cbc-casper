@@ -33,7 +33,6 @@ class BlockchainTestLang(StateLanguage):
         message = self.messages[estimate]
         validator.update_safe_estimates()
 
-        # NOTE: This should never fail
         assert validator.view.last_finalized_block is None or \
             not message.conflicts_with(validator.view.last_finalized_block), \
             "Block {0} failed safety assert for validator-{1}".format(estimate, validator.name)
@@ -45,7 +44,6 @@ class BlockchainTestLang(StateLanguage):
         message = self.messages[estimate]
         validator.update_safe_estimates()
 
-        # NOTE: This should never fail
         assert validator.view.last_finalized_block is None or \
             message.conflicts_with(validator.view.last_finalized_block), \
             "Block {} failed no-safety assert".format(estimate)
