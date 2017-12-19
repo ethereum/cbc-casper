@@ -1,5 +1,6 @@
 """The testing language module ... """
 import re
+import random as r
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.networks import NoDelayNetwork
@@ -19,9 +20,7 @@ class StateLanguage(object):
         self.validator_set = ValidatorSet(val_weights, protocol)
         self.network = NoDelayNetwork(self.validator_set, protocol)
 
-        self.messages = dict()      # name => message
-        self.message_names = dict() # message => name
-        # NOTE: consider using two way dict here
+        self.messages = dict()
 
         self.plot_tool = protocol.PlotTool(
             display,
@@ -36,13 +35,16 @@ class StateLanguage(object):
         self.handlers['M'] = self.make_message
         self.handlers['I'] = self.make_invalid
         self.handlers['S'] = self.send_message
-
         self.handlers['P'] = self.plot
+        self.handlers['SJ'] = self.send_and_justify
+        self.handlers['RR'] = self.round_robin
+        self.handlers['CE'] = self.check_estimate
+        self.handlers['CS'] = self.check_safe
+        self.handlers['CU'] = self.check_unsafe
 
 
     def make_message(self, validator, message_name, messages_to_hide=None):
         """Have a validator generate a new message"""
-        self.check_validator_exists(validator)
         self.check_message_not_exists(message_name)
 
         #NOTE: Once validators have the ability to lie about their view, hide messages_to_hide!
@@ -55,25 +57,66 @@ class StateLanguage(object):
         self.plot_tool.update([new_message])
 
         self.messages[message_name] = new_message
-        self.message_names[new_message] = message_name
 
     def send_message(self, validator, message_name):
         """Send a message to a specific validator"""
-        self.check_validator_exists(validator)
         self.check_message_exists(message_name)
 
         message = self.messages[message_name]
 
-        self.propagate_message_to_validator(validator, message)
+        self._propagate_message_to_validator(validator, message)
 
     def make_invalid(self, validator, message_name):
         """TODO: Implement this when validators can make/handle invalid messages"""
         raise NotImplementedError
 
-    def check_validator_exists(self, validator):
-        """Throws an error if validator does not exist"""
-        if validator not in self.validator_set:
-            raise ValueError('Validator {} does not exist'.format(validator))
+    def send_and_justify(self, validator, message_name):
+        self.check_message_exists(message_name)
+
+        message = self.messages[message_name]
+        self._propagate_message_to_validator(validator, message)
+
+        messages_to_send = self._message_needed_to_justify(message, validator)
+        for message in messages_to_send:
+            self._propagate_message_to_validator(validator,  message)
+
+        assert self.messages[message_name].hash in validator.view.justified_messages
+
+    def round_robin(self, validator, message_name):
+        """Have each validator create a message in a perfect round robin."""
+        self.check_message_not_exists(message_name)
+
+        # start round robin at validator speicied by validator in args
+        validators = self.validator_set.sorted_by_name()
+        start_index = validators.index(validator)
+        validators = validators[start_index:] + validators[:start_index]
+
+        for i in range(len(self.validator_set)):
+            if i == len(self.validator_set) - 1:
+                name = message_name
+            else:
+                name = r.random()
+            maker = validators[i]
+            receiver = validators[(i + 1) % len(validators)]
+
+            self.make_message(maker, name)
+            self.send_and_justify(receiver, name)
+
+    def plot(self):
+        """Display or save a viewgraph"""
+        self.plot_tool.plot()
+
+    def check_estimate(self, validator, estimate):
+        """Must be implemented by child class"""
+        raise NotImplementedError
+
+    def check_safe(self, validator, estimate):
+        """Must be implemented by child class"""
+        raise NotImplementedError
+
+    def check_unsafe(self, validator, estimate):
+        """Must be implemented by child class"""
+        raise NotImplementedError
 
     def check_message_exists(self, message_name):
         """Throws an error if message_name does not exist"""
@@ -81,18 +124,40 @@ class StateLanguage(object):
             raise ValueError('Block {} does not exist'.format(message_name))
 
     def check_message_not_exists(self, message_name):
-        """Throws an error if message_name does exist"""
+        """Throws an error if message_name does not exist"""
         if message_name in self.messages:
             raise ValueError('Block {} already exists'.format(message_name))
 
-    def propagate_message_to_validator(self, validator, message):
+    def _propagate_message_to_validator(self, validator, message):
         self.network.send(validator, message)
         received_message = self.network.receive(validator)
         if received_message:
             validator.receive_messages(set([received_message]))
 
-    def plot(self):
-        self.plot_tool.plot()
+    def _message_needed_to_justify(self, message, validator):
+        messages_needed = set()
+
+        current_message_hashes = set()
+        for message_hash in message.justification.values():
+            if message_hash not in validator.view.pending_messages and \
+               message_hash not in validator.view.justified_messages:
+                current_message_hashes.add(message_hash)
+
+        while any(current_message_hashes):
+            next_hashes = set()
+
+            for message_hash in current_message_hashes:
+                message = self.network.global_view.justified_messages[message_hash]
+                messages_needed.add(message)
+
+                for other_hash in message.justification.values():
+                    if other_hash not in validator.view.pending_messages and \
+                       other_hash not in validator.view.justified_messages:
+                        next_hashes.add(other_hash)
+
+            current_message_hashes = next_hashes
+
+        return messages_needed
 
     def parse(self, protocol_state_string):
         """Parse the state string!"""
@@ -104,7 +169,6 @@ class StateLanguage(object):
             else:
                 validator = self.validator_set.get_validator_by_name(int(validator))
                 self.handlers[letter](validator, message)
-
 
     def parse_token(self, token):
         letter, validator, dash, message, removed_message_names = re.match(
