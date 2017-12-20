@@ -1,7 +1,7 @@
 """The language testing module ... """
 import pytest
 
-from simulations.state_language import StateLanguage
+from state_languages.state_language import StateLanguage
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol

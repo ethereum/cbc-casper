@@ -7,7 +7,7 @@ from casper.protocols.blockchain.block import Block
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.validator import Validator
 
-from testing_languages.blockchain_test_lang import BlockchainTestLang
+from state_languages.blockchain_test_lang import BlockchainTestLang
 
 
 def test_equality_of_copies_off_genesis(validator, empty_just):

@@ -2,7 +2,7 @@ import pytest
 
 from casper.abstract_view import AbstractView
 from casper.protocols.blockchain.block import Block
-from testing_languages.blockchain_test_lang import BlockchainTestLang
+from state_languages.blockchain_test_lang import BlockchainTestLang
 
 
 TEST_WEIGHT = {0: 10, 1: 11}

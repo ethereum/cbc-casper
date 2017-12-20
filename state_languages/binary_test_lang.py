@@ -2,7 +2,7 @@
 import re
 import random as r
 
-from simulations.state_language import StateLanguage
+from state_languages.state_language import StateLanguage
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
 

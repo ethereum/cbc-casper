@@ -1,7 +1,7 @@
 """The language testing module ... """
 import pytest
 
-from testing_languages.integer_test_lang import IntegerTestLang
+from state_languages.integer_test_lang import IntegerTestLang
 from casper.network import Network
 from casper.validator_set import ValidatorSet
 
