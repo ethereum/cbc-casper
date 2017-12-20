@@ -15,6 +15,7 @@ class BlockchainPlotTool(PlotTool):
         self.genesis_block = self.view.genesis_block
         self.message_fault_tolerance = dict()
 
+        self.tracked_messages = set()
         self.blockchain = []
         self.communications = []
 
@@ -27,15 +28,23 @@ class BlockchainPlotTool(PlotTool):
 
         self.message_labels[self.genesis_block] = "G"
 
-    def update(self, new_messages=None):
+    def new_messages(self):
+        return set(self.view.justified_messages.values()) - self.tracked_messages
+
+    def _track_messages(self, messages):
+        self.tracked_messages.update(messages)
+
+    def update(self):
         """Updates displayable items with new messages and paths"""
-        if new_messages is None:
-            new_messages = []
+        new_messages = self.new_messages()
+        if not new_messages:
+            return
 
         self._update_new_justifications(new_messages)
         self._update_blockchain(new_messages)
         self._update_block_fault_tolerance()
         self._update_message_labels(new_messages)
+        self._track_messages(new_messages)
 
     def plot(self):
         """Builds relevant edges to display and creates next viegraph using them"""
@@ -73,7 +82,8 @@ class BlockchainPlotTool(PlotTool):
         return vals_chain_edges
 
     def _update_new_justifications(self, new_messages):
-        for message in new_messages:
+        sorted_messages = sorted(new_messages, key=lambda message: message.sequence_number)
+        for message in sorted_messages:
             sender = message.sender
             for validator in message.justification:
                 last_message = self.view.justified_messages[message.justification[validator]]
@@ -89,7 +99,8 @@ class BlockchainPlotTool(PlotTool):
 
     def _update_message_labels(self, new_messages):
         for message in new_messages:
-            self.message_labels[message] = message.sequence_number
+            if message not in self.message_labels:
+                self.message_labels[message] = message.sequence_number
 
     def _update_block_fault_tolerance(self):
         tip = self.view.estimate()

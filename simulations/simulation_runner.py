@@ -60,17 +60,17 @@ class SimulationRunner:
         received_messages = self._receive_messages()
         self._update_safe_estimates(received_messages.keys())
 
-        new_messages = self._generate_new_messages()
+        self._generate_new_messages()
 
-        self.plot_tool.update(new_messages)
+        self.plot_tool.update()
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
     def _advance_time(self):
         self.round += 1
-        self.network.set_time(self.round)
+        self.network.clock.set_time(self.round)
         for validator_client in self.validator_clients:
-            validator_client.set_time(self.round)
+            validator_client.clock.set_time(self.round)
 
     def _receive_messages(self):
         received_messages = {}

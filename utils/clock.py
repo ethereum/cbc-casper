@@ -1,5 +1,9 @@
+import time
+
+
 class Clock(object):
     def __init__(self):
+        self._start_process_time = time.process_time()
         self._current_time = 0
 
     @property
@@ -11,3 +15,6 @@ class Clock(object):
 
     def set_time(self, time):
         self._current_time = time
+
+    def advance_process_time(self):
+        self._current_time = time.process_time() - self._start_process_time

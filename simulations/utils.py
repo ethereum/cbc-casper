@@ -14,11 +14,21 @@ from simulations.networks.simple_networks import (
     NoDelayNetwork,
     StepNetwork
 )
+from simulations.simulation_runner import SimulationRunner
+from simulations.threaded_simulation import ThreadedSimulation
 
 
 MESSAGE_MODES = ['rand', 'always']
 NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
 PROTOCOLS = ['blockchain', 'binary', 'integer', 'order']
+SIMULATORS = ['single-threaded', 'multi-threaded']
+
+
+def select_simulator(simulator):
+    if simulator == 'multi-threaded':
+        return ThreadedSimulation
+    if simulator == 'single-threaded':
+        return SimulationRunner
 
 
 def select_network(network):
@@ -51,8 +61,8 @@ def message_strategy(mode):
     if mode == "rand":
 
         def random():
-            """each time asked, 25% chance of making message"""
-            if r.random() <= 0.25:
+            """each time asked, 10% chance of making message"""
+            if r.random() <= 0.10:
                 return True
             return False
 

@@ -27,11 +27,41 @@ class PlotTool(object):
         self.save = save
         self.node_shape = node_shape
 
+        self.tracked_messages = set()
+
         if save:
             self._create_graph_folder()
 
         self.report_number = 0
 
+    #
+    # Generic Message methods
+    #
+    def new_messages(self):
+        return set(self.view.justified_messages.values()) - self.tracked_messages
+
+    def _track_messages(self, messages):
+        self.tracked_messages.update(messages)
+
+    def _update_new_justifications(self, new_messages):
+        sorted_messages = sorted(new_messages, key=lambda message: message.sequence_number)
+        for message in sorted_messages:
+            sender = message.sender
+            for validator in message.justification:
+                last_message = self.view.justified_messages[message.justification[validator]]
+                # only show if new justification
+                if last_message not in self.justifications[sender]:
+                    self.communications.append([last_message, message])
+                    self.justifications[sender].append(last_message)
+
+    def _update_message_labels(self, new_messages):
+        for message in new_messages:
+            if message not in self.message_labels:
+                self.message_labels[message] = message.sequence_number
+
+    #
+    # Plot methods
+    #
     def _create_graph_folder(self):
         graph_path = os.path.dirname(os.path.abspath(__file__)) + '/../graphs/'
         # if there isn't a graph folder, make one!
@@ -56,7 +86,7 @@ class PlotTool(object):
 
         graph = nx.Graph()
 
-        nodes = view.justified_messages.values()
+        nodes = list(view.justified_messages.values())
 
         fig_size = plt.rcParams["figure.figsize"]
         fig_size[0] = 20

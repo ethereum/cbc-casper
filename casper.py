@@ -10,15 +10,16 @@ this manner, yet... :)
 import argparse
 from configparser import ConfigParser
 
-from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
     message_strategy,
     select_network,
     select_protocol,
+    select_simulator,
     MESSAGE_MODES,
     NETWORKS,
-    PROTOCOLS
+    PROTOCOLS,
+    SIMULATORS
 )
 
 
@@ -51,6 +52,11 @@ def main():
         help='specifies the protocol for the simulation'
     )
     parser.add_argument(
+        '--simulator', type=str, default=config.get("DefaultSimulator"),
+        choices=SIMULATORS,
+        help='specifies the type of simulator'
+    )
+    parser.add_argument(
         '--network', type=str, default=config.get("DefaultNetwork"),
         choices=NETWORKS,
         help='specifies the network model for the simulation'
@@ -81,8 +87,9 @@ def main():
     )
 
     args = parser.parse_args()
-    protocol = select_protocol(args.protocol)
     network_type = select_network(args.network)
+    protocol = select_protocol(args.protocol)
+    simulator = select_simulator(args.simulator)
 
     validator_set = generate_random_gaussian_validator_set(
         protocol,
@@ -90,7 +97,7 @@ def main():
     )
     network = network_type(validator_set, protocol)
 
-    simulation_runner = SimulationRunner(
+    simulation_runner = simulator(
         validator_set,
         message_strategy(args.mode),
         protocol=protocol,

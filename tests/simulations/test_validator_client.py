@@ -1,6 +1,5 @@
 """ValidatorClient testing module ... """
 import pytest
-from casper.message import Message
 from simulations.validator_client import ValidatorClient
 
 
@@ -24,8 +23,7 @@ def test_new_validator_client(validator, network):
     assert client.network == network
 
 
-def test_make_new_message_if_should(validator_client):
-    validator_client.should_make_new_message = true
+def test_make_new_message(validator_client):
     message = validator_client.make_new_message()
 
     assert message
@@ -36,15 +34,8 @@ def test_make_new_message_if_should_not(validator_client):
     validator_client.should_make_new_message = false
     message = validator_client.make_new_message()
 
-    assert message is None
-
-
-def test_validator_client_time(validator_client):
-    assert validator_client.time == 0
-    validator_client.advance_time()
-    assert validator_client.time == 1
-    validator_client.set_time(100)
-    assert validator_client.time == 100
+    assert message
+    assert message.hash in validator_client.validator.view.justified_messages
 
 
 @pytest.mark.parametrize(
@@ -83,8 +74,7 @@ def test_propagate_message(network, validator_client):
         assert message_queue.peek()[1] == message
 
 
-def test_make_and_propagate_message_when_should(network, global_view, validator_client):
-    validator_client.should_make_new_message = true
+def test_make_and_propagate_message(network, global_view, validator_client):
     message = validator_client.make_and_propagate_message()
     assert message
     assert message.hash in global_view.justified_messages
@@ -92,8 +82,10 @@ def test_make_and_propagate_message_when_should(network, global_view, validator_
 
 def test_make_and_propagate_message_when_should_not(network, global_view, validator_client):
     validator_client.should_make_new_message = false
-    global_justified_messages_length = len(global_view.justified_messages)
-
     message = validator_client.make_and_propagate_message()
-    assert not message
-    assert len(global_view.justified_messages) == global_justified_messages_length
+    assert message
+    assert message.hash in global_view.justified_messages
+
+
+def test_is_thread(validator_client):
+    assert validator_client.start
