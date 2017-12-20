@@ -34,6 +34,7 @@ class ThreadedSimulation:
         print("starting simulation")
         self._send_initial_messages()
 
+        # run each validator_client in separate thread
         for validator_client in self.validator_clients:
             validator_client.start()
 
