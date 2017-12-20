@@ -7,10 +7,10 @@ from utils.clock import Clock
 from utils.priority_queue import PriorityQueue
 
 
-class Network(Clock):
+class Network(object):
     """Simulates a network that allows for message passing between validators."""
     def __init__(self, validator_set, protocol=BlockchainProtocol):
-        Clock.__init__(self)
+        self.clock = Clock()
 
         self.validator_set = validator_set
         self.global_view = protocol.View(
@@ -21,6 +21,9 @@ class Network(Clock):
             validator: PriorityQueue()
             for validator in self.validator_set
         }
+
+        # not currently using these. If Network moves to own thread, could use
+        # these to signal ValidatorClients to wake up and receive messages.
         self.message_events = {
             validator: threading.Event()
             for validator in self.validator_set
@@ -38,14 +41,11 @@ class Network(Clock):
         self.global_view.add_messages(
             set([message])
         )
-        self.advance_process_time()
+        self.clock.advance_process_time()
         self.message_queues[validator].put((
-            self.time + self.delay(message.sender, validator),
+            self.clock.time + self.delay(message.sender, validator),
             message
         ))
-
-        # because of delay, this actually doesn't make any sense.
-        # self.message_events[validator].set()
 
     def send_to_all(self, message):
         for validator in self.validator_set:
@@ -57,7 +57,7 @@ class Network(Clock):
         queue = self.message_queues[validator]
         if queue.qsize() == 0:
             return None
-        if queue.peek()[0] > self.time:
+        if queue.peek()[0] > self.clock.time:
             return None
 
         return queue.get()[1]

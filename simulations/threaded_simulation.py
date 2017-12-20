@@ -23,6 +23,8 @@ class ThreadedSimulation:
         self.validator_clients = [
             ValidatorClient(validator, network) for validator in validator_set
         ]
+
+        # currently monkey patches VC. Move to Strategy object in future
         for validator_client in self.validator_clients:
             validator_client.should_make_new_message = msg_strategy
 

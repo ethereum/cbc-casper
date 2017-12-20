@@ -68,9 +68,9 @@ class SimulationRunner:
 
     def _advance_time(self):
         self.round += 1
-        self.network.set_time(self.round)
+        self.network.clock.set_time(self.round)
         for validator_client in self.validator_clients:
-            validator_client.set_time(self.round)
+            validator_client.clock.set_time(self.round)
 
     def _receive_messages(self):
         received_messages = {}
