@@ -33,16 +33,14 @@ def test_init_creates_state_lang(test_weight):
         ('CU0-A', ValueError),
     ]
 )
-def test_only_binary_estimates(test_string, error, test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+def test_only_binary_estimates(test_string, error, binary_lang):
     binary_lang.parse('M0-A')
 
     with pytest.raises(error):
         binary_lang.parse(test_string)
 
 
-def test_check_estimate_passes_on_valid_assertions(test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+def test_check_estimate_passes_on_valid_assertions(binary_lang):
     binary_lang.parse('M0-A S1-A S2-A S3-A S4-A')
 
     current_estimates = dict()
@@ -62,17 +60,16 @@ def test_check_estimate_passes_on_valid_assertions(test_weight):
     [
         ('M0-A CE0-0 CE0-1'),
         ('RR0-A RR0-B CE0-0 CE0-1'),
+        ('M0-A CS0-0 CS0-1'),
+        ('RR0-A RR0-B CS1-0 CS1-1'),
     ]
 )
-def test_check_estimate_fails_on_invalid_assertions(test_weight, test_string):
-    binary_lang = BinaryTestLang(test_weight, False)
-
+def test_checks_fails_on_invalid_assertions(test_string, binary_lang):
     with pytest.raises(AssertionError):
         binary_lang.parse(test_string)
 
 
-def test_check_safe_passes_on_valid_assertions(test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+def test_check_safe_passes_on_valid_assertions(binary_lang):
     binary_lang.parse('RR0-A RR0-B RR0-C RR0-D')
 
     current_estimate = binary_lang.network.global_view.estimate()
@@ -85,29 +82,14 @@ def test_check_safe_passes_on_valid_assertions(test_weight):
     binary_lang.parse(check_safe)
 
 
-@pytest.mark.parametrize(
-    'test_string',
-    [
-        ('M0-A CS0-0 CS0-1'),
-        ('RR0-A RR0-B CS1-0 CS1-1'),
-    ]
-)
-def test_check_safe_fails_on_invalid_assertions(test_weight, test_string):
-    binary_lang = BinaryTestLang(test_weight, False)
-
-    with pytest.raises(AssertionError):
-        binary_lang.parse(test_string)
-
-
-def test_check_unsafe_passes_on_valid_assertions(test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+def test_check_unsafe_passes_on_valid_assertions(binary_lang):
     binary_lang.parse('M0-A S1-A S2-A S3-A S4-A CU0-0 CU0-1 CU1-0 CU1-1 CU2-0 CU2-1 CU3-0 CU3-1 CU4-0 CU4-1')
 
     for validator in binary_lang.validator_set:
         assert validator.view.last_finalized_estimate is None
 
-def test_check_unsafe_passes_on_valid_assertions_rr(test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+
+def test_check_unsafe_passes_on_valid_assertions_rr(binary_lang):
     binary_lang.parse('RR0-A RR0-B RR0-C RR0-D')
 
     current_estimate = binary_lang.network.global_view.estimate()
@@ -120,8 +102,7 @@ def test_check_unsafe_passes_on_valid_assertions_rr(test_weight):
     binary_lang.parse(check_unsafe)
 
 
-def test_check_unsafe_fails_on_invalid_assertions(test_weight):
-    binary_lang = BinaryTestLang(test_weight, False)
+def test_check_unsafe_fails_on_invalid_assertions(binary_lang):
     binary_lang.parse('RR0-A RR0-B RR0-C RR0-D')
 
     current_estimate = binary_lang.network.global_view.estimate()

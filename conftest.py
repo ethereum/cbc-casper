@@ -2,12 +2,16 @@ import random as r
 import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+
 from casper.networks import (
     ConstantDelayNetwork,
     NoDelayNetwork
 )
 
 from testing_languages.blockchain_test_lang import BlockchainTestLang
+from testing_languages.integer_test_lang import IntegerTestLang
+from testing_languages.binary_test_lang import BinaryTestLang
+
 from simulations.utils import generate_random_gaussian_validator_set
 
 
@@ -46,11 +50,33 @@ def report(request):
 
 
 @pytest.fixture
+def empty_just():
+    return {}
+
+
+@pytest.fixture
+def test_weight():
+    return {i: 5 - i for i in range(5)}
+
+
+@pytest.fixture
 def test_lang_runner(report):
     if report:
         return run_test_lang_with_reports
     else:
         return run_test_lang_without_reports
+
+@pytest.fixture
+def binary_lang(report, test_weight):
+    return BinaryTestLang(test_weight, report)
+
+@pytest.fixture
+def blockchain_lang(report, test_weight):
+    return BlockchainTestLang(test_weight, report)
+
+@pytest.fixture
+def integer_lang(report, test_weight):
+    return IntegerTestLang(test_weight, report)
 
 
 @pytest.fixture

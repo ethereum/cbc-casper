@@ -19,7 +19,6 @@ def test_equality_of_copies_off_genesis(validator, empty_just):
 
 @pytest.mark.skip(reason="current deepcopy bug")
 def test_equality_of_copies_of_non_genesis(report):
-    pass
     test_string = "M0-A SJ1-A M1-B SJ0-B M0-C SJ1-C M1-D SJ0-D CE0-D"
     test_lang = BlockchainTestLang({0: 10, 1: 11}, report)
     test_lang.parse(test_string)

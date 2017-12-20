@@ -16,15 +16,11 @@ GENESIS_PROTOCOLS = [BlockchainProtocol]
 # each val starts with different block
 INITAL_MESSAGE_PROTOCOLS = [BinaryProtocol, OrderProtocol, IntegerProtocol]
 
+protocol_params = [(protocol) for protocol in PROTOCOLS]
+
 
 @pytest.mark.parametrize(
-    'protocol',
-    (
-        OrderProtocol,
-        BlockchainProtocol,
-        BinaryProtocol,
-        IntegerProtocol
-    )
+    'protocol', protocol_params
 )
 def test_init(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
@@ -38,13 +34,7 @@ def test_init(protocol, test_weight):
 
 
 @pytest.mark.parametrize(
-    'protocol',
-    (
-        OrderProtocol,
-        BlockchainProtocol,
-        BinaryProtocol,
-        IntegerProtocol
-    )
+    'protocol', protocol_params
 )
 def test_registers_handlers(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
@@ -96,13 +86,7 @@ def test_allows_new_handlers_to_register(handler, error, test_weight, example_fu
 
 
 @pytest.mark.parametrize(
-    'protocol',
-    (
-        OrderProtocol,
-        BlockchainProtocol,
-        BinaryProtocol,
-        IntegerProtocol
-    )
+    'protocol', protocol_params
 )
 def test_init_validators_have_only_inital_messages(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
@@ -189,6 +173,7 @@ def test_parse_only_valid_val_and_messages(test_string, test_weight, exception):
 
         state_lang.parse(test_string)
 
+
 @pytest.mark.parametrize(
     'test_strings, test_weight, exception',
     [
@@ -247,8 +232,6 @@ def test_make_adds_to_global_view_(
         assert len(state_lang.network.global_view.justified_messages) == num_blocks + num_inital_blocks
 
 
-# NOTE: None means the block is not named by the testing language
-# this means the block was a init block, or was created by round robin
 @pytest.mark.parametrize(
     'test_string, block_justification',
     [
