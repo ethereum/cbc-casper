@@ -28,6 +28,13 @@ def random_gaussian_validator_set_from_protocol(protocol=BlockchainProtocol):
     return generate_random_gaussian_validator_set(protocol)
 
 
+def example_func():
+    return
+
+@pytest.fixture
+def example_function():
+    return example_func
+
 @pytest.fixture(autouse=True)
 def reset_blockchain_protocol(request):
     BlockchainProtocol.genesis_block = None

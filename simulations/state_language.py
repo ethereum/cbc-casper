@@ -10,9 +10,6 @@ from casper.validator_set import ValidatorSet
 class StateLanguage(object):
     """Allows testing of simulation scenarios with small testing language."""
 
-    # Signal to py.test that TestLangCBC should not be discovered.
-    __test__ = False
-
     TOKEN_PATTERN = '([A-Za-z]*)([0-9]*)([-]*)([A-Za-z0-9]*)([\\{A-Za-z,}]*)'
 
     def __init__(self, val_weights, protocol=BlockchainProtocol, display=False):
@@ -32,20 +29,26 @@ class StateLanguage(object):
         # Register token handlers.
         self.handlers = dict()
 
-        self.handlers['M'] = self.make_message
-        self.handlers['I'] = self.make_invalid
-        self.handlers['S'] = self.send_message
-        self.handlers['P'] = self.plot
-        self.handlers['SJ'] = self.send_and_justify
-        self.handlers['RR'] = self.round_robin
-        self.handlers['CE'] = self.check_estimate
-        self.handlers['CS'] = self.check_safe
-        self.handlers['CU'] = self.check_unsafe
+        self.register_handler('M', self.make_message)
+        self.register_handler('I', self.make_invalid)
+        self.register_handler('S', self.send_message)
+        self.register_handler('P', self.plot)
+        self.register_handler('SJ', self.send_and_justify)
+        self.register_handler('RR', self.round_robin)
+        self.register_handler('CE', self.check_estimate)
+        self.register_handler('CS', self.check_safe)
+        self.register_handler('CU', self.check_unsafe)
 
+    def register_handler(self, token, function):
+        """Registers a function with a new token. Throws an error if already registered"""
+        if token in self.handlers:
+            raise KeyError('A function has been registered with that token')
+
+        self.handlers[token] = function
 
     def make_message(self, validator, message_name, messages_to_hide=None):
         """Have a validator generate a new message"""
-        self.check_message_not_exists(message_name)
+        self.require_message_not_exists(message_name)
 
         #NOTE: Once validators have the ability to lie about their view, hide messages_to_hide!
 
@@ -60,7 +63,7 @@ class StateLanguage(object):
 
     def send_message(self, validator, message_name):
         """Send a message to a specific validator"""
-        self.check_message_exists(message_name)
+        self.require_message_exists(message_name)
 
         message = self.messages[message_name]
 
@@ -71,12 +74,12 @@ class StateLanguage(object):
         raise NotImplementedError
 
     def send_and_justify(self, validator, message_name):
-        self.check_message_exists(message_name)
+        self.require_message_exists(message_name)
 
         message = self.messages[message_name]
         self._propagate_message_to_validator(validator, message)
 
-        messages_to_send = self._message_needed_to_justify(message, validator)
+        messages_to_send = self._messages_needed_to_justify(message, validator)
         for message in messages_to_send:
             self._propagate_message_to_validator(validator,  message)
 
@@ -84,9 +87,9 @@ class StateLanguage(object):
 
     def round_robin(self, validator, message_name):
         """Have each validator create a message in a perfect round robin."""
-        self.check_message_not_exists(message_name)
+        self.require_message_not_exists(message_name)
 
-        # start round robin at validator speicied by validator in args
+        # start round robin at validator specified by validator in args
         validators = self.validator_set.sorted_by_name()
         start_index = validators.index(validator)
         validators = validators[start_index:] + validators[:start_index]
@@ -118,12 +121,12 @@ class StateLanguage(object):
         """Must be implemented by child class"""
         raise NotImplementedError
 
-    def check_message_exists(self, message_name):
+    def require_message_exists(self, message_name):
         """Throws an error if message_name does not exist"""
         if message_name not in self.messages:
             raise ValueError('Block {} does not exist'.format(message_name))
 
-    def check_message_not_exists(self, message_name):
+    def require_message_not_exists(self, message_name):
         """Throws an error if message_name does not exist"""
         if message_name in self.messages:
             raise ValueError('Block {} already exists'.format(message_name))
@@ -134,7 +137,8 @@ class StateLanguage(object):
         if received_message:
             validator.receive_messages(set([received_message]))
 
-    def _message_needed_to_justify(self, message, validator):
+    def _messages_needed_to_justify(self, message, validator):
+        """Returns the set of messages needed to justify a message to a validator"""
         messages_needed = set()
 
         current_message_hashes = set()
@@ -161,7 +165,7 @@ class StateLanguage(object):
 
     def parse(self, protocol_state_string):
         """Parse the state string!"""
-        for token in protocol_state_string.split(' '):
+        for token in protocol_state_string.split():
             letter, validator, message = self.parse_token(token)
 
             if letter == 'P':

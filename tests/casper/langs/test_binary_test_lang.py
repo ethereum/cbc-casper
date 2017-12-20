@@ -22,27 +22,23 @@ def test_init_creates_state_lang(test_weight):
         assert len(validator.view.justified_messages) == 1
 
 
-def test_only_accepts_binary_estimates(test_weight):
+@pytest.mark.parametrize(
+    'test_string, error',
+    [
+        ('CE0-2', AssertionError),
+        ('CS0-2', AssertionError),
+        ('CU0-2', AssertionError),
+        ('CE0-A', ValueError),
+        ('CS0-A', ValueError),
+        ('CU0-A', ValueError),
+    ]
+)
+def test_only_binary_estimates(test_string, error, test_weight):
     binary_lang = BinaryTestLang(test_weight, False)
     binary_lang.parse('M0-A')
 
-    with pytest.raises(AssertionError):
-        binary_lang.parse('CE0-2')
-
-    with pytest.raises(AssertionError):
-        binary_lang.parse('CS0-2')
-
-    with pytest.raises(AssertionError):
-        binary_lang.parse('CU0-2')
-
-    with pytest.raises(ValueError):
-        binary_lang.parse('CE0-A')
-
-    with pytest.raises(ValueError):
-        binary_lang.parse('CS0-A')
-
-    with pytest.raises(ValueError):
-        binary_lang.parse('CU0-A')
+    with pytest.raises(error):
+        binary_lang.parse(test_string)
 
 
 def test_check_estimate_passes_on_valid_assertions(test_weight):
@@ -68,7 +64,7 @@ def test_check_estimate_passes_on_valid_assertions(test_weight):
         ('RR0-A RR0-B CE0-0 CE0-1'),
     ]
 )
-def test_check_estimate_fails_fails_on_invalid_assertions(test_weight, test_string):
+def test_check_estimate_fails_on_invalid_assertions(test_weight, test_string):
     binary_lang = BinaryTestLang(test_weight, False)
 
     with pytest.raises(AssertionError):
@@ -96,7 +92,7 @@ def test_check_safe_passes_on_valid_assertions(test_weight):
         ('RR0-A RR0-B CS1-0 CS1-1'),
     ]
 )
-def test_check_safe_fails_fails_on_invalid_assertions(test_weight, test_string):
+def test_check_safe_fails_on_invalid_assertions(test_weight, test_string):
     binary_lang = BinaryTestLang(test_weight, False)
 
     with pytest.raises(AssertionError):
@@ -124,7 +120,7 @@ def test_check_unsafe_passes_on_valid_assertions_rr(test_weight):
     binary_lang.parse(check_unsafe)
 
 
-def test_check_unsafe_fails_fails_on_invalid_assertions(test_weight):
+def test_check_unsafe_fails_on_invalid_assertions(test_weight):
     binary_lang = BinaryTestLang(test_weight, False)
     binary_lang.parse('RR0-A RR0-B RR0-C RR0-D')
 

@@ -41,7 +41,7 @@ def test_check_estimate_passes_on_valid_assertions(test_weight):
         ('M0-A S1-A S2-A S3-A S4-A CE0-A CE1-A CE2-A CE3-A CE4-A M0-B CE0-A'),
     ]
 )
-def test_check_estimate_fails_fails_on_invalid_assertions(test_weight, test_string):
+def test_check_estimate_fails_on_invalid_assertions(test_weight, test_string):
     blockchain_lang = BlockchainTestLang(test_weight, False)
 
     with pytest.raises(AssertionError):
@@ -68,7 +68,7 @@ def test_check_safe_passes_on_valid_assertions(test_weight):
         ('RR0-A RR0-B RR0-C RR0-D RR0-E RR0-F CS1-F'),
     ]
 )
-def test_check_safe_fails_fails_on_invalid_assertions(test_weight, test_string):
+def test_check_safe_fails_on_invalid_assertions(test_weight, test_string):
     blockchain_lang = BlockchainTestLang(test_weight, False)
 
     with pytest.raises(AssertionError):
@@ -92,7 +92,7 @@ def test_check_unsafe_passes_on_valid_assertions(test_weight):
         ('M0-A RR0-B RR0-C RR0-D CE1-A CS1-A CU0-A'),
     ]
 )
-def test_check_unsafe_fails_fails_on_invalid_assertions(test_weight, test_string):
+def test_check_unsafe_fails_on_invalid_assertions(test_weight, test_string):
     blockchain_lang = BlockchainTestLang(test_weight, False)
 
     with pytest.raises(AssertionError):

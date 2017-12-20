@@ -34,10 +34,7 @@ def test_init(protocol, test_weight):
     assert state_lang.validator_set.validator_weights() == set(test_weight.values())
     assert state_lang.validator_set.weight() == sum(test_weight.values())
 
-    assert callable(state_lang.make_message)
-    assert callable(state_lang.make_invalid)
-    assert callable(state_lang.send_message)
-    assert callable(state_lang.plot)
+    assert isinstance(state_lang.network, Network)
 
 
 @pytest.mark.parametrize(
@@ -49,11 +46,53 @@ def test_init(protocol, test_weight):
         IntegerProtocol
     )
 )
-def test_init_creates_network(protocol, test_weight):
+def test_registers_handlers(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
 
-    assert isinstance(state_lang.network, Network)
+    assert callable(state_lang.make_message)
+    assert callable(state_lang.make_invalid)
+    assert callable(state_lang.send_message)
+    assert callable(state_lang.plot)
+    assert callable(state_lang.check_estimate)
+    assert callable(state_lang.check_safe)
+    assert callable(state_lang.check_unsafe)
 
+    assert state_lang.make_message == state_lang.handlers['M']
+    assert state_lang.make_invalid == state_lang.handlers['I']
+    assert state_lang.send_message == state_lang.handlers['S']
+    assert state_lang.plot == state_lang.handlers['P']
+    assert state_lang.check_estimate == state_lang.handlers['CE']
+    assert state_lang.check_safe == state_lang.handlers['CS']
+    assert state_lang.check_unsafe == state_lang.handlers['CU']
+
+
+@pytest.mark.parametrize(
+    'handler, error',
+    (
+        ('M', KeyError),
+        ('S', KeyError),
+        ('I', KeyError),
+        ('P', KeyError),
+        ('CE', KeyError),
+        ('CS', KeyError),
+        ('CU', KeyError),
+        ('CV', None),
+        ('H', None),
+        ('123-123', None),
+    )
+)
+def test_allows_new_handlers_to_register(handler, error, test_weight, example_function):
+    for protocol in PROTOCOLS:
+        state_lang = StateLanguage(test_weight, protocol, False)
+
+        if isinstance(error, type) and issubclass(error, Exception):
+            with pytest.raises(error):
+                state_lang.register_handler(handler, example_function)
+            return
+
+        state_lang.register_handler(handler, example_function)
+        assert callable(state_lang.handlers[handler])
+        assert state_lang.handlers[handler] == example_function
 
 
 @pytest.mark.parametrize(

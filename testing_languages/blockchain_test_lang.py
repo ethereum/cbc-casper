@@ -17,7 +17,7 @@ class BlockchainTestLang(StateLanguage):
 
     def check_estimate(self, validator, estimate):
         """Check that a validators forkchoice is some block"""
-        self.check_message_exists(estimate)
+        self.require_message_exists(estimate)
 
         message = self.messages[estimate]
 
@@ -28,7 +28,7 @@ class BlockchainTestLang(StateLanguage):
 
     def check_safe(self, validator, estimate):
         """Check that some validator does not detect safety on a block."""
-        self.check_message_exists(estimate)
+        self.require_message_exists(estimate)
 
         message = self.messages[estimate]
         validator.update_safe_estimates()
@@ -39,7 +39,7 @@ class BlockchainTestLang(StateLanguage):
 
     def check_unsafe(self, validator, estimate):
         """Must be implemented by child class"""
-        self.check_message_exists(estimate)
+        self.require_message_exists(estimate)
 
         message = self.messages[estimate]
         validator.update_safe_estimates()
