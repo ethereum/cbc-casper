@@ -2,7 +2,7 @@
 import pytest
 
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from simulations.testing_language import TestLangCBC
+from state_languages.blockchain_test_lang import BlockchainTestLang
 
 
 @pytest.mark.skip(reason="test not yet implemented")
