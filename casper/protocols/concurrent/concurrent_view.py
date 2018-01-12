@@ -19,20 +19,22 @@ class ConcurrentView(AbstractView):
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
-        print("\n")
-        blocks = forkchoice.get_fork_choice(
+        available_outputs, output_dict = forkchoice.get_fork_choice(
             self.last_finalized_estimate,
             self.children,
             self.latest_messages
         )
-        print("Length: {}".format(len(blocks)))
 
-        inputs = forkchoice.get_available_inputs(blocks)
+        num_outputs = r.randint(1, len(available_outputs))
+        old_outputs = set(r.sample(available_outputs, num_outputs))
+        new_outputs = set([r.randint(0, 1000000000) for _ in range(len(old_outputs))])
 
-        selected_inputs = set(r.sample(inputs, 2))
-        outputs = set([r.randint(0, 1000000000) for x in selected_inputs])
+        blocks = {output_dict[output] for output in old_outputs}
 
-        return (blocks, selected_inputs, outputs)
+        for output in old_outputs:
+            assert output in output_dict[output].estimate[2]
+
+        return (blocks, old_outputs, new_outputs)
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on messages in views forkchoice, and updates last_finalized_estimate"""

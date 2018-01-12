@@ -39,11 +39,8 @@ class ConcurrentPlotTool(PlotTool):
 
     def plot(self):
         """Builds relevant edges to display and creates next viegraph using them"""
-        for message in self.view.justified_messages.values():
-            print("estimate: {}".format(message.estimate))
 
         best_schedule_edge = self.get_best_schedule()
-        print("Best schedule {}".format(best_schedule_edge))
 
         validator_chain_edges = self.get_validator_chains()
 
@@ -65,7 +62,6 @@ class ConcurrentPlotTool(PlotTool):
         """Returns an edge made of the global forkchoice to genesis"""
         best_messages = self.view.estimate()[0]
         best_schedule = utils.build_schedule(best_messages, set([None]))
-        print("best_schedule {}".format(best_schedule))
         return utils.edge(best_schedule, 5, 'red', 'solid')
 
     def get_validator_chains(self):
