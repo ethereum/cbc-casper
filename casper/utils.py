@@ -52,7 +52,7 @@ def build_chain(tip, base):
     return chain
 
 
-def build_schedule(tip, base):
+def build_schedule(tip):
     """Returns a list of blocks and blocks estimates from tip to base."""
     stack = [block for block in tip]
     schedule = []
@@ -63,7 +63,7 @@ def build_schedule(tip, base):
         if curr_block is None:
             continue
 
-        for ancestor in curr_block.estimate[0]:
+        for ancestor in curr_block.estimate['blocks']:
             if ancestor is None:
                 continue
             schedule.append((curr_block, ancestor))

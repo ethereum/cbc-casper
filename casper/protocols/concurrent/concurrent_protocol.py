@@ -21,6 +21,6 @@ class ConcurrentProtocol(Protocol):
             inputs = set([r.randint(0, 1000000000) for x in range(7)])
             outputs = set([r.randint(0, 1000000000) for x in inputs])
 
-            estimate = (blocks, inputs, outputs)
+            estimate = {'blocks': blocks, 'inputs': inputs, 'outputs': outputs}
             cls.genesis_block = Block(estimate, dict(), validator, -1, 0)
         return cls.genesis_block

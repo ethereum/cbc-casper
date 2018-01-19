@@ -1,4 +1,4 @@
-"""The blockchain plot tool implements functions for plotting blockchain data structures"""
+"""The concurrent plot tool implements functions for plotting concurrent data structures"""
 
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle
@@ -6,7 +6,7 @@ import casper.utils as utils
 
 
 class ConcurrentPlotTool(PlotTool):
-    """The module contains functions for plotting a blockchain data structure"""
+    """The module contains functions for plotting a concurrent data structure"""
 
     def __init__(self, display, save, view, validator_set):
         super().__init__(display, save, 's')
@@ -15,7 +15,7 @@ class ConcurrentPlotTool(PlotTool):
         self.genesis_block = self.view.genesis_block
         self.message_fault_tolerance = dict()
 
-        self.blockchain = []
+        self.schedule = []
         self.communications = []
 
         self.block_fault_tolerance = {}
@@ -33,7 +33,7 @@ class ConcurrentPlotTool(PlotTool):
             new_messages = []
 
         self._update_new_justifications(new_messages)
-        self._update_blockchain(new_messages)
+        self._update_schedule(new_messages)
         self._update_block_fault_tolerance()
         self._update_message_labels(new_messages)
 
@@ -45,7 +45,7 @@ class ConcurrentPlotTool(PlotTool):
         validator_chain_edges = self.get_validator_chains()
 
         edgelist = []
-        edgelist.append(utils.edge(self.blockchain, 2, 'grey', 'solid'))
+        edgelist.append(utils.edge(self.schedule, 2, 'grey', 'solid'))
         edgelist.append(utils.edge(self.communications, 1, 'black', 'dotted'))
         edgelist.append(best_schedule_edge)
         edgelist.extend(validator_chain_edges)
@@ -60,15 +60,15 @@ class ConcurrentPlotTool(PlotTool):
 
     def get_best_schedule(self):
         """Returns an edge made of the global forkchoice to genesis"""
-        best_messages = self.view.estimate()[0]
-        best_schedule = utils.build_schedule(best_messages, set([None]))
+        best_messages = self.view.estimate()['blocks']
+        best_schedule = utils.build_schedule(best_messages)
         return utils.edge(best_schedule, 5, 'red', 'solid')
 
     def get_validator_chains(self):
         """Returns a list of edges main from validators current forkchoice to genesis"""
         vals_chain_edges = []
         for validator in self.validator_set:
-            chain = utils.build_schedule(set([validator.my_latest_message()]), set([None]))
+            chain = utils.build_schedule(set([validator.my_latest_message()]))
             vals_chain_edges.append(utils.edge(chain, 2, 'blue', 'solid'))
 
         return vals_chain_edges
@@ -83,11 +83,11 @@ class ConcurrentPlotTool(PlotTool):
                     self.communications.append([last_message, message])
                     self.justifications[sender].append(last_message)
 
-    def _update_blockchain(self, new_messages):
+    def _update_schedule(self, new_messages):
         for message in new_messages:
-            for ancestor in message.estimate[0]:
+            for ancestor in message.estimate['blocks']:
                 if ancestor is not None:
-                    self.blockchain.append([message, ancestor])
+                    self.schedule.append([message, ancestor])
 
     def _update_message_labels(self, new_messages):
         for message in new_messages:

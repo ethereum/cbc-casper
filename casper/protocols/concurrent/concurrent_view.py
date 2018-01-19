@@ -1,4 +1,4 @@
-"""The blockchain view module extends a view for blockchain data structures """
+"""The concurrent view module extends a view for concurrent data structures """
 import random as r
 
 from casper.safety_oracles.clique_oracle import CliqueOracle
@@ -15,26 +15,32 @@ class ConcurrentView(AbstractView):
 
         self._initialize_message_caches(messages)
 
+        # In the future, can change this to any function that follows the interface
+        self.select_outputs = self.select_random_outputs_to_consume
+        self.create_outputs = self.create_random_new_outputs
+
         super().__init__(messages)
 
     def estimate(self):
         """Returns the current forkchoice in this view"""
-        available_outputs, output_dict = forkchoice.get_fork_choice(
+        available_outputs, output_sources = forkchoice.get_fork_choice(
             self.last_finalized_estimate,
             self.children,
             self.latest_messages
         )
 
+        old_outputs = self.select_outputs(available_outputs, output_sources)
+        new_outputs = self.create_outputs(old_outputs, len(old_outputs))
+        blocks = {output_sources[output] for output in old_outputs}
+
+        return {'blocks': blocks, 'inputs': old_outputs, 'outputs': new_outputs}
+
+    def select_random_outputs_to_consume(self, available_outputs, output_sources):
         num_outputs = r.randint(1, len(available_outputs))
-        old_outputs = set(r.sample(available_outputs, num_outputs))
-        new_outputs = set([r.randint(0, 1000000000) for _ in range(len(old_outputs))])
+        return set(r.sample(available_outputs, num_outputs))
 
-        blocks = {output_dict[output] for output in old_outputs}
-
-        for output in old_outputs:
-            assert output in output_dict[output].estimate[2]
-
-        return (blocks, old_outputs, new_outputs)
+    def create_random_new_outputs(self, old_outputs, num_new_outputs):
+        return set([r.randint(0, 1000000000) for _ in range(num_new_outputs)])
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on messages in views forkchoice, and updates last_finalized_estimate"""
@@ -46,7 +52,7 @@ class ConcurrentView(AbstractView):
         assert message.hash in self.justified_messages, "...should not have seen message!"
 
         # update the children dictonary with the new message
-        for ancestor in message.estimate[0]:
+        for ancestor in message.estimate['blocks']:
             if ancestor not in self.children:
                 self.children[ancestor] = set()
             self.children[ancestor].add(message)
