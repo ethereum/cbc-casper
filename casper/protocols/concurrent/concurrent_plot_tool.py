@@ -1,7 +1,6 @@
 """The concurrent plot tool implements functions for plotting concurrent data structures"""
 
 from casper.plot_tool import PlotTool
-from casper.safety_oracles.clique_oracle import CliqueOracle
 import casper.utils as utils
 
 
@@ -38,7 +37,7 @@ class ConcurrentPlotTool(PlotTool):
         self._update_message_labels(new_messages)
 
     def plot(self):
-        """Builds relevant edges to display and creates next viegraph using them"""
+        """Builds relevant edges to display and creates next viewgraph using them"""
 
         best_schedule_edge = self.get_best_schedule()
 

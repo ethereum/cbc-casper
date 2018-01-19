@@ -1,5 +1,6 @@
 """The forkchoice module implements the estimator function a concurrent schedule"""
 
+
 def get_ancestors(block):
     ancestors = set()
     stack = [block]
@@ -16,6 +17,7 @@ def get_ancestors(block):
 
     return ancestors
 
+
 def get_scores(latest_messages):
     scores = dict()
 
@@ -26,6 +28,7 @@ def get_scores(latest_messages):
 
     return scores
 
+
 def get_outputs(blocks):
     outputs = set()
 
@@ -34,6 +37,7 @@ def get_outputs(blocks):
 
     return outputs
 
+
 def update_outputs(outputs, blocks):
     for block in blocks:
         for output in block.estimate['inputs']:
@@ -41,12 +45,13 @@ def update_outputs(outputs, blocks):
         for output in block.estimate['outputs']:
             outputs.add(output)
 
-# record of what blocks create what ouputs
+
 def track_output_sources(output_sources, new_blocks):
     for block in new_blocks:
         for output in block.estimate['outputs']:
-            assert output not in output_sources # only should be spent once...
+            assert output not in output_sources  # only should be spent once...
             output_sources[output] = block
+
 
 def is_consumable(block, current_blocks, scores, available_outputs):
     for other_block in current_blocks:
@@ -59,6 +64,7 @@ def is_consumable(block, current_blocks, scores, available_outputs):
                 return False
 
     return True
+
 
 def get_children(blocks, children_dict):
     children_blocks = set()
@@ -74,13 +80,13 @@ def get_fork_choice(last_finalized_estimate, children, latest_messages):
     """Returns the estimate by selecting highest weight sub-trees.
     Starts from the last_finalized_estimate and stops when it reaches a tips."""
     output_sources = dict()
-    available_outputs = set() # should start w/ all the stuff from the last finalized estimate...
+    available_outputs = set()  # should start w/ all the stuff from the last finalized estimate...
     for block in last_finalized_estimate:
         available_outputs.update(block.estimate['inputs'])
 
     scores = get_scores(latest_messages)
 
-    current_blocks = last_finalized_estimate # this is a set of blocks
+    current_blocks = last_finalized_estimate  # this is a set of blocks
     track_output_sources(output_sources, current_blocks)
     update_outputs(available_outputs, current_blocks)
     current_children = get_children(current_blocks, children)

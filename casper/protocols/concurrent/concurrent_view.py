@@ -1,7 +1,6 @@
 """The concurrent view module extends a view for concurrent data structures """
 import random as r
 
-from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 import casper.protocols.concurrent.forkchoice as forkchoice
 
@@ -45,7 +44,6 @@ class ConcurrentView(AbstractView):
     def update_safe_estimates(self, validator_set):
         """Checks safety on messages in views forkchoice, and updates last_finalized_estimate"""
         pass
-
 
     def _update_protocol_specific_view(self, message):
         """Given a now justified message, updates children and when_recieved"""
