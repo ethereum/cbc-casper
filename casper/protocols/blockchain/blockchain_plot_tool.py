@@ -38,7 +38,7 @@ class BlockchainPlotTool(PlotTool):
         self._update_message_labels(new_messages)
 
     def plot(self):
-        """Builds relevant edges to display and creates next viegraph using them"""
+        """Builds relevant edges to display and creates next viewgraph using them"""
         best_chain_edge = self.get_best_chain()
 
         validator_chain_edges = self.get_validator_chains()

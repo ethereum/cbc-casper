@@ -35,7 +35,7 @@ class BinaryPlotTool(PlotTool):
         self._update_message_labels(new_messages)
 
     def plot(self):
-        """Builds relevant edges to display and creates next viegraph using them"""
+        """Builds relevant edges to display and creates next viewgraph using them"""
         if self.first_time:
             self._update_first_message_labels()
             self.first_time = False
