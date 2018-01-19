@@ -1,4 +1,4 @@
-"""The block module implements the message data structure for concurrent schedule replication"""
+"""The block module implements the message data structure for a concurrent protocol"""
 from casper.message import Message
 
 
