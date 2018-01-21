@@ -1,17 +1,17 @@
 """The safety oracle testing module ... """
 
 
-def test_round_robin_safety(test_lang_runner):
+def test_round_robin_safety(blockchain_lang_runner):
     test_string = (
         'P M0-A SJ1-A RR1-B RR1-C RR1-D RR1-E SJ2-E '
         'SJ3-E SJ4-E CE0-E CE1-E CE2-E CE3-E CE4-E CS0-A '
         'CS1-A CS2-A CS3-A CS4-A P'
     )
     weights = {0: 9.3, 1: 8.2, 2: 7.1, 3: 6, 4: 5}
-    test_lang_runner(test_string, weights)
+    blockchain_lang_runner(weights, test_string)
 
 
-def test_majority_fork_safe(test_lang_runner):
+def test_majority_fork_safe(blockchain_lang_runner):
     test_string = (
         # create right hand side of fork and check for safety
         'P M1-A SJ0-A M0-L0 SJ1-L0 M1-L1 SJ0-L1 M0-L2 SJ1-L2 '
@@ -20,10 +20,10 @@ def test_majority_fork_safe(test_lang_runner):
         'SJ2-A M2-R0 SJ0-R0 CE0-L4 SJ1-R0 CE0-L4 P'
     )
     weights = {0: 5, 1: 6, 2: 7}
-    test_lang_runner(test_string, weights)
+    blockchain_lang_runner(weights, test_string)
 
 
-def test_no_majority_fork_unsafe(test_lang_runner):
+def test_no_majority_fork_unsafe(blockchain_lang_runner):
     test_string = (
         # create right hand side of fork and check for no safety
         'P M2-A SJ1-A M1-L0 S0-L0 M0-L1 SJ1-L1 M1-L2 SJ0-L2 '
@@ -33,10 +33,10 @@ def test_no_majority_fork_unsafe(test_lang_runner):
         'SJ3-R3 M3-R4 SJ4-R4 CE4-R4 CU4-R0 CE3-R4 CU3-R0 P'
     )
     weights = {0: 5, 1: 4.5, 2: 6, 3: 4, 4: 5.25}
-    test_lang_runner(test_string, weights)
+    blockchain_lang_runner(weights, test_string)
 
 
-def test_no_majority_fork_safe_after_union(test_lang_runner):
+def test_no_majority_fork_safe_after_union(blockchain_lang_runner):
     test_string = (
         # generate both sides of an extended fork
         'P M2-A SJ1-A M1-L0 SJ0-L0 M0-L1 SJ1-L1 M1-L2 SJ0-L2 '
@@ -51,4 +51,4 @@ def test_no_majority_fork_safe_after_union(test_lang_runner):
         'RR0-J0 RR0-J1 CS0-L0 P'
     )
     weights = {0: 5, 1: 4.5, 2: 6, 3: 4, 4: 5.25}
-    test_lang_runner(test_string, weights)
+    blockchain_lang_runner(weights, test_string)

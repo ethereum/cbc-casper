@@ -2,10 +2,18 @@
 from casper.network import Network
 
 
-def test_new_network(validator_set):
-    network = Network(validator_set)
+def test_new_network_genesis(generate_validator_set, genesis_protocol):
+    validator_set = generate_validator_set(genesis_protocol)
+    network = Network(validator_set, genesis_protocol)
     assert network.validator_set == validator_set
     assert len(network.global_view.justified_messages) == 1
+
+
+def test_new_network_rand_start(generate_validator_set, rand_start_protocol):
+    validator_set = generate_validator_set(rand_start_protocol)
+    network = Network(validator_set, rand_start_protocol)
+    assert network.validator_set == validator_set
+    assert len(network.global_view.justified_messages) == len(validator_set)
 
 
 def test_default_time(network):

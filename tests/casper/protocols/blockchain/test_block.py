@@ -104,8 +104,9 @@ def test_is_in_blockchain__test_lang(report):
         ),
     ]
 )
-def test_block_height(report, test_string, weights, block_heights):
-    test_lang = BlockchainTestLang(weights, report)
+def test_block_height(blockchain_lang_creator, test_string, weights, block_heights):
+    print(weights)
+    test_lang = blockchain_lang_creator(weights)
     test_lang.parse(test_string)
 
     for block_name in block_heights:
