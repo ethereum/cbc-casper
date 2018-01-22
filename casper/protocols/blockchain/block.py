@@ -19,7 +19,7 @@ class Block(Message):
 
     @classmethod
     def is_valid_estimate(cls, estimate):
-        if not isinstance(estimate, Block) and not estimate is None:
+        if not isinstance(estimate, Block) and estimate is not None:
             return False
         return True
 
