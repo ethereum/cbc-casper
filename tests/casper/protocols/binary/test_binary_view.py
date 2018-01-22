@@ -11,13 +11,3 @@ def test_update_safe_estimates(weights, test_string, finalized, binary_lang_crea
     validator.view.update_safe_estimates(binary_lang.validator_set)
 
     assert validator.view.last_finalized_estimate.estimate == finalized
-
-
-
-
-
-
-
-@pytest.mark.skip(reason="test language not written")
-def test_update_protocol_specific_view():
-    pass
