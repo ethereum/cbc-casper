@@ -2,26 +2,9 @@
 import pytest
 
 from state_languages.state_language import StateLanguage
-
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.protocols.binary.binary_protocol import BinaryProtocol
-from casper.protocols.order.order_protocol import OrderProtocol
-from casper.protocols.integer.integer_protocol import IntegerProtocol
-
 from casper.network import Network
 
-PROTOCOLS = [BlockchainProtocol, BinaryProtocol, OrderProtocol, IntegerProtocol]
-# protocols with a single genesis block
-GENESIS_PROTOCOLS = [BlockchainProtocol]
-# each val starts with different block
-INITAL_MESSAGE_PROTOCOLS = [BinaryProtocol, OrderProtocol, IntegerProtocol]
 
-protocol_params = [(protocol) for protocol in PROTOCOLS]
-
-
-@pytest.mark.parametrize(
-    'protocol', protocol_params
-)
 def test_init(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
 
@@ -33,9 +16,6 @@ def test_init(protocol, test_weight):
     assert isinstance(state_lang.network, Network)
 
 
-@pytest.mark.parametrize(
-    'protocol', protocol_params
-)
 def test_registers_handlers(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
 
@@ -71,23 +51,19 @@ def test_registers_handlers(protocol, test_weight):
         ('123-123', None),
     )
 )
-def test_allows_new_handlers_to_register(handler, error, test_weight, example_function):
-    for protocol in PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
+def test_allows_new_handlers_to_register(handler, error, protocol, test_weight, example_function):
+    state_lang = StateLanguage(test_weight, protocol, False)
 
-        if isinstance(error, type) and issubclass(error, Exception):
-            with pytest.raises(error):
-                state_lang.register_handler(handler, example_function)
-            return
+    if isinstance(error, type) and issubclass(error, Exception):
+        with pytest.raises(error):
+            state_lang.register_handler(handler, example_function)
+        return
 
-        state_lang.register_handler(handler, example_function)
-        assert callable(state_lang.handlers[handler])
-        assert state_lang.handlers[handler] == example_function
+    state_lang.register_handler(handler, example_function)
+    assert callable(state_lang.handlers[handler])
+    assert state_lang.handlers[handler] == example_function
 
 
-@pytest.mark.parametrize(
-    'protocol', protocol_params
-)
 def test_init_validators_have_only_inital_messages(protocol, test_weight):
     state_lang = StateLanguage(test_weight, protocol, False)
 
@@ -113,8 +89,8 @@ def test_init_validators_have_only_inital_messages(protocol, test_weight):
         ('A0-A S1-A', KeyError),
     ]
 )
-def test_parse_only_valid_tokens(test_string, test_weight, error):
-    state_lang = StateLanguage(test_weight, BinaryProtocol, False)
+def test_parse_only_valid_tokens(test_string, test_weight, error, protocol):
+    state_lang = StateLanguage(test_weight, protocol, False)
 
     if isinstance(error, type) and issubclass(error, Exception):
         with pytest.raises(error):
@@ -134,18 +110,17 @@ def test_parse_only_valid_tokens(test_string, test_weight, error):
         (['M1-A', 'RR0-AB1-A'], ValueError),
     ]
 )
-def test_parse_only_valid_tokens_split_strings(test_strings, test_weight, error):
-    for protocol in PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
+def test_parse_only_valid_tokens_split_strings(test_strings, error, protocol, test_weight):
+    state_lang = StateLanguage(test_weight, protocol, False)
 
-        if isinstance(error, type) and issubclass(error, Exception):
-            with pytest.raises(error):
-                for test_string in test_strings:
-                    state_lang.parse(test_string)
-            return
+    if isinstance(error, type) and issubclass(error, Exception):
+        with pytest.raises(error):
+            for test_string in test_strings:
+                state_lang.parse(test_string)
+        return
 
-        for test_string in test_strings:
-            state_lang.parse(test_string)
+    for test_string in test_strings:
+        state_lang.parse(test_string)
 
 
 @pytest.mark.parametrize(
@@ -154,24 +129,23 @@ def test_parse_only_valid_tokens_split_strings(test_strings, test_weight, error)
         ('M0-A M1-B M2-C M3-D M4-E', {i: 5 - i for i in range(5)}, ''),
         ('M0-A S1-A S2-A S3-A S4-A', {i: 5 - i for i in range(5)}, ''),
         ('M0-A S1-A', {0: 1, 1: 2}, ''),
-        ('M5-A', {i: 5 - i for i in range(5)}, 'empty set'),
-        ('M0-A S1-A', {0: 1}, 'empty set'),
-        ('M0-A S1-A S2-A S3-A S4-A', {0: 0}, 'empty set'),
-        ('M4-A S5-A', {i: 5 - i for i in range(5)}, 'empty set'),
-        ('M0-A S1-B', {i: 5 - i for i in range(5)}, 'Block'),
-        ('M0-A M1-A', {i: 5 - i for i in range(5)}, 'Block'),
+        ('M5-A', {i: 5 - i for i in range(5)}, True),
+        ('M0-A S1-A', {0: 1}, True),
+        ('M0-A S1-A S2-A S3-A S4-A', {0: 0}, True),
+        ('M4-A S5-A', {i: 5 - i for i in range(5)}, True),
+        ('M0-A S1-B', {i: 5 - i for i in range(5)}, True),
+        ('M0-A M1-A', {i: 5 - i for i in range(5)}, True),
     ]
 )
-def test_parse_only_valid_val_and_messages(test_string, test_weight, exception):
-    for protocol in PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
+def test_parse_only_valid_val_and_messages(test_string, test_weight, exception, protocol):
+    state_lang = StateLanguage(test_weight, protocol, False)
 
-        if exception:
-            with pytest.raises(Exception, match=exception):
-                state_lang.parse(test_string)
-            return
+    if exception:
+        with pytest.raises(Exception):
+            state_lang.parse(test_string)
+        return
 
-        state_lang.parse(test_string)
+    state_lang.parse(test_string)
 
 
 @pytest.mark.parametrize(
@@ -180,25 +154,24 @@ def test_parse_only_valid_val_and_messages(test_string, test_weight, exception):
         (['M0-A M1-B', 'M2-C M3-D M4-E'], {i: 5 - i for i in range(5)}, ''),
         (['M0-A S1-A', 'S2-A S3-A S4-A'], {i: 5 - i for i in range(5)}, ''),
         (['M0-A', 'S1-A'], {0: 1, 1: 2}, ''),
-        (['M0-A', 'S1-A'], {0: 1}, 'empty set'),
-        (['M0-A S1-A', 'S2-A S3-A S4-A'], {0: 0}, 'empty set'),
-        (['M4-A', 'S5-A'], {i: 5 - i for i in range(5)}, 'empty set'),
-        (['M0-A', 'S1-B'], {i: 5 - i for i in range(5)}, 'Block'),
-        (['M0-A', 'M1-A'], {i: 5 - i for i in range(5)}, 'Block'),
+        (['M0-A', 'S1-A'], {0: 1}, True),
+        (['M0-A S1-A', 'S2-A S3-A S4-A'], {0: 0}, True),
+        (['M4-A', 'S5-A'], {i: 5 - i for i in range(5)}, True),
+        (['M0-A', 'S1-B'], {i: 5 - i for i in range(5)}, True),
+        (['M0-A', 'M1-A'], {i: 5 - i for i in range(5)}, True),
     ]
 )
-def test_parse_only_valid_val_and_messages_split_strings(test_strings, test_weight, exception):
-    for protocol in PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
+def test_parse_only_valid_val_and_messages_split_strings(test_strings, test_weight, exception, protocol):
+    state_lang = StateLanguage(test_weight, protocol, False)
 
-        if exception:
-            with pytest.raises(Exception, match=exception):
-                for test_string in test_strings:
-                    state_lang.parse(test_string)
-            return
+    if exception:
+        with pytest.raises(Exception):
+            for test_string in test_strings:
+                state_lang.parse(test_string)
+        return
 
-        for test_string in test_strings:
-            state_lang.parse(test_string)
+    for test_string in test_strings:
+        state_lang.parse(test_string)
 
 
 @pytest.mark.parametrize(
@@ -217,19 +190,19 @@ def test_make_adds_to_global_view_(
         test_string,
         test_weight,
         num_blocks,
-        exception
+        exception,
+        protocol
         ):
-    for protocol in PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
+    state_lang = StateLanguage(test_weight, protocol, False)
 
-        num_inital_blocks = len(state_lang.network.global_view.justified_messages)
-        if exception:
-            with pytest.raises(Exception, match=exception):
-                state_lang.parse(test_string)
-            return
+    num_inital_blocks = len(state_lang.network.global_view.justified_messages)
+    if exception:
+        with pytest.raises(Exception, match=exception):
+            state_lang.parse(test_string)
+        return
 
-        state_lang.parse(test_string)
-        assert len(state_lang.network.global_view.justified_messages) == num_blocks + num_inital_blocks
+    state_lang.parse(test_string)
+    assert len(state_lang.network.global_view.justified_messages) == num_blocks + num_inital_blocks
 
 
 @pytest.mark.parametrize(
@@ -243,27 +216,26 @@ def test_make_adds_to_global_view_(
         ),
     ]
 )
-def test_make_messages_builds_on_view(test_string, block_justification, test_weight):
-    for protocol in GENESIS_PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
-        state_lang.parse(test_string)
-        global_view = state_lang.network.global_view
+def test_make_messages_builds_on_view(test_string, block_justification, test_weight, genesis_protocol):
+    state_lang = StateLanguage(test_weight, genesis_protocol, False)
+    state_lang.parse(test_string)
+    global_view = state_lang.network.global_view
 
-        for b in block_justification:
-            block = state_lang.messages[b]
-            assert len(block.justification) == len(block_justification[b])
-            for validator_name in block_justification[b]:
-                block_in_justification = block_justification[b][validator_name]
-                validator = state_lang.validator_set.get_validator_by_name(validator_name)
+    for b in block_justification:
+        block = state_lang.messages[b]
+        assert len(block.justification) == len(block_justification[b])
+        for validator_name in block_justification[b]:
+            block_in_justification = block_justification[b][validator_name]
+            validator = state_lang.validator_set.get_validator_by_name(validator_name)
 
-                if block_in_justification:
-                    message_hash = block.justification[validator]
-                    justification_message = global_view.justified_messages[message_hash]
+            if block_in_justification:
+                message_hash = block.justification[validator]
+                justification_message = global_view.justified_messages[message_hash]
 
-                    if block_in_justification == "GEN":
-                        assert global_view.genesis_block == justification_message
-                    else:
-                        assert state_lang.messages[block_in_justification] == justification_message
+                if block_in_justification == "GEN":
+                    assert global_view.genesis_block == justification_message
+                else:
+                    assert state_lang.messages[block_in_justification] == justification_message
 
 
 @pytest.mark.parametrize(
@@ -301,14 +273,14 @@ def test_send_updates_val_view_genesis_protocols(
         test_string,
         test_weight,
         num_messages_per_view,
-        message_keys
+        message_keys,
+        genesis_protocol
     ):
-    for protocol in GENESIS_PROTOCOLS:
-        state_lang = StateLanguage(test_weight, protocol, False)
-        state_lang.parse(test_string)
+    state_lang = StateLanguage(test_weight, genesis_protocol, False)
+    state_lang.parse(test_string)
 
-        for validator_name in num_messages_per_view:
-            validator = state_lang.validator_set.get_validator_by_name(validator_name)
-            assert len(validator.view.justified_messages) == num_messages_per_view[validator_name]
-            for message_name in message_keys[validator_name]:
-                assert state_lang.messages[message_name] in validator.view.justified_messages.values()
+    for validator_name in num_messages_per_view:
+        validator = state_lang.validator_set.get_validator_by_name(validator_name)
+        assert len(validator.view.justified_messages) == num_messages_per_view[validator_name]
+        for message_name in message_keys[validator_name]:
+            assert state_lang.messages[message_name] in validator.view.justified_messages.values()
