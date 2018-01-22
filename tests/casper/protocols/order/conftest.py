@@ -3,10 +3,14 @@ import pytest
 
 from casper.protocols.order.order_protocol import OrderProtocol
 
+@pytest.fixture
+def order_validator_set(generate_validator_set):
+    return generate_validator_set(OrderProtocol)
+
 
 @pytest.fixture
-def order_validator(generate_validator_set):
-    return random.choice(list(generate_validator_set(OrderProtocol)))
+def order_validator(order_validator_set):
+    return random.choice(list(order_validator_set))
 
 
 @pytest.fixture

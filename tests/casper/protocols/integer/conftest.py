@@ -3,10 +3,14 @@ import pytest
 
 from casper.protocols.integer.integer_protocol import IntegerProtocol
 
+@pytest.fixture
+def integer_validator_set(generate_validator_set):
+    return generate_validator_set(IntegerProtocol)
+
 
 @pytest.fixture
-def integer_validator(generate_validator_set):
-    return random.choice(list(generate_validator_set(IntegerProtocol)))
+def integer_validator(integer_validator_set):
+    return random.choice(list(integer_validator_set))
 
 
 @pytest.fixture

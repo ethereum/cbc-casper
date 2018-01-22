@@ -1,6 +1,7 @@
 """The block testing module ..."""
 import pytest
 
+from casper.protocols.integer.integer_protocol import IntegerProtocol
 from casper.protocols.integer.bet import Bet
 from casper.validator_set import ValidatorSet
 import casper.protocols.integer.integer_estimator as estimator
@@ -42,7 +43,7 @@ import casper.protocols.integer.integer_estimator as estimator
     ]
 )
 def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, empty_just):
-    validator_set = ValidatorSet(weights)
+    validator_set = ValidatorSet(weights, IntegerProtocol)
 
     latest_messages = dict()
     for val_name in latest_estimates:

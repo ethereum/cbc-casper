@@ -3,10 +3,14 @@ import pytest
 
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
+@pytest.fixture
+def binary_validator_set(generate_validator_set):
+    return generate_validator_set(BinaryProtocol)
+
 
 @pytest.fixture
-def binary_validator(generate_validator_set):
-    return random.choice(list(generate_validator_set(BinaryProtocol)))
+def binary_validator(binary_validator_set):
+    return random.choice(list(binary_validator_set))
 
 
 @pytest.fixture
