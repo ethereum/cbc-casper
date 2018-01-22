@@ -10,7 +10,6 @@ def blockchain_lang(report, test_weight):
     return BlockchainTestLang(test_weight, report)
 
 
-
 @pytest.fixture
 def blockchain_lang_runner(report):
     def runner(weights, test_string):
