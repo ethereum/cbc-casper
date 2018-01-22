@@ -1,7 +1,28 @@
 import random
 import pytest
 
+from state_languages.blockchain_test_lang import BlockchainTestLang
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
+
+
+@pytest.fixture
+def blockchain_lang(report, test_weight):
+    return BlockchainTestLang(test_weight, report)
+
+
+@pytest.fixture
+def blockchain_lang_runner(report):
+    def runner(weights, test_string):
+        BlockchainTestLang(weights, report).parse(test_string)
+    return runner
+
+
+@pytest.fixture
+def blockchain_lang_creator(report):
+    def creator(weights):
+        return BlockchainTestLang(weights, report)
+    return creator
+
 
 @pytest.fixture
 def blockchain_validator_set(generate_validator_set):
