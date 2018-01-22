@@ -5,6 +5,9 @@ import random as r
 class Message(object):
     """Message/bet data structure for blockchain consensus"""
     def __init__(self, estimate, justification, sender, sequence_number, display_height):
+        if not self.is_valid_estimate(estimate):
+            raise TypeError("Estimate {} is invalid!".format(estimate))
+
         assert isinstance(justification, dict), "expected justification a Justification!"
 
         self.sender = sender
@@ -47,6 +50,11 @@ class Message(object):
     @property
     def hash(self):
         return hash(str(self.header))
+
+    @classmethod
+    def is_valid_estimate(cls, estimate):
+        '''Must be implemented by child class'''
+        raise NotImplementedError
 
     def conflicts_with(self, message):
         '''Must be implemented by child class'''
