@@ -1,7 +1,11 @@
 import pytest
 
-from casper.protocols.integer.integer_view import IntegerView
 
-@pytest.mark.skip(reason="test not written")
-def test_set_min_and_max(minimum, maximum, error):
+@pytest.mark.skip(reason="test language not written")
+def test_update_safe_estimates():
+    pass
+
+
+@pytest.mark.skip(reason="test language not written")
+def test_update_protocol_specific_view():
     pass
