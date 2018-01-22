@@ -11,10 +11,6 @@ from casper.networks import (
     NoDelayNetwork
 )
 
-from state_languages.blockchain_test_lang import BlockchainTestLang
-from state_languages.integer_test_lang import IntegerTestLang
-from state_languages.binary_test_lang import BinaryTestLang
-
 from simulations.utils import generate_random_gaussian_validator_set
 
 
@@ -43,17 +39,15 @@ def rand_start_protocol(request):
     return request.param
 
 
+@pytest.fixture
+def message(protocol):
+    return protocol.Message
 
-
-def random_gaussian_validator_set_from_protocol(protocol):
-    return generate_random_gaussian_validator_set(protocol)
-
-
-def example_func():
-    return
 
 @pytest.fixture
 def example_function():
+    def example_func():
+        return
     return example_func
 
 @pytest.fixture(autouse=True)
@@ -75,65 +69,15 @@ def empty_just():
 def test_weight():
     return {i: 5 - i for i in range(5)}
 
-@pytest.fixture
-def binary_lang(report, test_weight):
-    return BinaryTestLang(test_weight, report)
-
-@pytest.fixture
-def blockchain_lang(report, test_weight):
-    return BlockchainTestLang(test_weight, report)
-
-@pytest.fixture
-def integer_lang(report, test_weight):
-    return IntegerTestLang(test_weight, report)
-
-
-@pytest.fixture
-def binary_lang_runner(report):
-    def runner(weights, test_string):
-        BinaryTestLang(weights, report).parse(test_string)
-    return runner
-
-@pytest.fixture
-def blockchain_lang_runner(report):
-    def runner(weights, test_string):
-        BlockchainTestLang(weights, report).parse(test_string)
-    return runner
-
-@pytest.fixture
-def integer_lang_runner(report):
-    def runner(weights, test_string):
-        IntegerTestLang(weights, report).parse(test_string)
-    return runner
-
-
-@pytest.fixture
-def binary_lang_creator(report):
-    def creator(weights):
-        return BinaryTestLang(weights, report)
-    return creator
-
-@pytest.fixture
-def blockchain_lang_creator(report):
-    def creator(weights):
-        return BlockchainTestLang(weights, report)
-    return creator
-
-@pytest.fixture
-def integer_lang_creator(report):
-    def creator(weights):
-        return IntegerTestLang(weights, report)
-    return creator
-
 
 @pytest.fixture
 def generate_validator_set():
-    return random_gaussian_validator_set_from_protocol
+    return generate_random_gaussian_validator_set
 
 
 @pytest.fixture
 def validator_set(protocol):
-    return random_gaussian_validator_set_from_protocol(protocol)
+    return generate_random_gaussian_validator_set(protocol)
 
 
 @pytest.fixture
@@ -165,7 +109,7 @@ def network(validator_set, protocol):
 
 
 @pytest.fixture
-def no_delay_network(validator_set, protocol, ):
+def no_delay_network(validator_set, protocol):
     return NoDelayNetwork(validator_set, protocol)
 
 

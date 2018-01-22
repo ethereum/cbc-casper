@@ -9,6 +9,37 @@ from casper.validator import Validator
 
 from state_languages.blockchain_test_lang import BlockchainTestLang
 
+@pytest.mark.parametrize(
+    'estimate, is_valid',
+    [
+        (None, True),
+        ('block', False),
+        (0, False),
+        (True, False),
+    ]
+)
+def test_accepts_valid_estimates(estimate, is_valid, block):
+    if estimate == 'block':
+        Block.is_valid_estimate(block) == is_valid
+
+    assert Block.is_valid_estimate(estimate) == is_valid
+
+
+@pytest.mark.parametrize(
+    'estimate_one, estimate_two, conflicts',
+    [
+        (None, 'prev', False),
+        (None, None, True),
+    ]
+)
+def test_conflicts_with(estimate_one, estimate_two, conflicts, create_block):
+    bet_one = create_block(estimate_one)
+    if estimate_two == 'prev':
+        estimate_two = bet_one
+    bet_two = create_block(estimate_two)
+
+    assert bet_one.conflicts_with(bet_two) == conflicts
+
 
 def test_equality_of_copies_off_genesis(validator, empty_just):
     block = Block(None, empty_just, validator, 0, 0)
