@@ -4,6 +4,7 @@ import pytest
 from state_languages.binary_test_lang import BinaryTestLang
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
+
 @pytest.fixture
 def binary_lang(report, test_weight):
     return BinaryTestLang(test_weight, report)
@@ -36,6 +37,7 @@ def binary_validator(binary_validator_set):
 @pytest.fixture
 def bet(empty_just, binary_validator):
     return BinaryProtocol.Message(0, empty_just, binary_validator, 0, 0)
+
 
 @pytest.fixture
 def create_bet(empty_just, binary_validator):

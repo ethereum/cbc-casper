@@ -2,6 +2,7 @@ import pytest
 
 from casper.protocols.order.bet import Bet
 
+
 @pytest.mark.parametrize(
     'estimate, is_valid',
     [

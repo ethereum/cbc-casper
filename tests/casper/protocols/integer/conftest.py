@@ -4,6 +4,7 @@ import pytest
 from state_languages.integer_test_lang import IntegerTestLang
 from casper.protocols.integer.integer_protocol import IntegerProtocol
 
+
 @pytest.fixture
 def integer_lang(report, test_weight):
     return IntegerTestLang(test_weight, report)

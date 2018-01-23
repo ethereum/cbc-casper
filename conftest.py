@@ -50,6 +50,7 @@ def example_function():
         return
     return example_func
 
+
 @pytest.fixture(autouse=True)
 def reset_blockchain_protocol(request):
     BlockchainProtocol.genesis_block = None
