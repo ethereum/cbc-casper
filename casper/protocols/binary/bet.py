@@ -7,9 +7,7 @@ class Bet(Message):
 
     @classmethod
     def is_valid_estimate(cls, estimate):
-        if estimate != 0 and estimate != 1:
-            return False
-        return True
+        return estimate in [0, 1]
 
     def conflicts_with(self, message):
         """Returns true if the other_message estimate is not the same as this estimate"""

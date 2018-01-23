@@ -21,6 +21,7 @@ from state_languages.blockchain_test_lang import BlockchainTestLang
 def test_accepts_valid_estimates(estimate, is_valid, block):
     if estimate == 'block':
         Block.is_valid_estimate(block) == is_valid
+        return
 
     assert Block.is_valid_estimate(estimate) == is_valid
 

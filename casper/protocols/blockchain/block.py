@@ -19,9 +19,7 @@ class Block(Message):
 
     @classmethod
     def is_valid_estimate(cls, estimate):
-        if not isinstance(estimate, Block) and estimate is not None:
-            return False
-        return True
+        return isinstance(estimate, Block) or estimate is None
 
     def conflicts_with(self, message):
         """Returns true if self is not in the prev blocks of other_message"""
