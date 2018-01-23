@@ -1,7 +1,7 @@
 import pytest
 
 from casper.protocols.integer.bet import Bet
-from casper.protocols.integer.integer_view import IntegerView
+
 
 @pytest.mark.parametrize(
     'estimate, is_valid',

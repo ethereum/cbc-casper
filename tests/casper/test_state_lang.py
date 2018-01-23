@@ -161,7 +161,12 @@ def test_parse_only_valid_val_and_messages(test_string, test_weight, exception, 
         (['M0-A', 'M1-A'], {i: 5 - i for i in range(5)}, True),
     ]
 )
-def test_parse_only_valid_val_and_messages_split_strings(test_strings, test_weight, exception, protocol):
+def test_parse_only_valid_val_and_messages_split_strings(
+        test_strings,
+        test_weight,
+        exception,
+        protocol
+        ):
     state_lang = StateLanguage(test_weight, protocol, False)
 
     if exception:
@@ -216,7 +221,12 @@ def test_make_adds_to_global_view_(
         ),
     ]
 )
-def test_make_messages_builds_on_view(test_string, block_justification, test_weight, genesis_protocol):
+def test_make_messages_builds_on_view(
+        test_string,
+        block_justification,
+        test_weight,
+        genesis_protocol
+        ):
     state_lang = StateLanguage(test_weight, genesis_protocol, False)
     state_lang.parse(test_string)
     global_view = state_lang.network.global_view
@@ -275,7 +285,7 @@ def test_send_updates_val_view_genesis_protocols(
         num_messages_per_view,
         message_keys,
         genesis_protocol
-    ):
+        ):
     state_lang = StateLanguage(test_weight, genesis_protocol, False)
     state_lang.parse(test_string)
 

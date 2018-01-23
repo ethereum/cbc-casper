@@ -1,8 +1,7 @@
-import random as r
 import pytest
 
 from casper.protocols.binary.bet import Bet
-from casper.protocols.binary.binary_protocol import BinaryProtocol
+
 
 @pytest.mark.parametrize(
     'estimate, is_valid',

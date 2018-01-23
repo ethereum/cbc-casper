@@ -1,5 +1,6 @@
 """The safety oracle testing module ... """
 
+
 def test_round_robin_safety(oracle_class, test_lang_creator):
     test_lang = test_lang_creator({0: 9.3, 1: 8.2, 2: 7.1, 3: 6, 4: 5})
     test_string = (
@@ -26,7 +27,6 @@ def test_majority_fork_safe(oracle_class, test_lang_creator):
         'M1-L3 SJ0-L3 M0-L4 SJ1-L4'
     )
     test_lang.parse(test_string)
-
 
     message = test_lang.messages['L0']
 
@@ -76,7 +76,6 @@ def test_no_majority_fork_safe_after_union(oracle_class, test_lang_creator):
         'M0-L3 SJ1-L3 M1-L4 SJ0-L4 '
         'SJ3-A M3-R0 SJ4-R0 M4-R1 SJ3-R1 M3-R2 SJ4-R2 M4-R3 '
         'SJ3-R3 M3-R4 SJ4-R4'
-
     )
     test_lang.parse(test_string)
 
@@ -98,7 +97,6 @@ def test_no_majority_fork_safe_after_union(oracle_class, test_lang_creator):
 
         assert fault_tolerance == 0
 
-
     test_string = (
         # show all validators all messages
         'SJ0-R4 SJ1-R4 SJ2-R4 SJ2-L4 SJ3-L4 SJ4-L4 '
@@ -108,7 +106,6 @@ def test_no_majority_fork_safe_after_union(oracle_class, test_lang_creator):
     test_lang.parse(test_string)
 
     validator = test_lang.validator_set.get_validator_by_name(0)
-
     message = test_lang.messages['L0']
 
     oracle = oracle_class(message, validator.view, test_lang.validator_set)
