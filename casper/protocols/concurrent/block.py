@@ -8,20 +8,16 @@ class Block(Message):
     @classmethod
     def is_valid_estimate(cls, estimate):
         if not isinstance(estimate, dict):
-            print("here1")
             return False
 
         for field in ['blocks', 'inputs', 'outputs']:
             if field not in estimate:
-                print("here2")
                 return False
 
         if len(estimate) != 3:
-            print("here3")
             return False
 
         if not isinstance(estimate['blocks'], set) or len(estimate['blocks']) < 1:
-            print('here4')
             return False
 
         return True
