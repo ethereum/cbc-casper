@@ -5,12 +5,22 @@ from casper.message import Message
 class Block(Message):
     """Message data structure for concurrent consensus"""
 
-    def __init__(self, estimate, justification, sender, sequence_number, display_height):
-        # Do some type checking for safety!
-        assert isinstance(estimate, dict), "...expected a valid estimate!"
-        assert len(estimate['blocks']) > 0, "... most point to a least one thing"
+    @classmethod
+    def is_valid_estimate(cls, estimate):
+        if not isinstance(estimate, dict):
+            return False
 
-        super().__init__(estimate, justification, sender, sequence_number, display_height)
+        for field in ['blocks', 'inputs', 'outputs']:
+            if field not in estimate:
+                return False
+
+        if len(estimate) != 3:
+            return False
+
+        if not isinstance(estimate['blocks'], set) or len(estimate['blocks']) < 1:
+            return False
+
+        return True
 
     def conflicts_with(self, message):
         """Returns true if self is not in the prev blocks of other_message"""

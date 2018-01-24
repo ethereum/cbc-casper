@@ -1,12 +1,7 @@
 """The validator testing module ... """
-
 import pytest
 
-from casper.protocols.blockchain.block import Block
 from casper.validator import Validator
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.protocols.binary.binary_protocol import BinaryProtocol
-
 
 
 @pytest.mark.parametrize(
@@ -32,9 +27,11 @@ def test_new_validator(name, weight, error):
     assert validator.weight == weight
 
 
-def test_validator_created_with_genesis():
-    validator = Validator(0, 1, BlockchainProtocol)
+def test_validator_created_with_genesis(genesis_protocol):
+    validator = Validator(0, 1, genesis_protocol)
     assert validator.view.last_finalized_block is not None
 
-    validator = Validator(0, 1, BinaryProtocol)
+
+def test_validator_created_with_inital_message(rand_start_protocol):
+    validator = Validator(0, 1, rand_start_protocol)
     assert validator.my_latest_message() is not None

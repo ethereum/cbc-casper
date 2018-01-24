@@ -1,49 +1,39 @@
-"""The block testing module ..."""
+"""The binary estimator testing module tests the binary estimator"""
 import pytest
 
-from casper.protocols.integer.integer_protocol import IntegerProtocol
-from casper.protocols.integer.bet import Bet
+from casper.protocols.binary.binary_protocol import BinaryProtocol
+from casper.protocols.binary.bet import Bet
 from casper.validator_set import ValidatorSet
-import casper.protocols.integer.integer_estimator as estimator
+import casper.protocols.binary.binary_estimator as estimator
 
 
 @pytest.mark.parametrize(
     'weights, latest_estimates, estimate',
     [
         (
-            {0: 5},
-            {0: 5},
-            5
+            {0: 1},
+            {0: 1},
+            1
         ),
         (
             {0: 5, 1: 6, 2: 7},
-            {0: 5, 1: 5, 2: 5},
-            5
-        ),
-        (
-            {0: 5, 1: 10, 2: 14},
-            {0: 0, 1: 5, 2: 10},
-            5
-        ),
-        (
-            {0: 5, 1: 11},
-            {0: 0, 1: 6},
-            6
-        ),
-        (
-            {0: 5, 1: 10, 2: 14},
             {0: 0, 1: 0, 2: 1},
             0
         ),
         (
-            {0: 5, 1: 5},
+            {0: 5, 1: 10, 2: 14},
+            {0: 1, 1: 1, 2: 0},
+            1
+        ),
+        (
+            {0: 5, 1: 11},
             {0: 0, 1: 1},
-            0
+            1
         ),
     ]
 )
 def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, empty_just):
-    validator_set = ValidatorSet(weights, IntegerProtocol)
+    validator_set = ValidatorSet(weights, BinaryProtocol)
 
     latest_messages = dict()
     for val_name in latest_estimates:

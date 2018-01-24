@@ -4,10 +4,42 @@ import copy
 import pytest
 
 from casper.protocols.blockchain.block import Block
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.validator import Validator
 
 from state_languages.blockchain_test_lang import BlockchainTestLang
+
+
+@pytest.mark.parametrize(
+    'estimate, is_valid',
+    [
+        (None, True),
+        ('block', False),
+        (0, False),
+        (True, False),
+    ]
+)
+def test_accepts_valid_estimates(estimate, is_valid, block):
+    if estimate == 'block':
+        Block.is_valid_estimate(block) == is_valid
+        return
+
+    assert Block.is_valid_estimate(estimate) == is_valid
+
+
+@pytest.mark.parametrize(
+    'estimate_one, estimate_two, conflicts',
+    [
+        (None, 'prev', False),
+        (None, None, True),
+    ]
+)
+def test_conflicts_with(estimate_one, estimate_two, conflicts, create_block):
+    bet_one = create_block(estimate_one)
+    if estimate_two == 'prev':
+        estimate_two = bet_one
+    bet_two = create_block(estimate_two)
+
+    assert bet_one.conflicts_with(bet_two) == conflicts
 
 
 def test_equality_of_copies_off_genesis(validator, empty_just):
@@ -16,6 +48,7 @@ def test_equality_of_copies_off_genesis(validator, empty_just):
     shallow_copy = copy.copy(block)
 
     assert block == shallow_copy
+
 
 @pytest.mark.skip(reason="current deepcopy bug")
 def test_equality_of_copies_of_non_genesis(report):
@@ -104,8 +137,8 @@ def test_is_in_blockchain__test_lang(report):
         ),
     ]
 )
-def test_block_height(report, test_string, weights, block_heights):
-    test_lang = BlockchainTestLang(weights, report)
+def test_block_height(blockchain_lang_creator, test_string, weights, block_heights):
+    test_lang = blockchain_lang_creator(weights)
     test_lang.parse(test_string)
 
     for block_name in block_heights:

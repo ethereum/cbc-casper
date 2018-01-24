@@ -1,5 +1,6 @@
 import pytest
 
+from casper.networks import NoDelayNetwork
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 from simulations.analyzer import Analyzer
@@ -16,7 +17,9 @@ import simulations.utils as utils
         ('nofinal', 2),
     ]
 )
-def test_num_messages(validator_set, network, mode, messages_generated_per_round):
+def test_num_messages_genesis(generate_validator_set, genesis_protocol, mode, messages_generated_per_round):
+    validator_set = generate_validator_set(genesis_protocol)
+    network = NoDelayNetwork(validator_set, genesis_protocol)
     msg_gen = utils.message_maker(mode)
     simulation_runner = SimulationRunner(
         validator_set,

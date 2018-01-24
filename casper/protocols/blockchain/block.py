@@ -17,6 +17,10 @@ class Block(Message):
         else:
             self.height = 1
 
+    @classmethod
+    def is_valid_estimate(cls, estimate):
+        return isinstance(estimate, Block) or estimate is None
+
     def conflicts_with(self, message):
         """Returns true if self is not in the prev blocks of other_message"""
         assert isinstance(message, Block), "...expected a block"
