@@ -28,19 +28,21 @@ class CliqueOracle(AbstractOracle):
         for val1, val2 in itertools.combinations(self.with_candidate, 2):
             # the latest message val1 has seen from val2 is on the candidate estimate,
             v1_msg = self.view.latest_messages[val1]
-            if val2 not in v1_msg.justification.latest_messages:
+            if val2 not in v1_msg.justification:
                 continue
 
-            v2_msg_in_v1_view = v1_msg.justification.latest_messages[val2]
+            message_hash = v1_msg.justification[val2]
+            v2_msg_in_v1_view = self.view.justified_messages[message_hash]
             if self.candidate_estimate.conflicts_with(v2_msg_in_v1_view):
                 continue
 
             # the latest block val2 has seen from val1 is on the candidate estimate
             v2_msg = self.view.latest_messages[val2]
-            if val1 not in v2_msg.justification.latest_messages:
+            if val1 not in v2_msg.justification:
                 continue
 
-            v1_msg_in_v2_view = v2_msg.justification.latest_messages[val1]
+            message_hash = v2_msg.justification[val1]
+            v1_msg_in_v2_view = self.view.justified_messages[message_hash]
             if self.candidate_estimate.conflicts_with(v1_msg_in_v2_view):
                 continue
 

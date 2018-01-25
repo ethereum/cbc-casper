@@ -14,10 +14,21 @@ from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
     message_maker,
+    select_network,
     select_protocol,
     MESSAGE_MODES,
+    NETWORKS,
     PROTOCOLS
 )
+
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 def default_configuration():
@@ -40,6 +51,11 @@ def main():
         help='specifies the protocol for the simulation'
     )
     parser.add_argument(
+        '--network', type=str, default=config.get("DefaultNetwork"),
+        choices=NETWORKS,
+        help='specifies the network model for the simulation'
+    )
+    parser.add_argument(
         '--validators', type=int, default=config.getint("NumValidators"),
         help='specifies the number of validators in validator set'
     )
@@ -52,30 +68,38 @@ def main():
         help='specifies the interval in rounds at which to plot results'
     )
     parser.add_argument(
-        '--hide-display', help='hide simulation display', action='store_true'
+        '--hide-display', action="store_true",
+        help='display simulations round by round'
     )
     parser.add_argument(
-        '--save', help='hide simulation display', action='store_true'
+        '--save', type=str2bool, default=config.getboolean("Save"),
+        help='save the simulation in graphs/ directory'
+    )
+    parser.add_argument(
+        '--justify-messages', type=str2bool, default=config.getboolean("JustifyMessages"),
+        help='force full propagation of all messages in justification of message when sending'
     )
 
     args = parser.parse_args()
     protocol = select_protocol(args.protocol)
+    network_type = select_network(args.network)
 
     validator_set = generate_random_gaussian_validator_set(
         protocol,
         args.validators
     )
+    network = network_type(validator_set, protocol)
 
     msg_gen = message_maker(args.mode)
-    display = not args.hide_display
 
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
-        protocol,
+        protocol=protocol,
+        network=network,
         total_rounds=args.rounds,
         report_interval=args.report_interval,
-        display=display,
+        display=(not args.hide_display),
         save=args.save,
     )
     simulation_runner.run()

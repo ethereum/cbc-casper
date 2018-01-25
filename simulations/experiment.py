@@ -21,6 +21,7 @@ class Experiment:
             validator_set_generator,
             msg_mode,
             protocol,
+            network_class,
             sim_rounds,
             sim_report_interval
     ):
@@ -30,6 +31,7 @@ class Experiment:
         self.validator_set_generator = validator_set_generator
         self.msg_mode = msg_mode
         self.protocol = protocol
+        self.network_class = network_class
         self.sim_rounds = sim_rounds
         self.sim_report_interval = sim_report_interval
         self.intervals = int(self.sim_rounds / self.sim_report_interval)
@@ -50,10 +52,12 @@ class Experiment:
 
     def run_sim(self, sim_id):
         validator_set = self.validator_set_generator()
+        network = self.network_class(validator_set, self.protocol)
         runner = SimulationRunner(
             validator_set,
             message_maker(self.msg_mode),
             self.protocol,
+            network,
             total_rounds=self.sim_rounds,
             report_interval=self.sim_report_interval,
             display=False,
@@ -96,7 +100,7 @@ class Experiment:
 
         analyzer = Analyzer(runner)
         self.analyzer_data['simulation_data'][sim_id][interval] = {
-            d: getattr(analyzer, d)()
+            d: getattr(analyzer, d)
             for d in self.data
 
         }

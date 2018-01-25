@@ -1,9 +1,6 @@
 """The validator testing module ... """
-
 import pytest
 
-from casper.blockchain.block import Block
-from casper.justification import Justification
 from casper.validator import Validator
 
 
@@ -30,9 +27,11 @@ def test_new_validator(name, weight, error):
     assert validator.weight == weight
 
 
-def test_check_estimate_safety_without_validator_set():
-    validator = Validator("cool", 10.2)
-    block = Block(None, Justification(), validator)
+def test_validator_created_with_genesis(genesis_protocol):
+    validator = Validator(0, 1, genesis_protocol)
+    assert validator.view.last_finalized_block is not None
 
-    with pytest.raises(AttributeError):
-        validator.check_estimate_safety(block)
+
+def test_validator_created_with_inital_message(rand_start_protocol):
+    validator = Validator(0, 1, rand_start_protocol)
+    assert validator.my_latest_message() is not None

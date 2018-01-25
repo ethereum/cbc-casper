@@ -7,6 +7,7 @@ import calendar
 
 from simulations.experiment import Experiment
 from simulations.utils import (
+    select_network,
     select_protocol,
     validator_generator
 )
@@ -34,6 +35,7 @@ def main():
 
     experiment_name = "{}-{}".format(file_name, timestamp())
     protocol = select_protocol(config['protocol'])
+    network_class = select_network(config['network'])
 
     experiment = Experiment(
         experiment_name,
@@ -42,6 +44,7 @@ def main():
         validator_generator(config['validator_info'], protocol),
         config['msg_mode'],
         protocol,
+        network_class,
         config['rounds_per_sim'],
         config['report_interval']
     )

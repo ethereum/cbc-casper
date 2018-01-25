@@ -1,6 +1,7 @@
 import pytest
 
-from casper.blockchain.blockchain_protocol import BlockchainProtocol
+from casper.networks import NoDelayNetwork
+from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 from simulations.analyzer import Analyzer
 from simulations.simulation_runner import SimulationRunner
@@ -16,12 +17,15 @@ import simulations.utils as utils
         ('nofinal', 2),
     ]
 )
-def test_num_messages(validator_set, mode, messages_generated_per_round):
+def test_num_messages_genesis(generate_validator_set, genesis_protocol, mode, messages_generated_per_round):
+    validator_set = generate_validator_set(genesis_protocol)
+    network = NoDelayNetwork(validator_set, genesis_protocol)
     msg_gen = utils.message_maker(mode)
     simulation_runner = SimulationRunner(
         validator_set,
         msg_gen,
         BlockchainProtocol,
+        network,
         100,
         20,
         False,
@@ -29,13 +33,14 @@ def test_num_messages(validator_set, mode, messages_generated_per_round):
     )
     analyzer = Analyzer(simulation_runner)
 
-    # due to random_initialization
-    assert analyzer.num_messages() == len(validator_set)
+    assert analyzer.num_messages == 1
+    potential_extra_messages = len(validator_set) - 1
 
     for i in range(10):
         simulation_runner.step()
-        assert analyzer.num_messages() == \
-            len(validator_set) + (i + 1) * messages_generated_per_round
+        messages_generated = 1 + (i + 1) * messages_generated_per_round
+
+        assert analyzer.num_messages <= messages_generated + potential_extra_messages
 
 
 @pytest.mark.skip(reason="test not written")

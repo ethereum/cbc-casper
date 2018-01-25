@@ -15,7 +15,8 @@ def exists_free_message(estimate, val, sequence_num, view):
         if curr_message.sequence_number == 0:
             break
 
-        curr_message = curr_message.justification.latest_messages[val]
+        next_message_hash = curr_message.justification[val]
+        curr_message = view.justified_messages[next_message_hash]
 
     return False
 
@@ -49,3 +50,23 @@ def build_chain(tip, base):
         next_block = next_block.estimate
 
     return chain
+
+
+def build_schedule(tip):
+    """Returns a list of blocks and blocks estimates from tip to base."""
+    stack = [block for block in tip]
+    schedule = []
+
+    while any(stack):
+        curr_block = stack.pop()
+
+        if curr_block is None:
+            continue
+
+        for ancestor in curr_block.estimate['blocks']:
+            if ancestor is None:
+                continue
+            schedule.append((curr_block, ancestor))
+            stack.append(ancestor)
+
+    return schedule

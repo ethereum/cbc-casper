@@ -1,7 +1,5 @@
 import sys
 
-from casper.network import Network
-
 
 class SimulationRunner:
     def __init__(
@@ -9,6 +7,7 @@ class SimulationRunner:
             validator_set,
             msg_gen,
             protocol,
+            network,
             total_rounds,
             report_interval,
             display,
@@ -29,8 +28,7 @@ class SimulationRunner:
         else:
             self.report_interval = 1
 
-        self.network = Network(validator_set, protocol)
-        self.network.random_initialization()
+        self.network = network
 
         self.plot_tool = protocol.PlotTool(display, save, self.network.global_view, validator_set)
         self.plot_tool.plot()
@@ -38,47 +36,56 @@ class SimulationRunner:
     def run(self):
         """ run simulation total_rounds if specified
             otherwise, run indefinitely """
+        self._send_initial_messages()
+
         while self.round < self.total_rounds:
             self.step()
 
         if self.save:
+            print("making gif")
             self.plot_tool.make_gif()
 
     def step(self):
         """ run one round of the simulation """
+        """ this becomes, who is going to make a message and send to the network """
+        """ rather than what explicit paths happen """
         self.round += 1
-        message_paths = self.msg_gen(self.validator_set)
+        received_messages = self._receive_messages()
+        self._update_safe_estimates(received_messages.keys())
 
-        affected_validators = {j for i, j in message_paths}
+        new_messages = self._generate_new_messages()
 
-        sent_messages = self._send_messages_along_paths(message_paths)
-        new_messages = self._make_new_messages(affected_validators)
-        self._check_for_new_safety(affected_validators)
-
-        self.plot_tool.update(message_paths, sent_messages, new_messages)
+        self.plot_tool.update(new_messages)
         if self.round % self.report_interval == self.report_interval - 1:
             self.plot_tool.plot()
 
-    def _send_messages_along_paths(self, message_paths):
-        sent_messages = {}
-        # Send most recent message of sender to receive
-        for sender, receiver in message_paths:
-            message = sender.my_latest_message()
-            self.network.propagate_message_to_validator(message, receiver)
-            sent_messages[sender] = message
+        self.network.advance_time()
 
-        return sent_messages
-
-    def _make_new_messages(self, validators):
-        messages = {}
+    def _generate_new_messages(self):
+        validators = self.msg_gen(self.validator_set)
+        new_messages = []
         for validator in validators:
-            message = self.network.get_message_from_validator(validator)
-            messages[validator] = message
+            message = validator.make_new_message()
+            self.network.send_to_all(message)
+            new_messages.append(message)
+        return new_messages
 
-        return messages
+    def _receive_messages(self):
+        received_messages = {}
+        for validator in self.validator_set:
+            messages = self.network.receive_all_available(validator)
+            if messages:
+                validator.receive_messages(set(messages))
+                received_messages[validator] = messages
+        return received_messages
 
-    def _check_for_new_safety(self, affected_validators):
-        for validator in affected_validators:
+    def _update_safe_estimates(self, validators):
+        for validator in validators:
             validator.update_safe_estimates()
-
         self.network.global_view.update_safe_estimates(self.validator_set)
+
+    def _send_initial_messages(self):
+        """ ensures that initial messages are attempted to be propogated.
+            requirement for any protocol where initial message is not shared """
+        for validator in self.validator_set:
+            self.network.send_to_all(validator.initial_message)
