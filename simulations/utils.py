@@ -13,11 +13,12 @@ from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
 from casper.protocols.order.order_protocol import OrderProtocol
 from casper.protocols.concurrent.concurrent_protocol import ConcurrentProtocol
+from casper.protocols.sharding.sharding_protocol import ShardingProtocol
 from casper.validator_set import ValidatorSet
 
 MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
 NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
-PROTOCOLS = ['blockchain', 'binary', 'integer', 'order', 'concurrent']
+PROTOCOLS = ['blockchain', 'binary', 'integer', 'order', 'concurrent', 'sharding']
 
 
 def select_network(network):
@@ -44,6 +45,8 @@ def select_protocol(protocol):
         return IntegerProtocol
     if protocol == 'concurrent':
         return ConcurrentProtocol
+    if protocol == 'sharding':
+        return ShardingProtocol
 
 
 def message_maker(mode):

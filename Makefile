@@ -30,3 +30,6 @@ run-nofinal:
 
 run-binary:
 	venv/bin/python casper.py rand --protocol binary --report-interval 3
+
+run-sharding:
+	venv/bin/python casper.py rand --protocol sharding --validators 14 --report-interval 3
