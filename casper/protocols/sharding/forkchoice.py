@@ -29,15 +29,6 @@ def get_scores(starting_block, latest_messages, shard_id):
     return scores
 
 
-
-
-
-
-
-
-    # ah. So
-
-
 def get_shard_fork_choice(starting_block, children, latest_messages, shard_id):
     """Get the forkchoice for a specific shard"""
 

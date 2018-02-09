@@ -35,7 +35,6 @@ class ShardingProtocol(Protocol):
     def initial_message(cls, validator):
         """Returns a dict from shard_id -> shard genesis block"""
         # hard coded for now (3 is a arbitrary :-) )
-
         if cls.num_validators_assigned == 0:
             if '' not in cls.shard_genesis_blocks:
                 estimate = {'prev_blocks': set([None]), 'shard_ids': set([''])}

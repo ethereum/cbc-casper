@@ -92,9 +92,9 @@ class ShardingView(AbstractView):
 
     def update_safe_estimates(self, validator_set):
         """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
+        # check the safety of the top shard!
         pass
 
-        # check the safety of the top shard!
         tip = self.forkchoice_on_shard('')
 
         while tip and tip != self.starting_blocks['']:

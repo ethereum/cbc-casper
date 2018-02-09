@@ -19,7 +19,7 @@ class Block(Message):
         return shard_id in self.estimate['shard_ids']
 
     def prev_block(self, shard_id):
-        """Returns the previous block, which is on the shard_id
+        """Returns the previous block on the shard: shard_id
         Throws a KeyError if there is no previous block"""
         if shard_id not in self.estimate['shard_ids']:
             raise KeyError("No previous block on that shard")
