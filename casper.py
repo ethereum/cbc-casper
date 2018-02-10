@@ -13,12 +13,9 @@ from configparser import ConfigParser
 from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
     generate_random_gaussian_validator_set,
-    message_maker,
-    select_network,
-    select_protocol,
-    MESSAGE_MODES,
-    NETWORKS,
-    PROTOCOLS
+    SELECT_NETWORK,
+    SELECT_PROTOCOL,
+    SELECT_MESSAGE_MODE,
 )
 
 
@@ -42,17 +39,17 @@ def main():
     parser = argparse.ArgumentParser(description='Run CasperCBC standard simulations.')
     parser.add_argument(
         'mode', metavar='Mode', type=str,
-        choices=MESSAGE_MODES,
+        choices=SELECT_MESSAGE_MODE.keys(),
         help='specifies how to generate and propogate new messages'
     )
     parser.add_argument(
         '--protocol', type=str, default=config.get("DefaultProtocol"),
-        choices=PROTOCOLS,
+        choices=SELECT_PROTOCOL.keys(),
         help='specifies the protocol for the simulation'
     )
     parser.add_argument(
         '--network', type=str, default=config.get("DefaultNetwork"),
-        choices=NETWORKS,
+        choices=SELECT_NETWORK.keys(),
         help='specifies the network model for the simulation'
     )
     parser.add_argument(
@@ -81,8 +78,8 @@ def main():
     )
 
     args = parser.parse_args()
-    protocol = select_protocol(args.protocol)
-    network_type = select_network(args.network)
+    protocol = SELECT_PROTOCOL[args.protocol]
+    network_type = SELECT_NETWORK[args.network]
 
     validator_set = generate_random_gaussian_validator_set(
         protocol,
@@ -90,11 +87,11 @@ def main():
     )
     network = network_type(validator_set, protocol)
 
-    msg_gen = message_maker(args.mode)
+    message_mode = SELECT_MESSAGE_MODE[args.mode]()
 
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        message_mode,
         protocol=protocol,
         network=network,
         total_rounds=args.rounds,

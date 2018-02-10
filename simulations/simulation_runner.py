@@ -5,7 +5,7 @@ class SimulationRunner:
     def __init__(
             self,
             validator_set,
-            msg_gen,
+            message_mode,
             protocol,
             network,
             total_rounds,
@@ -14,7 +14,7 @@ class SimulationRunner:
             save,
     ):
         self.validator_set = validator_set
-        self.msg_gen = msg_gen
+        self.message_mode = message_mode
         self.save = save
 
         self.round = 0
@@ -62,12 +62,17 @@ class SimulationRunner:
         self.network.advance_time()
 
     def _generate_new_messages(self):
-        validators = self.msg_gen(self.validator_set)
+        sending_validators = self.message_mode.get_message_makers(self.validator_set)
         new_messages = []
-        for validator in validators:
+        for validator in sending_validators:
             message = validator.make_new_message()
-            self.network.send_to_all(message)
             new_messages.append(message)
+
+        recieving_validators = self.message_mode.get_message_recievers(self.validator_set)
+        for validator in recieving_validators:
+            for message in new_messages:
+                self.network.send(validator, message)
+
         return new_messages
 
     def _receive_messages(self):
