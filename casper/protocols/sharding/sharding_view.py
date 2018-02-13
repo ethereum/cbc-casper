@@ -6,6 +6,7 @@ from casper.abstract_view import AbstractView
 import casper.protocols.sharding.forkchoice as forkchoice
 
 
+
 class ShardingView(AbstractView):
     """A view class that also keeps track of a last_finalized_block and children"""
     def __init__(self, messages=None, shard_genesis_block=None):
@@ -25,36 +26,63 @@ class ShardingView(AbstractView):
     def estimate(self):
         """Returns the current forkchoice in this view"""
         print("\n\n Running Forkchoice")
-        self.update_starting_blocks()
+        shards_forkchoice = dict()
 
-        shards_forkchoice = forkchoice.get_all_shards_fork_choice(
-            self.starting_blocks,
-            self.children,
-            self.latest_messages_on_shard
-        )
+        for shard_id in sorted(self.starting_blocks):
+            tip = forkchoice.get_shard_fork_choice(
+                self.starting_blocks[shard_id],
+                self.children,
+                self.latest_messages_on_shard[shard_id],
+                shard_id
+            )
+            shards_forkchoice[shard_id] = tip
+
+            left_child_shard = shard_id + '0'
+            if left_child_shard in self.starting_blocks:
+                left_merge_block = self.previous_merge_block_on_shard(tip, shard_id, left_child_shard)
+                if left_merge_block:
+                    self.starting_blocks[left_child_shard] = left_merge_block
+
+            right_child_shard = shard_id + '1'
+            if right_child_shard in self.starting_blocks:
+                right_merge_block = self.previous_merge_block_on_shard(tip, shard_id, right_child_shard)
+                if right_merge_block:
+                    self.starting_blocks[right_child_shard] = right_merge_block
 
         self.check_forkchoice_atomicity(shards_forkchoice)
 
-        # for now, randomly build somewhere!
-        shards_to_build_on = r.choice([{''}, {'0'}, {'1'}, {'', '0'}, {'', '1'}])
+        # pay no attenting to the code behind the curtain ::))
+        shards_to_build_on = [r.choice([key for key in self.starting_blocks.keys()])]
+        if (r.randint(0, 1) == 1):
+            child = str(r.randint(0, 1))
+            if shards_to_build_on[0] + child in self.starting_blocks:
+                shards_to_build_on.append(shards_to_build_on[0] + child)
+
+        shards_to_build_on = set(shards_to_build_on)
+
         return {'prev_blocks': {shards_forkchoice[shard_id] for shard_id in shards_to_build_on},
                 'shard_ids': shards_to_build_on}
 
     def check_forkchoice_atomicity(self, shards_forkchoice):
         # assert the atomicity things about the shards_forkchoice
-        bast_chain_tip = self.forkchoice_on_shard('')
-        zero_chain_tip = self.forkchoice_on_shard('0')
-        one_chain_tip = self.forkchoice_on_shard('1')
+        for shard_id in sorted(shards_forkchoice):
+            tip = shards_forkchoice[shard_id]
 
-        zero_merge_block = self.previous_merge_block_on_shard(bast_chain_tip, '', '0')
-        one_merge_block = self.previous_merge_block_on_shard(bast_chain_tip, '', '1')
+            left_child_shard = shard_id + '0'
+            if left_child_shard in shards_forkchoice:
+                left_merge_block = self.previous_merge_block_on_shard(tip, shard_id, left_child_shard)
+                if left_merge_block:
+                    print("Checking shard {} and {} atomicity:".format(shard_id, left_child_shard))
+                    assert left_merge_block.is_in_blockchain(shards_forkchoice[left_child_shard], left_child_shard), str(left_merge_block.estimate)
+                    print("Passed")
 
-        if zero_merge_block:
-            assert zero_merge_block.is_in_blockchain(zero_chain_tip, '0')
-            print("Checked shard '' and 0 atomicity: passed")
-        if one_merge_block:
-            assert one_merge_block.is_in_blockchain(one_chain_tip, '1')
-            print("Checked shard '' and 1 atomicity: passed")
+            right_child_shard = shard_id + '1'
+            if right_child_shard in shards_forkchoice:
+                right_merge_block = self.previous_merge_block_on_shard(tip, shard_id, right_child_shard)
+                if right_merge_block:
+                    print("Checking shard {} and {} atomicity:".format(shard_id, right_child_shard))
+                    assert right_merge_block.is_in_blockchain(shards_forkchoice[right_child_shard], right_child_shard), str(right_merge_block.estimate)
+                    print("Passed")
 
 
     def previous_merge_block_on_shard(self, starting_block, block_shard_id, merge_shard):
@@ -67,19 +95,6 @@ class ShardingView(AbstractView):
             current_block = current_block.prev_block(block_shard_id)
         return None
 
-
-    def update_starting_blocks(self):
-        base_chain_tip = self.forkchoice_on_shard('')
-
-        # get the most recent merge block on shard '0'
-        merge_block = self.previous_merge_block_on_shard(base_chain_tip, '', '0')
-        if merge_block:
-            self.starting_blocks['0'] = merge_block
-
-        # get the most recent merge block on shard '0'
-        merge_block = self.previous_merge_block_on_shard(base_chain_tip, '', '1')
-        if merge_block:
-            self.starting_blocks['1'] = merge_block
 
     def forkchoice_on_shard(self, shard_id):
         return forkchoice.get_shard_fork_choice(
