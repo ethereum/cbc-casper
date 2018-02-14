@@ -8,6 +8,14 @@ from casper.networks import (
     NoDelayNetwork,
     StepNetwork
 )
+
+from simulations.message_modes import (
+    RandomMessageMode,
+    RoundRobinMessageMode,
+    FullMessageMode,
+    NoFinalMessageMode,
+)
+
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 from casper.protocols.integer.integer_protocol import IntegerProtocol
@@ -16,86 +24,30 @@ from casper.protocols.concurrent.concurrent_protocol import ConcurrentProtocol
 from casper.protocols.sharding.sharding_protocol import ShardingProtocol
 from casper.validator_set import ValidatorSet
 
-MESSAGE_MODES = ['rand', 'rrob', 'full', 'nofinal']
-NETWORKS = ['no-delay', 'step', 'constant', 'linear', 'gaussian']
-PROTOCOLS = ['blockchain', 'binary', 'integer', 'order', 'concurrent', 'sharding']
 
+SELECT_NETWORK = {
+    'no-delay': NoDelayNetwork,
+    'step': StepNetwork,
+    'constant': ConstantDelayNetwork,
+    'linear': LinearDelayNetwork,
+    'gaussian': GaussianDelayNetwork
+}
 
-def select_network(network):
-    if network == 'no-delay':
-        return NoDelayNetwork
-    if network == 'constant':
-        return ConstantDelayNetwork
-    if network == 'step':
-        return StepNetwork
-    if network == 'linear':
-        return LinearDelayNetwork
-    if network == 'gaussian':
-        return GaussianDelayNetwork
+SELECT_PROTOCOL = {
+    'blockchain': BlockchainProtocol,
+    'binary': BinaryProtocol,
+    'integer': IntegerProtocol,
+    'order': OrderProtocol,
+    'concurrent': ConcurrentProtocol,
+    'sharding': ShardingProtocol
+}
 
-
-def select_protocol(protocol):
-    if protocol == 'blockchain':
-        return BlockchainProtocol
-    if protocol == 'binary':
-        return BinaryProtocol
-    if protocol == 'order':
-        return OrderProtocol
-    if protocol == 'integer':
-        return IntegerProtocol
-    if protocol == 'concurrent':
-        return ConcurrentProtocol
-    if protocol == 'sharding':
-        return ShardingProtocol
-
-
-def message_maker(mode):
-    """The message maker defines the logic for running each type of simulation."""
-
-    if mode == "rand":
-
-        def random(validator_set, num_messages=1):
-            """Each round, some randomly selected validator makes a message"""
-            return r.sample(validator_set.validators, 1)
-            # pairs = list(itertools.permutations(validator_set, 2))
-            # return r.sample(pairs, num_messages)
-
-        return random
-
-    if mode == "rrob":
-
-        def round_robin(validator_set):
-            """Each round, the next validator in a set order makes a message"""
-            sorted_validators = validator_set.sorted_by_name()
-            sender_index = round_robin.next_sender_index
-            round_robin.next_sender_index = (sender_index + 1) % len(validator_set)
-            # receiver_index = round_robin.next_sender_index
-
-            return [sorted_validators[sender_index]]
-
-        round_robin.next_sender_index = 0
-        return round_robin
-
-    if mode == "full":
-
-        def full_propagation(validator_set):
-            """Each round, all validators make all messages"""
-            return validator_set.validators
-
-        return full_propagation
-
-    if mode == "nofinal":
-        rrob = message_maker("rrob")
-
-        def no_final(validator_set):
-            """Each round, two simultaneous round-robin message propagations occur at the same
-            time. This results in validators never being able to finalize later blocks (they
-            may finalize initial blocks, depending on validator weight distribution)."""
-            return [rrob(validator_set)[0], rrob(validator_set)[0]]
-
-        return no_final
-
-    return None
+SELECT_MESSAGE_MODE = {
+    'rand': RandomMessageMode,
+    'rrob': RoundRobinMessageMode,
+    'full': FullMessageMode,
+    'nofinal': NoFinalMessageMode
+}
 
 
 def generate_random_gaussian_validator_set(
