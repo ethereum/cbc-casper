@@ -38,16 +38,8 @@ class FullMessageMode(MessageMode):
         return validator_set
 
 
-class NoFinalMessageMode(MessageMode):
-    # TODO: fix this...
-    current_validator = 0
+class NoFinalMessageMode(RoundRobinMessageMode):
     def get_message_makers(self, validator_set):
-        self.current_validator = (self.current_validator + 1) % len(validator_set)
-        second_validator = (self.current_validator + 3) % len(validator_set)
-        return [
-            validator_set.get_validator_by_name(self.current_validator),
-            validator_set.get_validator_by_name(second_validator)
-            ]
-
-    def get_message_recievers(self, validator_set):
-        return validator_set
+        val_one = super().get_message_makers(validator_set)[0]
+        val_two = super().get_message_makers(validator_set)[0]
+        return [val_one, val_two]
