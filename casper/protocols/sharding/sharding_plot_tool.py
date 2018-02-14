@@ -25,7 +25,6 @@ class ShardingPlotTool(PlotTool):
             for validator in validator_set
         }
 
-
     def update(self, new_messages=None):
         """Updates displayable items with new messages and paths"""
         return
