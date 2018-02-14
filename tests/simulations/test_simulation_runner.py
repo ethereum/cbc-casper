@@ -1,6 +1,13 @@
 import sys
 import pytest
 
+from simulations.message_modes import (
+    RandomMessageMode,
+    RoundRobinMessageMode,
+    FullMessageMode,
+    NoFinalMessageMode,
+)
+
 from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 from casper.protocols.binary.binary_protocol import BinaryProtocol
 
@@ -11,22 +18,22 @@ import simulations.utils as utils
 
 
 @pytest.mark.parametrize(
-    'protocol, mode, rounds, report_interval',
+    'protocol, message_mode, rounds, report_interval',
     [
-        (BinaryProtocol, 'rand', 10, 2),
-        (BlockchainProtocol, 'rand', 10, 1),
-        (BlockchainProtocol, 'rrob', None, None),
-        (BinaryProtocol, 'rrob', None, None),
+        (BinaryProtocol, RandomMessageMode, 10, 2),
+        (BlockchainProtocol, RandomMessageMode, 10, 1),
+        (BlockchainProtocol, RoundRobinMessageMode, None, None),
+        (BinaryProtocol, RoundRobinMessageMode, None, None),
     ]
 )
-def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, report_interval):
-    msg_gen = utils.message_maker(mode)
+def test_new_simulation_runner(generate_validator_set, protocol, message_mode, rounds, report_interval):
+    message_mode = message_mode()
     validator_set = generate_validator_set(protocol)
     network = StepNetwork(validator_set, protocol)
 
     simulation_runner = SimulationRunner(
         validator_set,
-        msg_gen,
+        message_mode,
         protocol,
         network,
         rounds,
@@ -36,7 +43,7 @@ def test_new_simulation_runner(generate_validator_set, protocol, mode, rounds, r
     )
 
     assert simulation_runner.validator_set == validator_set
-    assert simulation_runner.msg_gen == msg_gen
+    assert simulation_runner.message_mode == message_mode
     assert simulation_runner.round == 0
     assert isinstance(simulation_runner.network, Network)
 
@@ -79,26 +86,26 @@ def test_simulation_runner_step(simulation_runner):
 
 
 @pytest.mark.parametrize(
-    'protocol, mode, messages_generated_per_round, potential_extra_messages',
+    'protocol, message_mode, messages_generated_per_round, potential_extra_messages',
     [
-        (BlockchainProtocol, 'rand', 1, 4),
-        (BlockchainProtocol, 'rrob', 1, 4),
-        (BlockchainProtocol, 'full', 5, 4),
-        (BlockchainProtocol, 'nofinal', 2, 2),
-        (BinaryProtocol, 'rand', 1, 0),
-        (BinaryProtocol, 'rrob', 1, 0),
-        (BinaryProtocol, 'full', 5, 0),
-        (BinaryProtocol, 'nofinal', 2, 0),
+        (BlockchainProtocol, RandomMessageMode, 1, 4),
+        (BlockchainProtocol, RoundRobinMessageMode, 1, 4),
+        (BlockchainProtocol, FullMessageMode, 5, 4),
+        (BlockchainProtocol, NoFinalMessageMode, 2, 2),
+        (BinaryProtocol, RandomMessageMode, 1, 0),
+        (BinaryProtocol, RoundRobinMessageMode, 1, 0),
+        (BinaryProtocol, FullMessageMode, 5, 0),
+        (BinaryProtocol, NoFinalMessageMode, 2, 0),
     ]
 )
 def test_simulation_runner_send_messages(
         generate_validator_set,
         protocol,
-        mode,
+        message_mode,
         messages_generated_per_round,
         potential_extra_messages
         ):
-    msg_gen = utils.message_maker(mode)
+    msg_gen = message_mode()
     validator_set = generate_validator_set(protocol)
     network = StepNetwork(validator_set, protocol)
 
