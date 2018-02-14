@@ -13,20 +13,21 @@ class ShardingProtocol(Protocol):
     curr_shard_idx = 0
     curr_shard_ids = ['']
 
-    # Shard ID's look like this:
-    #       ''
-    #     /    \
-    #   '0'    '1'
-    #  /  \    /  \
-    #'00''01''10''11'
-    #
+    """Shard ID's look like this:
+           ''
+         /    \
+       '0'    '1'
+      /  \    /  \
+    '00''01''10''11'
 
-    # Blocks can be merge mined between shards if
-    # there is an edge between shards
-    # That is, for ids shard_1 and shard_2, there can be a merge block if
-    # abs(len(shard_1) - len(shard_2)) = 1 AND
-    # for i in range(min(len(shard_1), len(shard_2))):
-    #    shard_1[i] = shard_2[i]
+
+     Blocks can be merge mined between shards if
+     there is an edge between shards
+     That is, for ids shard_1 and shard_2, there can be a merge block if
+     abs(len(shard_1) - len(shard_2)) = 1 AND
+     for i in range(min(len(shard_1), len(shard_2))):
+        shard_1[i] = shard_2[i]
+    """
 
     @classmethod
     def initial_message(cls, validator):
@@ -37,7 +38,6 @@ class ShardingProtocol(Protocol):
         cls.shard_genesis_blocks[''] = Block(estimate, dict(), validator, -1, 0)
 
         return cls.shard_genesis_blocks['']
-
 
     @classmethod
     def get_new_shard_id(cls):

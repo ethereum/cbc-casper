@@ -11,8 +11,8 @@ class ShardingView(AbstractView):
     def __init__(self, messages=None, shard_genesis_block=None):
         self.children = dict()
 
-        self.starting_blocks = dict() # shard_id -> starting block for forkchoice
-        self.latest_messages_on_shard = dict() # shard_id -> validator -> message
+        self.starting_blocks = dict()  # shard_id -> starting block for forkchoice
+        self.latest_messages_on_shard = dict()  # shard_id -> validator -> message
 
         self.select_shards = self.select_random_shards
 
@@ -68,7 +68,6 @@ class ShardingView(AbstractView):
                 shards_to_build_on.append(shards_to_build_on[0] + child)
 
         return set(shards_to_build_on)
-
 
     def check_forkchoice_atomicity(self, shards_forkchoice):
         """Asserts that if a merge block is in the forkchoice for a parent chain

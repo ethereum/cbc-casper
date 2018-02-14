@@ -40,7 +40,7 @@ def get_shard_fork_choice(starting_block, children, latest_messages, shard_id):
         max_score = 0
         for child in children[best_block]:
             if not child.on_shard(shard_id):
-                continue # we only select children on the same shard
+                continue  # we only select children on the same shard
             curr_scores[child] = scores.get(child, 0)
             max_score = max(curr_scores[child], max_score)
 
@@ -74,6 +74,6 @@ def get_all_shards_fork_choice(starting_blocks, children, latest_messages_on_sha
             latest_messages_on_shard[shard_id],
             shard_id
         ) for shard_id in starting_blocks
-        }
+    }
 
     return shards_forkchoice
