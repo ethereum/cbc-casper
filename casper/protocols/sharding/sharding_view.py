@@ -11,6 +11,7 @@ class ShardingView(AbstractView):
     def __init__(self, messages=None, shard_genesis_block=None):
         self.children = dict()
 
+        self.shard_genesis_blocks = dict()  # shard_id -> genesis for shard
         self.starting_blocks = dict()  # shard_id -> starting block for forkchoice
         self.latest_messages_on_shard = dict()  # shard_id -> validator -> message
 
@@ -18,6 +19,7 @@ class ShardingView(AbstractView):
 
         if shard_genesis_block:
             for shard_id in shard_genesis_block.estimate['shard_ids']:
+                self.shard_genesis_blocks[shard_id] = shard_genesis_block
                 self.starting_blocks[shard_id] = shard_genesis_block
 
         super().__init__(messages)
@@ -58,6 +60,8 @@ class ShardingView(AbstractView):
 
         if child_merge_block:
             self.starting_blocks[child_id] = child_merge_block
+        else:
+            self.starting_blocks[child_id] = self.shard_genesis_blocks[child_id]
 
     def select_random_shards(self, shards_forkchoice):
         """Randomly selects a shard to build on, and sometimes selects another child shard"""
@@ -128,6 +132,7 @@ class ShardingView(AbstractView):
         # set starting messages! ::))
         if None in message.estimate['prev_blocks']:
             for shard_id in message.estimate['shard_ids']:
+                self.shard_genesis_blocks[shard_id] = message
                 self.starting_blocks[shard_id] = message
 
         # update the latest_messages
