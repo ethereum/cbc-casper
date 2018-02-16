@@ -1,8 +1,8 @@
 """The block module implements the message data structure for a sharded blockchain"""
 from casper.message import Message
-
-
 NUM_MERGE_SHARDS = 2
+
+
 class Block(Message):
     """Message data structure for a sharded blockchain"""
 
