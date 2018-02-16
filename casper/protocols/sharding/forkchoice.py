@@ -1,4 +1,4 @@
-"""The forkchoice module implements the estimator function a blockchain"""
+"""The forkchoice module implements the estimator function a sharded blockchain"""
 
 
 def get_max_weight_indexes(scores):

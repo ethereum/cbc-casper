@@ -130,7 +130,7 @@ class ShardingView(AbstractView):
         assert message.hash in self.justified_messages, "...should not have seen message!"
 
         # set starting messages! ::))
-        if None in message.estimate['prev_blocks']:
+        if message.is_genesis_block:
             for shard_id in message.estimate['shard_ids']:
                 self.shard_genesis_blocks[shard_id] = message
                 self.starting_blocks[shard_id] = message

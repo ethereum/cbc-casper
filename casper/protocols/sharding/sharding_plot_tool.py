@@ -1,4 +1,4 @@
-"""The blockchain plot tool implements functions for plotting blockchain data structures"""
+"""The blockchain plot tool implements functions for plotting sharded blockchain data structures"""
 
 from casper.plot_tool import PlotTool
 from casper.safety_oracles.clique_oracle import CliqueOracle

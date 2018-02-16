@@ -31,26 +31,26 @@ class ShardingProtocol(Protocol):
 
     @classmethod
     def initial_message(cls, validator):
-        """Returns a dict from shard_id -> shard genesis block"""
-        shard_id = cls.get_new_shard_id()
+        """Returns a starting block for a shard"""
+        shard_id = cls.get_next_shard_id()
 
         estimate = {'prev_blocks': set([None]), 'shard_ids': set([shard_id])}
-        cls.shard_genesis_blocks[''] = Block(estimate, dict(), validator, -1, 0)
+        cls.shard_genesis_blocks[shard_id] = Block(estimate, dict(), validator, -1, 0)
 
         return cls.shard_genesis_blocks['']
 
     @classmethod
-    def get_new_shard_id(cls):
-        new_id = cls.curr_shard_ids[cls.curr_shard_idx]
+    def get_next_shard_id(cls):
+        next_id = cls.curr_shard_ids[cls.curr_shard_idx]
         cls.curr_shard_idx += 1
 
         if cls.curr_shard_idx == len(cls.curr_shard_ids):
-            new_ids = []
+            next_ids = []
             for shard_id in cls.curr_shard_ids:
-                new_ids.append(shard_id + '0')
-                new_ids.append(shard_id + '1')
+                next_ids.append(shard_id + '0')
+                next_ids.append(shard_id + '1')
 
             cls.curr_shard_idx = 0
-            cls.curr_shard_ids = new_ids
+            cls.curr_shard_ids = next_ids
 
-        return new_id
+        return next_id
