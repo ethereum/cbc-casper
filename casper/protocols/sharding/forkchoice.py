@@ -41,6 +41,15 @@ def get_shard_fork_choice(starting_block, children, latest_messages, shard_id):
         for child in children[best_block]:
             if not child.on_shard(shard_id):
                 continue  # we only select children on the same shard
+            # can't pick a child that a merge block with a higher shard
+            if child.is_merge_block:
+                not_in_forkchoice = False
+                for shard in child.estimate['shard_ids']:
+                    if len(shard) < len(shard_id):
+                        not_in_forkchoice = True
+                        break
+                if not_in_forkchoice:
+                    continue
             curr_scores[child] = scores.get(child, 0)
             max_score = max(curr_scores[child], max_score)
 
