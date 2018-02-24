@@ -16,20 +16,22 @@ test-with-reports:
 lint:
 	venv/bin/pylint casper/
 
-run-rand:
-	venv/bin/python casper.py rand
-
-run-rrob:
-	venv/bin/python casper.py rrob
-
-run-full:
-	venv/bin/python casper.py full
-
-run-nofinal:
-	venv/bin/python casper.py nofinal
+MODE?=rand
 
 run-binary:
-	venv/bin/python casper.py rand --protocol binary --report-interval 3
+	venv/bin/python casper.py $(MODE) --protocol binary
+
+run-blockchain:
+	venv/bin/python casper.py $(MODE) --protocol blockchain
+
+run-concurrent:
+	venv/bin/python casper.py $(MODE) --protocol concurrent
+
+run-integer:
+	venv/bin/python casper.py $(MODE) --protocol integer
+
+run-order:
+	venv/bin/python casper.py $(MODE) --protocol order
 
 run-sharding:
-	venv/bin/python casper.py rand --protocol sharding --validators 14 --report-interval 3
+	venv/bin/python casper.py $(MODE) --protocol sharding
