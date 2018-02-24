@@ -1,7 +1,6 @@
 """The sharding view module extends a view for sharded blockchain data structure"""
 import random as r
 
-from casper.safety_oracles.clique_oracle import CliqueOracle
 from casper.abstract_view import AbstractView
 import casper.protocols.sharding.forkchoice as forkchoice
 
@@ -65,11 +64,11 @@ class ShardingView(AbstractView):
 
     def select_random_shards(self, shards_forkchoice):
         """Randomly selects a shard to build on, and sometimes selects another child shard"""
-        shards_to_build_on = [r.choice([key for key in self.starting_blocks.keys()])]
-        if (r.randint(0, 1) == 1):
-            child = str(r.randint(0, 1))
-            if shards_to_build_on[0] + child in self.starting_blocks:
-                shards_to_build_on.append(shards_to_build_on[0] + child)
+        shards_to_build_on = [r.choice(list(self.starting_blocks.keys()))]
+        if r.choice([True, False]):
+            child_shard_id = shards_to_build_on[0] + str(r.randint(0, 1))
+            if child_shard_id in self.starting_blocks:
+                shards_to_build_on.append(child_shard_id)
 
         return set(shards_to_build_on)
 
@@ -112,18 +111,6 @@ class ShardingView(AbstractView):
         """Checks safety on messages in views forkchoice, and updates last_finalized_block"""
         # check the safety of the top shard!
         pass
-
-        tip = None
-
-        while tip and tip != self.starting_blocks['']:
-            oracle = CliqueOracle(tip, self, validator_set)
-            fault_tolerance, _ = oracle.check_estimate_safety()
-
-            if fault_tolerance > 0:
-                self.starting_blocks[''] = tip
-                return tip
-
-            tip = tip.prev_block('')
 
     def _update_protocol_specific_view(self, message):
         """Given a now justified message, updates children and when_recieved"""

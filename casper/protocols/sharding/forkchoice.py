@@ -7,7 +7,7 @@ def get_max_weight_indexes(scores):
 
     max_score = max(scores.values())
 
-    assert max_score != 0, "max_score of a block should never be zero"
+    assert max_score > 0, "max_score should be greater than zero"
 
     max_weight_estimates = {e for e in scores if scores[e] == max_score}
 
