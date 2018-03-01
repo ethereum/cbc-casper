@@ -7,7 +7,7 @@ Branch    | Tests
 master    | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/master.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/master)
 develop   | [![CircleCI](https://circleci.com/gh/ethereum/cbc-casper/tree/develop.svg?style=svg&circle-token=071bd3b625fc240222d1add41dc796ec8bee077d)](https://circleci.com/gh/ethereum/cbc-casper/tree/develop)
 
-A python implementation of a class of ["correct-by-construction" consensus protocols](https://github.com/ethereum/research/tree/master/papers/cbc-consensus). Currently, this includes Casper the Friendly Ghost (a blockchain consensus protocol) and Casper the Friendly Binary Consensus Protocol. 
+A python implementation of a class of ["correct-by-construction" consensus protocols](https://github.com/ethereum/research/tree/master/papers/cbc-consensus). Currently, this includes Casper the Friendly Ghost (a blockchain consensus protocol) and Casper the Friendly Binary Consensus Protocol.
 
 Specifications for these protocols can be found here [here](https://github.com/ethereum/research/tree/master/papers/CasperTFG), but the implementation and the spec may deviate from the spec, as they are still moving targets.
 
@@ -39,10 +39,17 @@ pip install using `requirements.txt`
 ### Standard
 Standard simulations are marked up for use as follows:
 
+```
+make run-[binary | blockchain | concurrent | integer | order | sharding]
+```
 
+Each protocol represents consensus on a different data structure.
+
+Optionally, you can add a message passing mode to each protocol. For example,
 ```
-make run-[rand | rrob | full | nofinal | binary]
+make run-binary MODE=rrob
 ```
+There are currently four message passing modes:
 
 `rand:` each round, some randomly selected validators propagate their most recent message to other randomly selected validators, who then create new messages.
 
