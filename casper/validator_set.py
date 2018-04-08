@@ -1,14 +1,16 @@
 """The validator set module contains the ValidatorSet class """
 from casper.validator import Validator
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
 
 
 class ValidatorSet:
     """Defines the validator set."""
-    def __init__(self, weights, protocol=BlockchainProtocol):
+    def __init__(self, weights, view_cls, message_cls):
+        self.view_cls = view_cls
+        self.message_cls = message_cls
+
         self.validators = {
-            Validator(name, weights[name], protocol, self)
-            for name in weights
+            Validator(name, weight, self, view_cls, message_cls)
+            for name, weight in enumerate(weights)
         }
 
     def __len__(self):

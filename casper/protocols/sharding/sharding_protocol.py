@@ -1,56 +1,81 @@
+import json
+import random as r
+
+from casper.utils import get_random_str
+from casper.protocol import Protocol
 from casper.protocols.sharding.sharding_view import ShardingView
 from casper.protocols.sharding.block import Block
 from casper.protocols.sharding.sharding_plot_tool import ShardingPlotTool
-from casper.protocol import Protocol
 
 
 class ShardingProtocol(Protocol):
-    View = ShardingView
-    Message = Block
     PlotTool = ShardingPlotTool
 
-    shard_genesis_blocks = dict()
-    curr_shard_idx = 0
-    curr_shard_ids = ['']
+    def __init__(self, json_string, display, save, report_interval):
+        parsed_json = self.parse_json(json_string)
 
-    """Shard ID's look like this:
-           ''
-         /    \
-       '0'    '1'
-      /  \    /  \
-    '00''01''10''11'
+        super().__init__(
+            parsed_json['config']['validators'],
+            parsed_json['execution']['execution_string'],
+            parsed_json['execution']['msg_per_round'] * report_interval,
+            display,
+            save,
+            ShardingPlotTool,
+            ShardingView,
+            Block
+        )
 
-
-     Blocks can be merge mined between shards if
-     there is an edge between shards
-     That is, for ids shard_1 and shard_2, there can be a merge block if
-     abs(len(shard_1) - len(shard_2)) = 1 AND
-     for i in range(min(len(shard_1), len(shard_2))):
-        shard_1[i] = shard_2[i]
-    """
+        self.set_initial_messages(parsed_json['config']['num_shards'])
 
     @classmethod
-    def initial_message(cls, validator):
-        """Returns a starting block for a shard"""
-        shard_id = cls.get_next_shard_id()
+    def parse_json(cls, json_string):
+        parsed_json = json.loads(json_string)
 
-        estimate = {'prev_blocks': set([None]), 'shard_ids': set([shard_id])}
-        cls.shard_genesis_blocks[shard_id] = Block(estimate, dict(), validator, -1, 0)
+        assert parsed_json['protocol'] == 'sharding'
 
-        return cls.shard_genesis_blocks['']
+        config = parsed_json['config']
+        assert len(config['validators']) >= config['num_shards']
 
-    @classmethod
-    def get_next_shard_id(cls):
-        next_id = cls.curr_shard_ids[cls.curr_shard_idx]
-        cls.curr_shard_idx += 1
+        return parsed_json
 
-        if cls.curr_shard_idx == len(cls.curr_shard_ids):
-            next_ids = []
-            for shard_id in cls.curr_shard_ids:
-                next_ids.append(shard_id + '0')
-                next_ids.append(shard_id + '1')
+    def set_initial_messages(self, num_shards):
+        shards = 0
+        genesis_blocks = set()
+        shard_id_gen = self.get_shard_id_gen()
 
-            cls.curr_shard_idx = 0
-            cls.curr_shard_ids = next_ids
+        for validator in self.global_validator_set:
+            if shards == num_shards:
+                break
 
-        return next_id
+            shard_id = shard_id_gen()
+            estimate = {'prev_blocks': set([None]), 'shard_ids': set([shard_id])}
+            genesis = Block(estimate, dict(), validator, -1, 0)
+            genesis_blocks.add(genesis)
+            shards += 1
+
+            self.register_message(genesis, get_random_str(10))
+
+        for validator in self.global_validator_set:
+            validator.initialize_view(genesis_blocks)
+
+
+    def get_shard_id_gen(self):
+        curr_list = ['']
+        curr_idx = 0
+
+        def gen():
+            nonlocal curr_list, curr_idx
+            next_id = curr_list[curr_idx]
+            curr_idx += 1
+
+            if curr_idx == len(curr_list):
+                next_list = []
+                for id in curr_list:
+                    next_list.append(id + '0')
+                    next_list.append(id + '1')
+
+                curr_list = next_list
+                curr_idx = 0
+
+            return next_id
+        return gen

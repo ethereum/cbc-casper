@@ -19,19 +19,19 @@ lint:
 MODE?=rand
 
 run-binary:
-	venv/bin/python casper.py $(MODE) --protocol binary
+	venv/bin/python casper.py --protocol binary --msg-mode $(MODE)
 
 run-blockchain:
-	venv/bin/python casper.py $(MODE) --protocol blockchain
+	venv/bin/python casper.py --protocol blockchain --msg-mode $(MODE) --network random
 
 run-concurrent:
-	venv/bin/python casper.py $(MODE) --protocol concurrent
+	venv/bin/python casper.py --protocol concurrent --msg-mode $(MODE)
 
 run-integer:
-	venv/bin/python casper.py $(MODE) --protocol integer
+	venv/bin/python casper.py --protocol integer --msg-mode $(MODE)
 
 run-order:
-	venv/bin/python casper.py $(MODE) --protocol order
+	venv/bin/python casper.py --protocol order --msg-mode $(MODE)
 
 run-sharding:
-	venv/bin/python casper.py $(MODE) --protocol sharding
+	venv/bin/python casper.py --protocol sharding --msg-mode $(MODE)

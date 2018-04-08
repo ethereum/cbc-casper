@@ -11,7 +11,7 @@ class Block(Message):
 
         super().__init__(estimate, justification, sender, sequence_number, display_height)
 
-        # height is the traditional block height - number of blocks back to genesis block
+        # number of blocks back to genesis block
         if estimate:
             self.height = estimate.height + 1
         else:

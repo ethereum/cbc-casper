@@ -3,15 +3,13 @@
 
 class AbstractView(object):
     """A set of seen messages. For performance, also stores a dict of most recent messages."""
-    def __init__(self, messages=None):
-        # now for some assignment...
-        if messages is None:
-            messages = set()
+    def __init__(self, initial_messages):
+        messages = initial_messages if initial_messages else set()
 
         self.justified_messages = dict()            # message hash => message
         self.pending_messages = dict()              # message hash => message
 
-        self.num_missing_dependencies = dict()  # message hash => number of message hashes
+        self.num_missing_dependencies = dict()      # message hash => number of message hashes
         self.dependents_of_message = dict()         # message hash => list(message hashes)
 
         self.latest_messages = dict()               # validator => message

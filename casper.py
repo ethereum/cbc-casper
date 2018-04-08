@@ -1,105 +1,95 @@
 '''
-Casper PoC: Correct-by-construction asynchronous binary consensus.
+Correct-by-construction Casper PoC
 
-Note that comments marked with "#########....#########"" barriers are probably
-conceptually important Other comments may be conceptually important but are
-mostly for code comprehension Note that not all comments have been marked up in
-this manner, yet... :)
+Asynchronous consensus on a variety of data structures, including:
+a bit, an integer, a list, a blockchain, a concurrent schedule,
+and a sharded blockchain.
+
+For more information,
+join the gitter: https://gitter.im/cbc-casper/Lobby
+read the wiki:
+
 '''
-
 import argparse
 from configparser import ConfigParser
 
-from simulations.simulation_runner import SimulationRunner
 from simulations.utils import (
-    generate_random_gaussian_validator_set,
-    SELECT_NETWORK,
+    str2bool,
+    exestr,
     SELECT_PROTOCOL,
-    SELECT_MESSAGE_MODE,
+
 )
+from simulations.json_generator import SELECT_JSON_GENERATOR
 
-
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-
+NOT_NEEDED = {'protocol', 'display', 'save', 'report_interval'}
 
 def default_configuration():
+    """Returns default configuration for execution"""
     config = ConfigParser()
     config.read("config.ini")
     return config["SimulationDefaults"]
 
 
 def main():
+    """Generates and runs specified CBC Casper simulation"""
     config = default_configuration()
     parser = argparse.ArgumentParser(description='Run CasperCBC standard simulations.')
     parser.add_argument(
-        'mode', metavar='Mode', type=str,
-        choices=SELECT_MESSAGE_MODE.keys(),
-        help='specifies how to generate and propogate new messages'
-    )
-    parser.add_argument(
-        '--protocol', type=str, default=config.get("DefaultProtocol"),
+        '--protocol', type=str, default=config.get("Protocol"),
         choices=SELECT_PROTOCOL.keys(),
-        help='specifies the protocol for the simulation'
+        help='specifies which data structure to form consensus on'
     )
     parser.add_argument(
-        '--network', type=str, default=config.get("DefaultNetwork"),
-        choices=SELECT_NETWORK.keys(),
-        help='specifies the network model for the simulation'
+        '--validators', type=int, default=config.getint("Validators"),
+        help='specifies the number of validators'
     )
     parser.add_argument(
-        '--validators', type=int, default=config.getint("NumValidators"),
-        help='specifies the number of validators in validator set'
+        '--weights', nargs='+', type=int, default=None,
+        help='specifies the weights of the validators'
     )
     parser.add_argument(
-        '--rounds', type=int, default=config.getint("NumRounds"),
+        '--exe-str', type=exestr, default=None,
+        help='specifies a specific execution (message creation and delivery)'
+    )
+    parser.add_argument(
+        '--msg-mode', type=str, default=config.get("MsgMode"),
+        help='specifies message passing schemes of the validators'
+    )
+    parser.add_argument(
+        '--network', type=str, default=config.get("Network"),
+        help='specifies network conditions for message passing'
+    )
+    parser.add_argument(
+        '--rounds', type=int, default=config.getint("Rounds"),
         help='specifies the number of rounds to run the simulation'
     )
     parser.add_argument(
         '--report-interval', type=int, default=config.getint("ReportInterval"),
-        help='specifies the interval in rounds at which to plot results'
+        help='specifies the interval (in rounds) at which to plot results'
     )
     parser.add_argument(
-        '--hide-display', action="store_true",
-        help='display simulations round by round'
+        '--display', type=str2bool, default=config.getboolean("Display"),
+        help='show the view graphs as they are created'
     )
     parser.add_argument(
         '--save', type=str2bool, default=config.getboolean("Save"),
-        help='save the simulation in graphs/ directory'
-    )
-    parser.add_argument(
-        '--justify-messages', type=str2bool, default=config.getboolean("JustifyMessages"),
-        help='force full propagation of all messages in justification of message when sending'
+        help='save the viewgraphs in graphs/ directory'
     )
 
     args = parser.parse_args()
-    protocol = SELECT_PROTOCOL[args.protocol]
-    network_type = SELECT_NETWORK[args.network]
+    generate_json = SELECT_JSON_GENERATOR[args.protocol]
 
-    validator_set = generate_random_gaussian_validator_set(
-        protocol,
-        args.validators
+    # not all parameters are needed to generate the json for execution
+    execution_string = generate_json(**{k: v for k, v in vars(args).items() if k not in NOT_NEEDED})
+
+    protocol = SELECT_PROTOCOL[args.protocol](
+        execution_string,
+        args.display,
+        args.save,
+        args.report_interval
     )
-    network = network_type(validator_set, protocol)
 
-    message_mode = SELECT_MESSAGE_MODE[args.mode]()
-
-    simulation_runner = SimulationRunner(
-        validator_set,
-        message_mode,
-        protocol=protocol,
-        network=network,
-        total_rounds=args.rounds,
-        report_interval=args.report_interval,
-        display=(not args.hide_display),
-        save=args.save,
-    )
-    simulation_runner.run()
+    protocol.execute()
 
 
 if __name__ == "__main__":

@@ -72,6 +72,9 @@ class IntegerPlotTool(PlotTool):
 
     def _update_message_fault_tolerance(self):
         for validator in self.view.latest_messages:
+            if not validator.view:
+                # can't detect safety as view isn't initialized yet
+                continue
 
             latest_message = self.view.latest_messages[validator]
 
