@@ -42,9 +42,8 @@ class ConcurrentProtocol(Protocol):
 
         self.plot_tool.plot()
 
-
-    @classmethod
-    def parse_json(cls, json_string):
+    @staticmethod
+    def parse_json(json_string):
         parsed_json = json.loads(json_string)
 
         assert parsed_json['protocol'] == 'concurrent'

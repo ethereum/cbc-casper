@@ -2,10 +2,8 @@
 NOTE: currently only prints to terminal instead of plotting
 """
 
-from casper.plot_tool import PlotTool
 
-
-class OrderPlotTool(PlotTool):
+class OrderPlotTool():
     """The module contains functions for plotting an order data structure"""
 
     def __init__(self, display, save, view, validator_set):

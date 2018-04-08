@@ -26,8 +26,10 @@ class OrderProtocol(Protocol):
 
         self.set_initial_messages(parsed_json['config']['initial_estimates'])
 
-    @classmethod
-    def parse_json(cls, json_string):
+        self.plot_tool.plot()
+
+    @staticmethod
+    def parse_json(json_string):
         parsed_json = json.loads(json_string)
 
         assert parsed_json['protocol'] == 'order'

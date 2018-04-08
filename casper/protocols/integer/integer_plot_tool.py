@@ -38,6 +38,7 @@ class IntegerPlotTool(PlotTool):
             self._update_first_message_labels()
             self.first_time = False
 
+
         edgelist = []
         edgelist.append(utils.edge(self.new_justifications, 1, 'black', 'solid'))
 
@@ -71,18 +72,11 @@ class IntegerPlotTool(PlotTool):
             self.message_labels[message] = message.estimate
 
     def _update_message_fault_tolerance(self):
-        for validator in self.view.latest_messages:
-            if not validator.view:
-                # can't detect safety as view isn't initialized yet
-                continue
+        if self.view:
+            for message in self.view.justified_messages.values():
+                if message not in self.bet_fault_tolerance:
+                    oracle = CliqueOracle(message, self.view, self.validator_set)
+                    fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
-            latest_message = self.view.latest_messages[validator]
-
-            if latest_message in self.bet_fault_tolerance:
-                continue
-
-            oracle = CliqueOracle(latest_message, validator.view, self.validator_set)
-            fault_tolerance, num_node_ft = oracle.check_estimate_safety()
-
-            if fault_tolerance > 0:
-                self.bet_fault_tolerance[latest_message] = num_node_ft
+                    if fault_tolerance > 0:
+                        self.bet_fault_tolerance[message] = num_node_ft

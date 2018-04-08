@@ -118,6 +118,8 @@ class Protocol(object):
         self.executed += self.unexecuted
         self.unexecuted = ''
 
+        self.plot_tool.make_gif()
+
     def parse_token(self, token):
         comm, _, vali, _, name, _, data = re.match(
             TOKEN_PATTERN, token

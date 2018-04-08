@@ -27,6 +27,8 @@ class BinaryProtocol(Protocol):
 
         self.set_initial_messages(parsed_json['config']['initial_estimates'])
 
+        self.plot_tool.plot()
+
     @classmethod
     def parse_json(cls, json_string):
         parsed_json = json.loads(json_string)
@@ -53,5 +55,3 @@ class BinaryProtocol(Protocol):
 
             self.register_message(initial_message, get_random_str(10))
             validator.initialize_view([initial_message])
-
-        self.plot_tool.plot()
