@@ -60,17 +60,17 @@ class Protocol(object):
         self.global_view.add_messages([message])
         self.plot_tool.update(new_messages=[message])
 
-    def make_message(self, validator, message_name):
+    def make_message(self, validator, message_name, data):
         """Have a validator generate a new message"""
         new_message = validator.make_new_message()
         self.register_message(new_message, message_name)
 
-    def send_message(self, validator, message_name):
+    def send_message(self, validator, message_name, data):
         """Send a message to a validator"""
         message = self.messages[message_name]
         validator.receive_messages(set([message]))
 
-    def send_and_justify(self, validator, message_name):
+    def send_and_justify(self, validator, message_name, data):
         message = self.messages[message_name]
         messages_to_send = self._messages_needed_to_justify(message, validator)
         validator.receive_messages(messages_to_send)
@@ -107,7 +107,7 @@ class Protocol(object):
             comm, vali, name, data = self.parse_token(token)
 
             validator = self.global_validator_set.get_validator_by_name(int(vali))
-            self.handlers[comm](validator, name)
+            self.handlers[comm](validator, name, data)
 
             if comm == 'M':
                 self.messages_this_round += 1
