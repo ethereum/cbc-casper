@@ -47,7 +47,7 @@ class Protocol(object):
         self.handlers[token] = function
 
     def register_message(self, message, name):
-        """Save a message with a given name"""
+        """Register a new message with a new name"""
         if name in self.messages:
             raise KeyError("Message with name {} already exists".format(name))
         if message.hash in self.message_from_hash:
@@ -71,6 +71,7 @@ class Protocol(object):
         validator.receive_messages(set([message]))
 
     def send_and_justify(self, validator, message_name, data):
+        """Send a message (and the messages in it's dependencies) to a validator"""
         message = self.messages[message_name]
         messages_to_send = self._messages_needed_to_justify(message, validator)
         validator.receive_messages(messages_to_send)
@@ -100,11 +101,12 @@ class Protocol(object):
         return messages_needed
 
     def execute(self, additional_str=None):
+        """Execute saved execution string as well as optional additional_str"""
         if additional_str:
             self.unexecuted += additional_str
 
         for token in self.unexecuted.split():
-            comm, vali, name, data = self.parse_token(token)
+            comm, vali, name, data = Protocol.parse_token(token)
 
             validator = self.global_validator_set.get_validator_by_name(int(vali))
             self.handlers[comm](validator, name, data)
@@ -118,9 +120,9 @@ class Protocol(object):
         self.executed += self.unexecuted
         self.unexecuted = ''
 
-        self.plot_tool.make_gif()
-
-    def parse_token(self, token):
+    @staticmethod
+    def parse_token(token):
+        """Break a token into a command, validator, name, and data"""
         comm, _, vali, _, name, _, data = re.match(
             TOKEN_PATTERN, token
         ).groups()

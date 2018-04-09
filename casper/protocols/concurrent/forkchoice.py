@@ -76,17 +76,17 @@ def get_children(blocks, children_dict):
     return children_blocks
 
 
-def get_fork_choice(last_finalized_estimate, children, latest_messages):
+def get_fork_choice(children, latest_messages):
     """Returns the estimate by selecting highest weight sub-trees.
     Starts from the last_finalized_estimate and stops when it reaches a tips."""
     output_sources = dict()
-    available_outputs = set()  # should start w/ all the stuff from the last finalized estimate...
-    for block in last_finalized_estimate:
+    available_outputs = set()  # always start from genesis
+    for block in children[None]:
         available_outputs.update(block.estimate['inputs'])
 
     scores = get_scores(latest_messages)
 
-    current_blocks = last_finalized_estimate  # this is a set of blocks
+    current_blocks = children[None]
     track_output_sources(output_sources, current_blocks)
     update_outputs(available_outputs, current_blocks)
     current_children = get_children(current_blocks, children)

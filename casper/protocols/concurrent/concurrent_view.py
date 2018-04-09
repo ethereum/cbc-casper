@@ -12,7 +12,6 @@ class ConcurrentView(AbstractView):
             messages = set()
 
         self.children = dict()
-        self.last_finalized_estimate = messages
 
         self.select_outputs = None
         self.create_outputs = None
@@ -26,10 +25,10 @@ class ConcurrentView(AbstractView):
     def estimate(self):
         """Returns the current forkchoice in this view"""
         available_outputs, output_sources = forkchoice.get_fork_choice(
-            self.last_finalized_estimate,
             self.children,
             self.latest_messages
         )
+        print(available_outputs)
 
         old_outputs = self.select_outputs(available_outputs, output_sources)
         new_outputs = self.create_outputs(old_outputs, len(old_outputs))

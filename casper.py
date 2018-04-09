@@ -10,6 +10,7 @@ join the gitter: https://gitter.im/cbc-casper/Lobby
 read the wiki:
 
 '''
+import pprint
 import argparse
 from configparser import ConfigParser
 
@@ -81,6 +82,8 @@ def main():
 
     # not all parameters are needed to generate the json for execution
     execution_string = generate_json(**{k: v for k, v in vars(args).items() if k not in NOT_NEEDED})
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(execution_string)
 
     protocol = SELECT_PROTOCOL[args.protocol](
         execution_string,

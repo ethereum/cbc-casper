@@ -6,12 +6,9 @@ class Block(Message):
     """Message data structure for blockchain consensus"""
 
     def __init__(self, estimate, justification, sender, sequence_number, display_height):
-        # Do some type checking for safety!
-        assert isinstance(estimate, Block) or estimate is None, "...expected a prevblock!"
-
         super().__init__(estimate, justification, sender, sequence_number, display_height)
 
-        # number of blocks back to genesis block
+        # number of blocks since genesis
         if estimate:
             self.height = estimate.height + 1
         else:
