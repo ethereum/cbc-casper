@@ -23,10 +23,9 @@ def generate_execution(num_validators, num_rounds, network_delay_func, get_creat
             commands_on_round[curr_round].append(make_com('M', creator, msg_name))
 
             for receiver in range(num_validators):
-                delivery_round = min(
-                    curr_round + network_delay_func(creator, receiver, curr_round),
-                    num_rounds - 1
-                )
+                delivery_round = curr_round + network_delay_func(creator, receiver, curr_round)
+                if delivery_round >= num_rounds:
+                    continue
 
                 if receiver not in sent_from[creator]:
                     send_command = 'SJ'
@@ -55,7 +54,7 @@ def generate_random_execution(num_validators, num_rounds, network_delay_func):
 
 def generate_full_execution(num_validators, num_rounds, network_delay_func):
     def all_creators():
-        return [v for v in range(num_validators)]
+        return range(num_validators)
 
     return generate_execution(num_validators, num_rounds, network_delay_func, all_creators), num_validators
 
