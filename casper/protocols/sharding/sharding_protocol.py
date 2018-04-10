@@ -9,7 +9,7 @@ from casper.protocols.sharding.sharding_plot_tool import ShardingPlotTool
 
 
 class ShardingProtocol(Protocol):
-    PlotTool = ShardingPlotTool
+    """A protocol for coming to consensus on a sharded blockchain with merge blocks"""
 
     def __init__(self, json_string, display, save, report_interval):
         parsed_json = self.parse_json(json_string)

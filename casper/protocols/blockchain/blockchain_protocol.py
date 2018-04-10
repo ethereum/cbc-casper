@@ -9,8 +9,7 @@ from casper.protocols.blockchain.blockchain_plot_tool import BlockchainPlotTool
 
 
 class BlockchainProtocol(Protocol):
-    PlotTool = BlockchainPlotTool
-
+    
     def __init__(self, json_string, display, save, report_interval):
         parsed_json = self.parse_json(json_string)
 

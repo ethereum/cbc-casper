@@ -9,7 +9,7 @@ from casper.protocols.concurrent.concurrent_plot_tool import ConcurrentPlotTool
 
 
 class ConcurrentProtocol(Protocol):
-    PlotTool = ConcurrentPlotTool
+    """A protocol for coming to consensus on a concurrent schedule"""
 
     def __init__(self, json_string, display, save, report_interval):
         parsed_json = self.parse_json(json_string)

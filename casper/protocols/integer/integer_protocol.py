@@ -9,7 +9,7 @@ from casper.protocols.integer.integer_plot_tool import IntegerPlotTool
 
 
 class IntegerProtocol(Protocol):
-    PlotTool = IntegerPlotTool
+    """A protocol for coming to consensus on an integer"""
 
     def __init__(self, json_string, display, save, report_interval):
         parsed_json = self.parse_json(json_string)
