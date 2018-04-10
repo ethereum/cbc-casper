@@ -9,6 +9,9 @@ from casper.protocols.integer.integer_plot_tool import IntegerPlotTool
 
 
 class BinaryProtocol(Protocol):
+    """A protocol for coming to consensus on a bit"""
+    Message = Bet
+    View = IntegerView
     PlotTool = IntegerPlotTool
 
     def __init__(self, json_string, display, save, report_interval):

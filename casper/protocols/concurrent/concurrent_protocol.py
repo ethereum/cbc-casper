@@ -9,6 +9,9 @@ from casper.protocols.concurrent.concurrent_plot_tool import ConcurrentPlotTool
 
 
 class ConcurrentProtocol(Protocol):
+    """A protocol for coming to consensus on a concurrent schedule"""
+    Message = Block
+    View = ConcurrentView
     PlotTool = ConcurrentPlotTool
 
     def __init__(self, json_string, display, save, report_interval):

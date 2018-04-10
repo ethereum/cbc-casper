@@ -9,6 +9,9 @@ from casper.protocols.blockchain.blockchain_plot_tool import BlockchainPlotTool
 
 
 class BlockchainProtocol(Protocol):
+    """A protocol for coming to consensus on a concurrent schedule"""
+    Message = Block
+    View = BlockchainView
     PlotTool = BlockchainPlotTool
 
     def __init__(self, json_string, display, save, report_interval):

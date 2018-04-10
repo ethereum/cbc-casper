@@ -8,6 +8,9 @@ from casper.protocols.order.order_plot_tool import OrderPlotTool
 
 
 class OrderProtocol(Protocol):
+    """A protocol for coming to consensus on a list of known elements"""
+    Message = Bet
+    View = OrderView
     PlotTool = OrderPlotTool
 
     def __init__(self, json_string, display, save, report_interval):
