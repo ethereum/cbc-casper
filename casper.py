@@ -45,7 +45,7 @@ def main():
         help='specifies the number of validators'
     )
     parser.add_argument(
-        '--weights', nargs='+', type=int, default=None,
+        '--weights', nargs='+', type=float, default=None,
         help='specifies the weights of the validators'
     )
     parser.add_argument(

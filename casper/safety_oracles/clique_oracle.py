@@ -48,15 +48,15 @@ class CliqueOracle(AbstractOracle):
 
             # there are no blocks from val2, that val1 has not seen;
             # that might change validators' estimate.
-            if utils.exists_free_message(self.candidate_estimate, val2,
-                                         v2_msg_in_v1_view.sequence_number, self.view):
-                continue
+            #if utils.exists_free_message(self.candidate_estimate, val2,
+            #                             v2_msg_in_v1_view.sequence_number, self.view):
+            #    continue
 
             # and if there are no blocks from val1, that val2 has not seen,
             # that might change val2's estimate.
-            if utils.exists_free_message(self.candidate_estimate, val1,
-                                         v1_msg_in_v2_view.sequence_number, self.view):
-                continue
+            #if utils.exists_free_message(self.candidate_estimate, val1,
+            #                             v1_msg_in_v2_view.sequence_number, self.view):
+            #    continue
 
             edges.append((val1, val2))
 
