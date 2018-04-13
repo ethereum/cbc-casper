@@ -1,5 +1,4 @@
 import json
-import random as r
 
 from casper.utils import get_random_str
 from casper.protocol import Protocol
@@ -60,7 +59,6 @@ class ShardingProtocol(Protocol):
 
         for validator in self.global_validator_set:
             validator.initialize_view(genesis_blocks)
-
 
     def get_shard_id_gen(self):
         curr_list = ['']

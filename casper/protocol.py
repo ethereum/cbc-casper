@@ -1,10 +1,9 @@
 import re
-import random
-import string
 
 from casper.validator_set import ValidatorSet
 
 TOKEN_PATTERN = '([A-Za-z]*)([-]*)([0-9]*)([-]*)([A-Za-z0-9]*)([-]*)([(){A-Za-z0-9,}]*)'
+
 
 class Protocol(object):
 
@@ -18,7 +17,7 @@ class Protocol(object):
             plot_tool,
             view_cls,
             message_cls
-        ):
+    ):
         self.global_validator_set = ValidatorSet(num_validators, view_cls, message_cls)
         self.global_view = view_cls()
 

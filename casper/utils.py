@@ -2,6 +2,7 @@
 import string
 import random
 
+
 def exists_free_message(estimate, val, sequence_num, view):
     """Returns whether there exists a free message.
     A free message is a message later than the sequence number from some val,
@@ -71,6 +72,7 @@ def build_schedule(tip):
             stack.append(ancestor)
 
     return schedule
+
 
 def get_random_str(length):
     return ''.join([random.choice(string.ascii_lowercase) for i in range(length)])

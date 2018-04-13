@@ -1,5 +1,4 @@
 import json
-import random as r
 
 from casper.utils import get_random_str
 from casper.protocol import Protocol

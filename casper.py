@@ -10,7 +10,6 @@ join the gitter: https://gitter.im/cbc-casper/Lobby
 read the wiki:
 
 '''
-import pprint
 import argparse
 from configparser import ConfigParser
 
@@ -23,6 +22,7 @@ from simulations.utils import (
 from simulations.json_generator import SELECT_JSON_GENERATOR
 
 NOT_NEEDED = {'protocol', 'display', 'save', 'report_interval'}
+
 
 def default_configuration():
     """Returns default configuration for execution"""

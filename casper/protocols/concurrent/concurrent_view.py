@@ -1,6 +1,4 @@
 """The concurrent view module extends a view for concurrent data structures """
-import random as r
-
 from casper.abstract_view import AbstractView
 import casper.protocols.concurrent.forkchoice as forkchoice
 

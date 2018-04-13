@@ -38,7 +38,6 @@ class IntegerPlotTool(PlotTool):
             self._update_first_message_labels()
             self.first_time = False
 
-
         edgelist = []
         edgelist.append(utils.edge(self.new_justifications, 1, 'black', 'solid'))
 
