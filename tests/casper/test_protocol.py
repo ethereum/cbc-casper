@@ -32,6 +32,7 @@ def test_protocol_init(protocol_instantiated):
 
 
 def test_protocol_saves_executed(protocol_instantiated):
+    print(protocol_instantiated.unexecuted)
     protocol_instantiated.execute("M-0-A")
     assert protocol_instantiated.executed == "M-0-A"
     assert protocol_instantiated.unexecuted == ''

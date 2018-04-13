@@ -8,14 +8,16 @@ import casper.utils as utils
 @pytest.mark.parametrize(
     'weights, subset, expected_weight',
     [
-        ({i: i for i in range(10)}, [i for i in range(10)], 45),
-        ({i: 9 - i for i in range(9, -1, -1)}, [i for i in range(10)], 45),
-        ({i: i * 2 for i in range(10)}, [0, 1, 2, 3], 12),
+        ([i for i in range(10)], [i for i in range(10)], 45),
+        ([i * 2 for i in range(10)], [0, 1, 2, 3], 12),
     ]
 )
 def test_get_weight(weights, subset, expected_weight, view, message):
     validator_set = ValidatorSet(weights, view, message)
     validators = validator_set.get_validators_by_names(subset)
+    for validator in validator_set:
+        print("Name: {}, Weight: {}".format(validator.name, validator.weight))
+
     assert round(utils.get_weight(validators), 2) == round(expected_weight, 2)
 
 

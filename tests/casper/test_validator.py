@@ -29,10 +29,10 @@ def test_new_validator(name, weight, error, view, message):
 
 def test_validator_not_created_with_view(view, message):
     validator = Validator(0, 1, None, view, message)
-    assert validator.view == None
+    assert validator.view is None
 
 
 def test_validator_saves_initial_message(view, message):
     validator = Validator(0, 1, None, view, message)
     validator.initialize_view(set())
-    assert validator.view != None
+    assert validator.view is not None

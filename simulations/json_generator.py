@@ -35,7 +35,7 @@ def make_base_exe_obj(
     val_weights = weights if weights else generate_random_gaussian_weights(validators)
     data['config']['validators'] = val_weights
 
-    if exe_str:
+    if exe_str is not None:
         data['execution']['msg_per_round'] = 1
         data['execution']['execution_string'] = exe_str
         return data

@@ -16,6 +16,13 @@ from simulations.network_delay import (
 PROTOCOL_NAMES = ['binary', 'integer', 'order', 'blockchain', 'concurrent', 'sharding']
 DELAY_FUNCTIONS = [no_delay, step_delay, constant_delay, random_delay, gaussian_delay]
 
+
+@pytest.fixture
+def test_weight():
+    # these are random, decreasing weights
+    return [10.123, 9.8293, 8.8873, 7.5564, 6.1245562]
+
+
 @pytest.fixture(params=PROTOCOL_NAMES)
 def protocol_name(request):
     return request.param
@@ -31,9 +38,14 @@ def protocol_json_gen(protocol_name):
     return SELECT_JSON_GENERATOR[protocol_name]
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def protocol_instantiated(protocol_class, protocol_json_gen):
-    temp = protocol_class(protocol_json_gen(exe_str=''), False, False, 1)
+    temp = protocol_class(
+        protocol_json_gen(exe_str=''),
+        False,
+        False,
+        1
+    )
     print("Execution should be empty:" + temp.unexecuted)
     return temp
 
