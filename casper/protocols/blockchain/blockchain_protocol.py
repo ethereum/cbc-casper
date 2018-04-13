@@ -24,7 +24,7 @@ class BlockchainProtocol(Protocol):
             display,
             save,
             BlockchainPlotTool,
-            BlockchainView,
+            BlockchaqinView,
             Block
         )
 
