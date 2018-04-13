@@ -1,39 +1,21 @@
 import pytest
 
-from casper.abstract_view import AbstractView
-from casper.protocols.blockchain.block import Block
-from state_languages.blockchain_test_lang import BlockchainTestLang
 
+def test_justification_stores_hash(protocol_instantiated):
+    protocol_instantiated.execute('M-0-A SJ-1-A M-1-B')
 
-TEST_WEIGHT = {0: 10, 1: 11}
-
-
-def test_new_view():
-    view = AbstractView()
-
-    assert not any(view.justified_messages)
-    assert not any(view.latest_messages)
-
-
-def test_justification_stores_hash():
-    test_lang = BlockchainTestLang(TEST_WEIGHT)
-    test_lang.parse('M0-A SJ1-A M1-B')
-
-    validator_0 = test_lang.validator_set.get_validator_by_name(0)
-    validator_1 = test_lang.validator_set.get_validator_by_name(1)
+    validator_0 = protocol_instantiated.validator_set.get_validator_by_name(0)
+    validator_1 = protocol_instantiated.validator_set.get_validator_by_name(1)
 
     justification = validator_1.justification()
 
     assert len(justification) == 2
-    assert not isinstance(justification[validator_0], Block)
-    assert not isinstance(justification[validator_1], Block)
-    assert justification[validator_0] == test_lang.messages['A'].hash
-    assert justification[validator_1] == test_lang.messages['B'].hash
+    assert justification[validator_0] == protocol_instantiated.messages['A'].hash
+    assert justification[validator_1] == protocol_instantiated.messages['B'].hash
 
 
-def test_justification_includes_justified_messages():
-    test_lang = BlockchainTestLang(TEST_WEIGHT)
-    test_lang.parse('M0-A M0-B S1-B M1-C')
+def test_justification_includes_justified_messages(protocol_instantiated):
+    protocol_instantiated.parse('M0-A M0-B S1-B M1-C')
 
     validator_0 = test_lang.validator_set.get_validator_by_name(0)
     validator_1 = test_lang.validator_set.get_validator_by_name(1)

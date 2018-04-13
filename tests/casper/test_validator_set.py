@@ -14,11 +14,11 @@ from casper.validator_set import ValidatorSet
         ({i: r.random() for i in range(10)}),
     ]
 )
-def test_new_validator_set(weights):
-    val_set = ValidatorSet(weights)
+def test_new_validator_set(weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     assert len(val_set.validators) == len(weights.keys())
-    assert set(map(lambda v: v.weight, val_set.validators)) == set(weights.values())
+    assert set([v.weight for v in validators]) == set(weights.values())
 
 
 @pytest.mark.parametrize(
@@ -28,8 +28,8 @@ def test_new_validator_set(weights):
         ({"name": 5, "cool": 1}),
     ]
 )
-def test_in(weights):
-    val_set = ValidatorSet(weights)
+def test_in(weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     for validator in val_set.validators:
         assert validator in val_set
@@ -42,8 +42,8 @@ def test_in(weights):
         ({"name": 5, "cool": 1}),
     ]
 )
-def test_len(weights):
-    val_set = ValidatorSet(weights)
+def test_len(weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     assert len(val_set) == len(weights)
 
@@ -59,8 +59,8 @@ def test_len(weights):
         ),
     ]
 )
-def test_validator_names(weights, expected_names):
-    val_set = ValidatorSet(weights)
+def test_validator_names(weights, expected_names, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     assert val_set.validator_names() == set(expected_names)
 
@@ -76,8 +76,8 @@ def test_validator_names(weights, expected_names):
         ),
     ]
 )
-def test_validator_weights(weights, expected_weights):
-    val_set = ValidatorSet(weights)
+def test_validator_weights(weights, expected_weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     assert val_set.validator_weights() == set(expected_weights)
 
@@ -92,8 +92,8 @@ def test_validator_weights(weights, expected_weights):
         ({i: i * 2 for i in range(10)}, 12, [0, 1, 2, 3]),
     ]
 )
-def test_weight(weights, expected_weight, validator_names):
-    val_set = ValidatorSet(weights)
+def test_weight(weights, expected_weight, validator_names, view, message):
+    val_set = ValidatorSet(weights, view, message)
     if expected_weight is None:
         expected_weight = sum(weights.values())
 
@@ -115,8 +115,8 @@ def test_weight(weights, expected_weight, validator_names):
         ({i: i*2 for i in range(10)}),
     ]
 )
-def test_get_validator_by_name(weights):
-    val_set = ValidatorSet(weights)
+def test_get_validator_by_name(weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     for validator in val_set:
         returned_val = val_set.get_validator_by_name(validator.name)
@@ -133,8 +133,8 @@ def test_get_validator_by_name(weights):
         ({i: i*2 for i in range(10)}),
     ]
 )
-def test_get_validators_by_names(weights):
-    val_set = ValidatorSet(weights)
+def test_get_validators_by_names(weights, view, message):
+    val_set = ValidatorSet(weights, view, message)
 
     for i in range(1, len(weights)):
         val_subsets = itertools.combinations(val_set, i)

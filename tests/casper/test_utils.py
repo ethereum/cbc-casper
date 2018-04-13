@@ -1,6 +1,4 @@
 """The testing utils module ... """
-
-import random as r
 import pytest
 
 from casper.validator_set import ValidatorSet
@@ -8,24 +6,16 @@ import casper.utils as utils
 
 
 @pytest.mark.parametrize(
-    'weights, expected_weight, validator_names',
+    'weights, subset, expected_weight',
     [
-        ({i: i for i in range(10)}, 45, None),
-        ({i: 9 - i for i in range(9, -1, -1)}, 45, None),
-        ({i: r.random() for i in range(10)}, None, None),
-        ({i: i * 2 for i in range(10)}, 12, set([0, 1, 2, 3])),
-        ({i: i * 2 for i in range(10)}, 12, [0, 1, 2, 3]),
+        ({i: i for i in range(10)}, [i for i in range(10)], 45),
+        ({i: 9 - i for i in range(9, -1, -1)}, [i for i in range(10)], 45),
+        ({i: i * 2 for i in range(10)}, [0, 1, 2, 3], 12),
     ]
 )
-def test_get_weight(weights, expected_weight, validator_names):
-    validator_set = ValidatorSet(weights)
-    if expected_weight is None:
-        expected_weight = sum(weights.values())
-    if validator_names is None:
-        validators = validator_set.validators
-    else:
-        validators = validator_set.get_validators_by_names(validator_names)
-
+def test_get_weight(weights, subset, expected_weight, view, message):
+    validator_set = ValidatorSet(weights, view, message)
+    validators = validator_set.get_validators_by_names(subset)
     assert round(utils.get_weight(validators), 2) == round(expected_weight, 2)
 
 

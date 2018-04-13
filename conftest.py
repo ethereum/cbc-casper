@@ -1,32 +1,33 @@
 import random as r
 import pytest
 
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from casper.protocols.integer.integer_protocol import IntegerProtocol
-from casper.protocols.binary.binary_protocol import BinaryProtocol
-from casper.protocols.order.order_protocol import OrderProtocol
-
-from casper.networks import (
-    ConstantDelayNetwork,
-    NoDelayNetwork
+from simulations.json_generator import SELECT_JSON_GENERATOR
+from simulations.utils import (
+    SELECT_PROTOCOL,
+    generate_random_gaussian_weights
 )
 
-from simulations.utils import generate_random_gaussian_validator_set
+PROTOCOL_NAMES = ['binary', 'integer', 'order', 'blockchain', 'concurrent', 'sharding']
 
 
-PROTOCOLS = [BlockchainProtocol, BinaryProtocol, IntegerProtocol, OrderProtocol]
-GENESIS_PROTOCOLS = [BlockchainProtocol]
-RAND_START_PROTOCOLS = [BinaryProtocol, IntegerProtocol, OrderProtocol]
-
-
-def pytest_addoption(parser):
-    parser.addoption("--report", action="store_true", default=False,
-                     help="plot TestLangCBC tests")
-
-
-@pytest.fixture(params=PROTOCOLS)
-def protocol(request):
+@pytest.fixture(params=PROTOCOL_NAMES)
+def protocol_name(request):
     return request.param
+
+
+@pytest.fixture
+def protocol_class(protocol_name):
+    return SELECT_PROTOCOL[protocol_name]
+
+
+@pytest.fixture
+def protocol_json_gen(protocol_name):
+    return SELECT_JSON_GENERATOR[protocol_name]
+
+
+@pytest.fixture
+def protocol_instantiated(protocol_class, protocol_json_gen):
+    return protocol_class(protocol_json_gen())
 
 
 @pytest.fixture(params=GENESIS_PROTOCOLS)
