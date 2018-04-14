@@ -1,5 +1,10 @@
 import json
-import random as r
+from copy import deepcopy
+from random import (
+    randint,
+    sample
+)
+
 
 from casper.utils import get_random_str
 from casper.protocol import Protocol
@@ -32,6 +37,8 @@ class ConcurrentProtocol(Protocol):
         self.create_rules = dict()
         self.select_rules['random'] = self.select_random_outputs_to_consume
         self.create_rules['random'] = self.create_random_new_outputs
+        self.select_rules['all'] = self.select_all_outputs
+        self.create_rules['all'] = self.create_all_incremented_outputs
 
         self.set_initial_messages(
             parsed_json['config']['genesis_estimate'],
@@ -81,8 +88,14 @@ class ConcurrentProtocol(Protocol):
         self.global_view.set_rewrite_rules(select_func, create_func)
 
     def select_random_outputs_to_consume(self, available_outputs, output_sources):
-        num_outputs = r.randint(1, len(available_outputs))
-        return set(r.sample(available_outputs, num_outputs))
+        num_outputs = randint(1, len(available_outputs))
+        return set(sample(available_outputs, num_outputs))
 
     def create_random_new_outputs(self, old_outputs, num_new_outputs):
-        return set([r.randint(0, 1000000000) for _ in range(num_new_outputs)])
+        return set([randint(0, 1000000000) for _ in range(num_new_outputs)])
+
+    def select_all_outputs(self, available_outputs, output_sources):
+        return deepcopy(available_outputs)
+
+    def create_all_incremented_outputs(self, old_outputs, num_new_outputs):
+        return [i + 1 for i in old_outputs]

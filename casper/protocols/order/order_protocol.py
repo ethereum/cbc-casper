@@ -42,6 +42,7 @@ class OrderProtocol(Protocol):
 
         all_items = set()
         for estimate in config['initial_estimates']:
+            assert isinstance(estimate, list)
             assert len(estimate) == len(set(estimate))
             all_items.update(estimate)
 

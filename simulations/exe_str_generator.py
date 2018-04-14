@@ -37,7 +37,8 @@ def generate_execution(num_validators, num_rounds, network_delay_func, get_creat
                     make_com(send_command, receiver, msg_name)
                 )
 
-        for command in commands_on_round[curr_round]:
+        # sort so all make commands during a round happen first
+        for command in sorted(commands_on_round[curr_round]):
             execution_string += command + ' '
 
     return execution_string
