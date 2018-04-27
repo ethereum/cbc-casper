@@ -1,33 +1,48 @@
 import random
 import pytest
 
-from state_languages.integer_test_lang import IntegerTestLang
 from casper.protocols.integer.integer_protocol import IntegerProtocol
+from casper.validator_set import ValidatorSet
+
+from simulations.json_generator import generate_integer_json
+
+@pytest.fixture
+def integer_class():
+    return IntegerProtocol
 
 
 @pytest.fixture
-def integer_lang(report, test_weight):
-    return IntegerTestLang(test_weight, report)
+def integer_instantiated(integer_class, test_weight):
+    return integer_class(
+        generate_integer_json(exe_str='', weights=test_weight),
+        False,
+        False,
+        1
+    )
 
 
 @pytest.fixture
-def integer_lang_runner(report):
-    def runner(weights, test_string):
-        IntegerTestLang(weights, report).parse(test_string)
-    return runner
-
-
-@pytest.fixture
-def integer_lang_creator(report):
+def integer_creator(integer_class):
     def creator(weights):
-        return IntegerTestLang(weights, report)
+        return integer_class(
+            generate_integer_json(exe_str='', weights=weights),
+            False,
+            False,
+            1
+        )
     return creator
 
 
 @pytest.fixture
-def integer_validator_set(generate_validator_set):
-    return generate_validator_set(IntegerProtocol)
+def integer_validator_set(test_weight, integer_class):
+    return ValidatorSet(test_weight, integer_class.View, integer_class.Message)
 
+
+@pytest.fixture
+def create_integer_validator_set(integer_class):
+    def create(weight):
+        return ValidatorSet(weight, integer_class.View, integer_class.Message)
+    return create
 
 @pytest.fixture
 def integer_validator(integer_validator_set):
@@ -35,12 +50,7 @@ def integer_validator(integer_validator_set):
 
 
 @pytest.fixture
-def bet(empty_just, integer_validator):
-    return IntegerProtocol.Message(0, empty_just, integer_validator, 0, 0)
-
-
-@pytest.fixture
-def create_bet(empty_just, integer_validator):
+def create_bet(integer_validator):
     def c_bet(estimate):
-        return IntegerProtocol.Message(estimate, empty_just, integer_validator, 0, 0)
+        return IntegerProtocol.Message(estimate, {}, integer_validator, 0, 0)
     return c_bet

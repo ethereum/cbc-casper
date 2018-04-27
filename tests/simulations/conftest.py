@@ -1,22 +1,15 @@
 import pytest
 
-from simulations.message_modes import RandomMessageMode
+from simulations.network_delay import (
+    no_delay,
+    step_delay,
+    constant_delay,
+    random_delay,
+    gaussian_delay
+)
 
-from casper.protocols.blockchain.blockchain_protocol import BlockchainProtocol
-from simulations.simulation_runner import SimulationRunner
-import simulations.utils as utils
+DELAY_FUNCTIONS = [no_delay, step_delay, constant_delay, random_delay, gaussian_delay]
 
-
-@pytest.fixture
-def simulation_runner(protocol, validator_set, network):
-    message_mode = RandomMessageMode()
-    return SimulationRunner(
-        validator_set,
-        message_mode,
-        protocol,
-        network,
-        20,
-        20,
-        False,
-        False
-    )
+@pytest.fixture(params=DELAY_FUNCTIONS)
+def delay_function(request):
+    return request.param

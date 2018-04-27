@@ -10,12 +10,12 @@ import casper.protocols.order.order_estimator as estimator
     'weights, latest_estimates, estimate',
     [
         (
-            {0: 5},
+            [5],
             {0: [1, 5, 6]},
             [1, 5, 6]
         ),
         (
-            {0: 5, 1: 6, 2: 7},
+            [5, 6, 7],
             {
                 0: [1, 2],
                 1: [1, 2],
@@ -24,7 +24,7 @@ import casper.protocols.order.order_estimator as estimator
             [1, 2]
         ),
         (
-            {0: 5, 1: 6, 2: 7},
+            [5, 6, 7],
             {
                 0: [1, 2, 3],
                 1: [2, 3, 1],
@@ -33,7 +33,7 @@ import casper.protocols.order.order_estimator as estimator
             [2, 1, 3]
         ),
         (
-            {0: 5, 1: 10, 2: 14},
+            [5, 10, 14],
             {
                 0: ["fish", "pig", "horse", "dog"],
                 1: ["dog", "horse", "pig", "fish"],
@@ -42,7 +42,7 @@ import casper.protocols.order.order_estimator as estimator
             ["pig", "horse", "dog", "fish"]
         ),
         (
-            {0: 5, 1: 6, 2: 7, 3: 8},
+            [5, 6, 7, 8],
             {
                 0: ["fish", "pig", "horse"],
                 1: ["horse", "pig", "fish"],
@@ -54,14 +54,13 @@ import casper.protocols.order.order_estimator as estimator
 
     ]
 )
-def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, empty_just):
-    validator_set = ValidatorSet(weights)
-
+def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, create_order_validator_set):
+    validator_set = create_order_validator_set(weights)
     latest_messages = dict()
     for val_name in latest_estimates:
         validator = validator_set.get_validator_by_name(val_name)
         latest_messages[validator] = Bet(
-            latest_estimates[val_name], empty_just, validator, 1, 1
+            latest_estimates[val_name], {}, validator, 1, 1
         )
 
     assert estimate == estimator.get_estimate_from_latest_messages(latest_messages)

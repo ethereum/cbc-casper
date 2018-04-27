@@ -1,32 +1,48 @@
 import random
 import pytest
 
-from state_languages.binary_test_lang import BinaryTestLang
+from casper.validator_set import ValidatorSet
 from casper.protocols.binary.binary_protocol import BinaryProtocol
+from simulations.json_generator import generate_binary_json
 
 
 @pytest.fixture
-def binary_lang(report, test_weight):
-    return BinaryTestLang(test_weight, report)
+def binary_class():
+    return BinaryProtocol
 
 
 @pytest.fixture
-def binary_lang_runner(report):
-    def runner(weights, test_string):
-        BinaryTestLang(weights, report).parse(test_string)
-    return runner
+def binary_instantiated(binary_class, test_weight):
+    return binary_class(
+        generate_binary_json(exe_str='', weights=test_weight),
+        False,
+        False,
+        1
+    )
 
 
 @pytest.fixture
-def binary_lang_creator(report):
+def binary_creator(binary_class):
     def creator(weights):
-        return BinaryTestLang(weights, report)
+        return binary_class(
+            generate_binary_json(exe_str='', weights=weights),
+            False,
+            False,
+            1
+        )
     return creator
 
 
 @pytest.fixture
-def binary_validator_set(generate_validator_set):
-    return generate_validator_set(BinaryProtocol)
+def binary_validator_set(test_weight, binary_class):
+    return ValidatorSet(test_weight, binary_class.View, binary_class.Message)
+
+
+@pytest.fixture
+def create_binary_validator_set(binary_class):
+    def create(weights):
+        return ValidatorSet(weights, binary_class.View, binary_class.Message)
+    return create
 
 
 @pytest.fixture
@@ -35,12 +51,7 @@ def binary_validator(binary_validator_set):
 
 
 @pytest.fixture
-def bet(empty_just, binary_validator):
-    return BinaryProtocol.Message(0, empty_just, binary_validator, 0, 0)
-
-
-@pytest.fixture
-def create_bet(empty_just, binary_validator):
+def create_bet(binary_validator):
     def c_bet(estimate):
-        return BinaryProtocol.Message(estimate, empty_just, binary_validator, 0, 0)
+        return BinaryProtocol.Message(estimate, {}, binary_validator, 0, 0)
     return c_bet
