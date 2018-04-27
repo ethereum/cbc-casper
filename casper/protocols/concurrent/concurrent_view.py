@@ -26,7 +26,6 @@ class ConcurrentView(AbstractView):
             self.children,
             self.latest_messages
         )
-        print(available_outputs)
 
         old_outputs = self.select_outputs(available_outputs, output_sources)
         new_outputs = self.create_outputs(old_outputs, len(old_outputs))

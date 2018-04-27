@@ -7,8 +7,7 @@ and a sharded blockchain.
 
 For more information,
 join the gitter: https://gitter.im/cbc-casper/Lobby
-read the wiki:
-
+read the wiki: https://github.com/ethereum/cbc-casper/wiki
 '''
 import argparse
 from configparser import ConfigParser
@@ -82,7 +81,7 @@ def main():
 
     # not all parameters are needed to generate the json for execution
     execution_string = generate_json(**{k: v for k, v in vars(args).items() if k not in NOT_NEEDED})
-    print(type(execution_string))
+    print(execution_string)
 
     protocol = SELECT_PROTOCOL[args.protocol](
         execution_string,

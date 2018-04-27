@@ -71,11 +71,10 @@ class IntegerPlotTool(PlotTool):
             self.message_labels[message] = message.estimate
 
     def _update_message_fault_tolerance(self):
-        if self.view:
-            for message in self.view.justified_messages.values():
-                if message not in self.bet_fault_tolerance:
-                    oracle = CliqueOracle(message, self.view, self.validator_set)
-                    fault_tolerance, num_node_ft = oracle.check_estimate_safety()
+        for message in self.view.justified_messages.values():
+            if message not in self.bet_fault_tolerance:
+                oracle = CliqueOracle(message, self.view, self.validator_set)
+                fault_tolerance, num_node_ft = oracle.check_estimate_safety()
 
-                    if fault_tolerance > 0:
-                        self.bet_fault_tolerance[message] = num_node_ft
+                if fault_tolerance > 0:
+                    self.bet_fault_tolerance[message] = num_node_ft

@@ -79,11 +79,7 @@ class Protocol(object):
         """Returns the set of messages needed to justify a message to a validator"""
         messages_needed = set([message])
 
-        current_message_hashes = set()
-        for message_hash in message.justification.values():
-            if message_hash not in validator.view.justified_messages:
-                current_message_hashes.add(message_hash)
-
+        current_message_hashes = set([message.hash])
         while any(current_message_hashes):
             next_hashes = set()
 

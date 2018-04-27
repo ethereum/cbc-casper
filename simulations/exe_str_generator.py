@@ -1,4 +1,5 @@
-"""The simulution utils module ... """
+"""The execution string generator contains functions for generating executions
+of CBC Casper protocols in terms of making and sending messages"""
 from random import (
     randint
 )
