@@ -21,8 +21,5 @@ from casper.protocols.concurrent.concurrent_protocol import ConcurrentProtocol
         (True, False),
     ]
 )
-def test_accepts_valid_estimates(estimate, is_valid, block):
+def test_accepts_valid_estimates(estimate, is_valid):
     assert Block.is_valid_estimate(estimate) == is_valid
-
-
-# TODO: Test once there is a complete concurrent testing language

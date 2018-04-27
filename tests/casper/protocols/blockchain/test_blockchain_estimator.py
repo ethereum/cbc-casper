@@ -1,80 +1,80 @@
-"""The forkchoice testing module ... """
+'''The forkchoice testing module ... '''
 import pytest
 import random as r
 
 import casper.protocols.blockchain.forkchoice as forkchoice
 
-
-def test_single_validator_correct_forkchoice(blockchain_lang_runner):
-    """ This tests that a single validator remains on their own chain """
-    test_string = ""
-    for i in range(100):
-        test_string += "M0-" + str(i) + " " + "CE0-" + str(i) + " "
-    test_string = test_string[:-1]
-
-    blockchain_lang_runner({0: 10}, test_string)
+from simulations.exe_str_generator import generate_rrob_execution
 
 
-def test_two_validators_round_robin_forkchoice(blockchain_lang_runner):
-    test_string = "M0-A SJ1-A M1-B SJ0-B M0-C SJ1-C M1-D SJ0-D CE0-D P"
-    blockchain_lang_runner({0: 10, 1: 11}, test_string)
+def test_single_validator_correct_forkchoice(blockchain_instantiated):
+    execution_string = 'M-0-A M-0-B M-0-C M-0-D M-0-E M-0-F M-0-G M-0-H'
+    blockchain_instantiated.execute(execution_string)
+
+    estimate = blockchain_instantiated.global_validator_set.get_validator_by_name(0).estimate()
+    assert estimate == blockchain_instantiated.messages['H']
 
 
-def test_many_val_round_robin_forkchoice(blockchain_lang_runner):
-    """
-    Tests that during a perfect round robin,
-    validators choose the one chain as their fork choice
-    """
-    test_string = ""
-    for i in range(25):
-        test_string += "M" + str(i % 10) + "-" + str(i) + " " \
-                     + "SJ" + str((i + 1) % 10) + "-" + str(i) + " " \
-                     + "CE" + str((i + 1) % 10) + "-" + str(i) + " "
-    test_string = test_string[:-1]
+def test_two_validators_round_robin_forkchoice(blockchain_instantiated):
+    execution_string = 'M-0-A SJ-1-A M-1-B SJ-0-B M-0-C SJ-1-C M-1-D SJ-0-D'
+    blockchain_instantiated.execute(execution_string)
 
-    blockchain_lang_runner(
-        {i: 10 - i + r.random() for i in range(10)},
-        test_string
-    )
+    estimate_0 = blockchain_instantiated.global_validator_set.get_validator_by_name(0).estimate()
+    estimate_1 = blockchain_instantiated.global_validator_set.get_validator_by_name(0).estimate()
+    assert estimate_0 == blockchain_instantiated.messages['D']
+    assert estimate_1 == blockchain_instantiated.messages['D']
 
 
-def test_fail_on_tie(blockchain_lang_runner):
-    """
-    Tests that if there are two subsets of the validator
-    set with the same weight, the forkchoice fails
-    """
-    test_string = "M1-A SJ0-A M0-B SJ1-B SJ2-A M2-C SJ1-C CE1-C"
+def test_many_val_round_robin_forkchoice(blockchain_instantiated, no_delay):
+    execution_string, _ = generate_rrob_execution(5, 10, no_delay)
+    print(execution_string)
+    blockchain_instantiated.execute(execution_string)
+    blockchain_instantiated.execute('M-0-A SJ-1-A SJ-2-A SJ-3-A SJ-4-A')
+
+    for validator in blockchain_instantiated.global_validator_set:
+        assert validator.estimate() == blockchain_instantiated.messages['A']
+
+
+def test_fail_on_tie(blockchain_creator):
+    protocol = blockchain_creator([5, 6, 5])
     with pytest.raises(AssertionError):
-        blockchain_lang_runner({0: 5, 1: 6, 2: 5}, test_string)
+        protocol.execute('M-1-A SJ-0-A M-0-B SJ-1-B SJ-2-A M-2-C SJ-1-C')
+        protocol.global_validator_set.get_validator_by_name(1).estimate()
 
 
-def test_ignore_zero_weight_validator(blockchain_lang_runner):
-    """
-    Tests that a validator with zero weight
-    will not affect the forkchoice
-    """
-    test_string = "M0-A SJ1-A M1-B SJ0-B CE1-A CE0-A"
-    blockchain_lang_runner({0: 1, 1: 0}, test_string)
+def test_ignore_zero_weight_validator(blockchain_creator):
+    protocol = blockchain_creator([5, 0])
+    protocol.execute('M-0-A SJ-1-A M-1-B SJ-0-B')
+
+    for validator in protocol.global_validator_set.get_validators_by_names([0, 1]):
+        assert validator.estimate() == protocol.messages['A']
 
 
-def test_ignore_zero_weight_block(blockchain_lang_runner):
-    """ Tests that the forkchoice ignores zero weight blocks """
+def test_ignore_zero_weight_block(blockchain_creator):
     # for more info about test, see
     # https://gist.github.com/naterush/8d8f6ec3509f50939d7911d608f912f4
-    test_string = (
-        "M0-A1 M0-A2 CE0-A2 M1-B1 M1-B2 SJ3-B2 M3-D1 CE3-D1 "
-        "SJ3-A2 CE3-A2 M3-D2 SJ2-B1 CE2-B1 M2-C1 CE2-C1 SJ1-D1 "
-        "SJ1-D2 SJ1-C1 CE1-B2"
+    execution_string = (
+        'M-0-A1 M-0-A2 M-1-B1 M-1-B2 SJ-3-B2 M-3-D1 '
+        'SJ-3-A2 M-3-D2 SJ-2-B1 M-2-C1 SJ-1-D1 '
+        'SJ-1-D2 SJ-1-C1'
     )
-    blockchain_lang_runner({0: 10, 1: 9, 2: 8, 3: 0.5}, test_string)
+    protocol = blockchain_creator([10, 9, 8, .5])
+    protocol.execute(execution_string)
+
+    validator = protocol.global_validator_set.get_validator_by_name(1)
+    assert validator.estimate() == protocol.messages['B2']
 
 
-def test_reverse_message_arrival_order_forkchoice(blockchain_lang_runner):
-    test_string = (
-        "M0-A SJ1-A M1-B SJ0-B M0-C SJ1-C M1-D SJ0-D M1-E SJ0-E "
-        "SJ2-E CE2-E SJ3-A SJ3-B SJ3-C SJ3-D SJ3-E CE3-E"
+def test_reverse_message_arrival_order_forkchoice(blockchain_creator):
+    execution_string = (
+        'M-0-A SJ-1-A M-1-B SJ-0-B M-0-C SJ-1-C M-1-D SJ-0-D M-1-E SJ-0-E '
+        'SJ-2-E SJ-3-A SJ-3-B SJ-3-C SJ-3-D SJ-3-E'
     )
-    blockchain_lang_runner({0: 5, 1: 6, 2: 7, 3: 8.1}, test_string)
+    protocol = blockchain_creator([5, 6, 7, 8.1])
+    protocol.execute(execution_string)
+
+    validator = protocol.global_validator_set.get_validator_by_name(3)
+    assert validator.estimate() == protocol.messages['E']
 
 
 @pytest.mark.parametrize(

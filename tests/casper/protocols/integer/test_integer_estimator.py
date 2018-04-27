@@ -11,45 +11,44 @@ import casper.protocols.integer.integer_estimator as estimator
     'weights, latest_estimates, estimate',
     [
         (
-            {0: 5},
+            [5],
             {0: 5},
             5
         ),
         (
-            {0: 5, 1: 6, 2: 7},
+            [5, 6, 7],
             {0: 5, 1: 5, 2: 5},
             5
         ),
         (
-            {0: 5, 1: 10, 2: 14},
+            [5, 10, 14],
             {0: 0, 1: 5, 2: 10},
             5
         ),
         (
-            {0: 5, 1: 11},
+            [5, 11],
             {0: 0, 1: 6},
             6
         ),
         (
-            {0: 5, 1: 10, 2: 14},
+            [5, 10, 14],
             {0: 0, 1: 0, 2: 1},
             0
         ),
         (
-            {0: 5, 1: 5},
+            [5, 5],
             {0: 0, 1: 1},
             0
         ),
     ]
 )
-def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, empty_just):
-    validator_set = ValidatorSet(weights, IntegerProtocol)
-
+def test_estimator_picks_correct_estimate(weights, latest_estimates, estimate, create_integer_validator_set):
+    validator_set = create_integer_validator_set(weights)
     latest_messages = dict()
     for val_name in latest_estimates:
         validator = validator_set.get_validator_by_name(val_name)
         latest_messages[validator] = Bet(
-            latest_estimates[val_name], empty_just, validator, 1, 1
+            latest_estimates[val_name], {}, validator, 1, 1
         )
 
     assert estimate == estimator.get_estimate_from_latest_messages(latest_messages)

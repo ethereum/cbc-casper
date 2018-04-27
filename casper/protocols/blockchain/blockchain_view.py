@@ -11,8 +11,6 @@ class BlockchainView(AbstractView):
         self.last_finalized_block = genesis_block
         self.genesis_block = genesis_block
 
-        self._initialize_message_caches(messages)
-
         super().__init__(messages)
 
     def estimate(self):
@@ -46,18 +44,3 @@ class BlockchainView(AbstractView):
         if message.estimate not in self.children:
             self.children[message.estimate] = set()
         self.children[message.estimate].add(message)
-
-        self._update_when_added_cache(message)
-
-    def _initialize_message_caches(self, messages):
-        self.when_added = {message: 0 for message in messages}
-        self.when_finalized = {self.genesis_block: 0}
-
-    def _update_when_added_cache(self, message):
-        if message not in self.when_added:
-            self.when_added[message] = len(self.justified_messages)
-
-    def _update_when_finalized_cache(self, tip):
-        while tip and tip not in self.when_finalized:
-            self.when_finalized[tip] = len(self.justified_messages)
-            tip = tip.estimate
