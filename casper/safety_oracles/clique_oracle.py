@@ -1,12 +1,11 @@
-"""The clique oracle module ... """
+"""The clique oracle module implements an easy-to-understand oracle w/out an adversary attack"""
 import itertools
 import networkx as nx
-from casper.safety_oracles.abstract_oracle import AbstractOracle
 
 import casper.utils as utils
 
 
-class CliqueOracle(AbstractOracle):
+class CliqueOracle(object):
     """A clique safety oracle detecting safety from validators committed to an estimate."""
 
     def __init__(self, candidate_estimate, view, validator_set):

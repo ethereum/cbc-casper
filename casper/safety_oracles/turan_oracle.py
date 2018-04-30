@@ -1,4 +1,4 @@
-"""The Turan Oracle module ...
+"""The Turan Oracle module implements a very-low bound on safety detection
 For details see https://gist.github.com/naterush/d867fe35ecb63c42e6c1f053e2ff33a8
 """
 

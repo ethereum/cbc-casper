@@ -1,11 +1,10 @@
-"""The adversary oracle module ... """
+"""The adversary oracle module attacks a given estimate to check if safe"""
 from casper.safety_oracles.adversary_models.model_bet import ModelBet
 from casper.safety_oracles.adversary_models.adversary import Adversary
-from casper.safety_oracles.abstract_oracle import AbstractOracle
 import casper.utils as utils
 
 
-class AdversaryOracle(AbstractOracle):
+class AdversaryOracle(object):
     """Runs an lower bound adversary to check safety on some estimate."""
 
     # We say candidate_estimate is 0, other is 1
