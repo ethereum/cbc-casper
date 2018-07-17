@@ -199,6 +199,8 @@ class PlotTool(object):
 
     def make_gif(self, frame_count_limit=IMAGE_LIMIT, gif_name="mygif.gif", frame_duration=0.4):
         """Make a GIF visualization of view graph."""
+        if not self.save:
+            return
 
         self.make_thumbnails(frame_count_limit=frame_count_limit)
 

@@ -115,6 +115,8 @@ class Protocol(object):
         self.executed += self.unexecuted
         self.unexecuted = ''
 
+        self.plot_tool.make_gif()
+
     @staticmethod
     def parse_token(token):
         """Break a token into a command, validator, name, and data"""
