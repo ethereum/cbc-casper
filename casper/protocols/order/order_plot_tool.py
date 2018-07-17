@@ -11,6 +11,8 @@ class OrderPlotTool(PlotTool):
         self.display = display
         self.view = view
         self.round = 0
+        self.save = save
+        self.display = display
 
     def update(self, new_messages=None):
         return
